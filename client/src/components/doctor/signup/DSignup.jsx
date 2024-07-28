@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Form, Button, Row, Col } from 'react-bootstrap';
-import { motion } from 'framer-motion';
-import { ToastContainer, toast, Slide } from 'react-toastify';
+import React, { useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import './DSingup.css';
 
-const DoctorSignup = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+const Signup = () => {
   const [formData, setFormData] = useState({
     name: '',
     age: '',
@@ -14,17 +12,10 @@ const DoctorSignup = () => {
     mobile: '',
     email: '',
     password: '',
-    specialization: '',
+    confirmPassword: '',
   });
+
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-  }, [isDarkMode]);
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,10 +24,19 @@ const DoctorSignup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error('Passwords do not match!', {
+        position: 'top-center',
+        className: 'custom-toast',
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/doctor/signup', {
+      const response = await fetch('http://localhost:5000/api/patient/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,8 +49,7 @@ const DoctorSignup = () => {
       if (response.ok) {
         toast.success('🎉 Signup successful!', {
           position: 'top-center',
-          className: 'hospital-toast',
-          transition: Slide,
+          className: 'custom-toast',
         });
 
         setFormData({
@@ -60,20 +59,18 @@ const DoctorSignup = () => {
           mobile: '',
           email: '',
           password: '',
-          specialization: '',
+          confirmPassword: '',
         });
       } else {
-        toast.error(data.error || '⚠ Signup failed. Please try again.', {
+        toast.error(data.error || '⚠️ Signup failed. Please try again.', {
           position: 'top-center',
-          className: 'hospital-toast',
-          transition: Slide,
+          className: 'custom-toast',
         });
       }
     } catch (error) {
       toast.error(`Error: ${error.message}`, {
         position: 'top-center',
-        className: 'hospital-toast',
-        transition: Slide,
+        className: 'custom-toast',
       });
     } finally {
       setLoading(false);
@@ -81,138 +78,106 @@ const DoctorSignup = () => {
   };
 
   return (
-    <Container fluid className={`signup-container ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
-      <Row className="justify-content-center align-items-center min-vh-100">
-        <Col xs={12} sm={10} md={8} lg={6} xl={4}>
-          <Button onClick={toggleTheme} className="toggle-button">
-            {isDarkMode ? '☀' : '🌙'}
-          </Button>
-          <motion.div
-            className="signup-card"
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
+    <div className="signup-page">
+      <div className="navbar">
+        <h3>mediConnect</h3>
+        <div className="navbar-content ">
+          <button>Login</button>
+        </div>
+      </div>
+      <div className="signup-container">
+        <form className="signup-form" onSubmit={handleSubmit}>
+          <h3 style={{ margintop: '8px' }}>Doctor Signup</h3>
+
+          <label htmlFor="name">Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+
+          <label htmlFor="spec">Specialization</label>
+          <input
+            type="text"
+            id="spec"
+            name="spec"
+            value={formData.spec}
+            onChange={handleChange}
+            required
+          />
+
+          {/* <label htmlFor="gender">Gender</label>
+          <select
+            id="gender"
+            name="gender"
+            value={formData.gender}
+            onChange={handleChange}
+            required
           >
-            <div className="signup-header text-Dark">Doctor Signup</div>
+            <option value="">Select your gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select> */}
 
-            <div className="signup-body">
-              <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="formName">
-                  <Form.Label className="form-label">Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter your name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="form-control confit"
-                  />
-                </Form.Group>
+          <label htmlFor="mobile">Mobile</label>
+          <input
+            type="tel"
+            id="mobile"
+            name="mobile"
+            value={formData.mobile}
+            onChange={handleChange}
+            required
+          />
 
-                <Form.Group controlId="formAge">
-                  <Form.Label className="form-label">Age</Form.Label>
-                  <Form.Control
-                    type="number"
-                    placeholder="Enter your age"
-                    name="age"
-                    value={formData.age}
-                    onChange={handleChange}
-                    required
-                    className="form-control confit"
-                  />
-                </Form.Group>
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
 
-                <Form.Group controlId="formGender">
-                  <Form.Label className="form-label">Gender</Form.Label>
-                  <Form.Control
-                    as="select"
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleChange}
-                    required
-                    className="form-control confit"
-                  >
-                    <option value="">Select your gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                  </Form.Control>
-                </Form.Group>
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
 
-                <Form.Group controlId="formMobile">
-                  <Form.Label className="form-label">Mobile</Form.Label>
-                  <Form.Control
-                    type="tel"
-                    placeholder="Enter your mobile number"
-                    name="mobile"
-                    value={formData.mobile}
-                    onChange={handleChange}
-                    required
-                    className="form-control confit"
-                  />
-                </Form.Group>
+          <label htmlFor="confirmPassword">Re-enter Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+          />
 
-                <Form.Group controlId="formEmail">
-                  <Form.Label className="form-label ">Email</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="Enter your email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="form-control confit"
-                  />
-                </Form.Group>
+          <button type="submit" disabled={loading}>
+            {loading ? 'Signing up...' : 'Signup'}
+          </button>
 
-                <Form.Group controlId="formPassword">
-                  <Form.Label className="form-label">Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Enter your password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    className="form-control confit"
-                  />
-                </Form.Group>
-
-                <Form.Group controlId="formSpecialization">
-                  <Form.Label className="form-label">Specialization</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter your specialization"
-                    name="specialization"
-                    value={formData.specialization}
-                    onChange={handleChange}
-                    required
-                    className="form-control confit"
-                  />
-                </Form.Group>
-
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button type="submit" className="button-custom mt-3" disabled={loading}>
-                    {loading ? (
-                      <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    ) : (
-                      'Signup'
-                    )}
-                  </Button>
-                </motion.div>
-
-                <div className="notification mt-3">
-                  Please ensure all information is correct before submitting.
-                </div>
-              </Form>
-            </div>
-          </motion.div>
-        </Col>
-      </Row>
-      <ToastContainer />
-    </Container>
+          {/* <div className="redirect-login">
+            Already have an account?{' '}
+            <Link to="/login" className="login-link">
+              Login here
+            </Link>
+          </div> */}
+        </form>
+        <ToastContainer />
+      </div>
+    </div>
   );
 };
 
-export default DoctorSignup;
+export default Signup;
