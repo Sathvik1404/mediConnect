@@ -1,15 +1,4 @@
-body {
-    background: var(--background-gradient);
-    color: var(--text-color);
-    font-family: 'Arial', sans-serif;
-    transition: background 0.3s, color 0.3s;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
-}
+/* Signup.css */
 
 .signup-container {
     display: flex;
@@ -21,21 +10,26 @@ body {
 
 .signup-card {
     position: relative;
-    width: 350px;
+    width: 450px;
     background-color: var(--card-background-color);
     border: none;
+    margin-right: 700px;
     border-radius: 10px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     padding: 20px;
-    transition: background-color 0.3s, box-shadow 0.3s;
 }
 
-.signup-header {
-    background: var(--header-gradient);
+.signup-form {
+    background-color: #FFFFFF;
+    /* White */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 20px;
+    width: 100%;
+    max-width: 400px;
     text-align: center;
     font-size: 1.5em;
-    color: var(--input-text-color);
+    color: #ffffff;
     animation: gradientAnimation 5s ease infinite;
 }
 
@@ -45,40 +39,47 @@ body {
 
 .signup-body {
     padding: 20px;
-    height: 600px;
 }
 
 label {
     color: var(--text-color);
     font-weight: bold;
+    text-align: left;
+    color: #333333;
+    /* Dark Gray */
 }
 
-input[type="text"],
-input[type="number"],
-input[type="tel"],
-input[type="email"],
-input[type="password"],
-select {
+.signup-form input,
+.signup-form select {
     width: 100%;
     padding: 10px;
-    margin: 10px 0;
-    border: 1px solid var(--input-border-color);
+    margin-bottom: 8px;
+    border: 1px solid #DDD;
     border-radius: 4px;
     background-color: var(--input-background-color);
     color: var(--input-text-color);
     transition: border-color 0.3s, background-color 0.3s, color 0.3s;
 }
 
-input[type="submit"],
-button {
+input::placeholder,
+select::placeholder {
+    color: var(--placeholder-color);
+    opacity: 1;
+    /* Ensures placeholder color is fully applied */
+}
+
+.signup-form button {
     width: 100%;
-    padding: 10px;
-    background-color: var(--button-background-color);
-    color: var(--button-text-color);
+    padding: 12px;
+    background-color: #FF6F61;
+    /* Coral */
+    color: #FFFFFF;
+    /* White */
     border: none;
     border-radius: 4px;
+    font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
+    transition: background-color 0.3s;
 }
 
 input[type="submit"]:hover,
@@ -90,6 +91,7 @@ button.toggle-button {
     position: absolute;
     top: 20px;
     right: 20px;
+    width: fit-content;
     background: var(--button-background-color);
     color: var(--button-text-color);
     border: none;
@@ -99,24 +101,21 @@ button.toggle-button {
     transition: background-color 0.3s, color 0.3s;
 }
 
-.notification {
-    margin-top: 10px;
-    font-size: 0.9em;
-    color: var(--text-color);
+.redirect-login {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666666;
+    /* Medium Gray */
 }
 
-@keyframes gradientAnimation {
-    0% {
-        background-position: 0% 50%;
-    }
+.login-link {
+    color: #87CEEB;
+    /* Sky Blue */
+    text-decoration: none;
+}
 
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
+.login-link:hover {
+    text-decoration: underline;
 }
 
 /* Light Mode Variables */
@@ -124,7 +123,7 @@ button.toggle-button {
     --background-gradient: linear-gradient(135deg, #87CEEB, #FFFFFF);
     --text-color: #333333;
     --card-background-color: #FFFFFF;
-    --header-gradient: #FFFFFF;
+    --header-gradient: linear-gradient(135deg, #87CEEB, #003366);
     --input-border-color: #CCCCCC;
     --input-background-color: #FFFFFF;
     --input-text-color: #333333;
@@ -136,10 +135,10 @@ button.toggle-button {
 
 /* Dark Mode Variables */
 body[data-theme="dark"] {
-    --header-gradient: #2F2F2F;
+    --background-gradient: linear-gradient(135deg, #1C1C1C, #2F2F2F);
     --text-color: #CCCCCC;
     --card-background-color: #2F2F2F;
-    --background-gradient: linear-gradient(135deg, #2B6CA3, #001F3F);
+    --header-gradient: linear-gradient(135deg, #2B6CA3, #001F3F);
     --input-border-color: #666666;
     --input-background-color: #2F2F2F;
     --input-text-color: #CCCCCC;
