@@ -23,16 +23,29 @@ router.use(session({
 
 router.post('/signup', async (req, res) => {
     const { name, email, password, age, mobile, gender } = req.body;
+
     try {
+        // Check if a user with the same email already exists
+        const existingUser = await patientModel.findOne({ email });
+
+        if (existingUser) {
+            return res.status(400).json({ error: 'User already exists with this email' });
+        }
+
+        // Hash the password
         const hash = await bcrypt.hash(password, 12);
+
+        // Create the new user
         await patientModel.create({ name, email, password: hash, age, gender, mobile })
             .then(user => res.json({ success: true }))
-            .catch(err => res.json(err))
+            .catch(err => res.status(500).json({ error: 'Failed to create user' }));
+
     } catch (err) {
         console.error('Signup error: ', err);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
 
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
