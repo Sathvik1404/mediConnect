@@ -4,34 +4,27 @@ body {
     font-family: 'Arial', sans-serif;
     transition: background 0.3s, color 0.3s;
     margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: 100vh;
     overflow: hidden;
-}
-
-button.toggle-button {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: var(--button-background-color);
-    color: var(--button-text-color);
-    border: none;
-    padding: 10px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background-color 2s, color 2s;
 }
 
 .signup-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 100%;
+    width: 100%;
 }
 
 .signup-card {
-    width: 350px;
+    position: relative;
+    width: 450px;
     background-color: var(--card-background-color);
     border: none;
+    margin-right: 700px;
     border-radius: 10px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     padding: 20px;
@@ -72,6 +65,13 @@ select {
     transition: border-color 0.3s, background-color 0.3s, color 0.3s;
 }
 
+input::placeholder,
+select::placeholder {
+    color: var(--placeholder-color);
+    opacity: 1;
+    /* Ensures placeholder color is fully applied */
+}
+
 input[type="submit"],
 button {
     width: 100%;
@@ -93,6 +93,7 @@ button.toggle-button {
     position: absolute;
     top: 20px;
     right: 20px;
+    width: fit-content;
     background: var(--button-background-color);
     color: var(--button-text-color);
     border: none;
@@ -131,6 +132,7 @@ button.toggle-button {
     --input-border-color: #CCCCCC;
     --input-background-color: #FFFFFF;
     --input-text-color: #333333;
+    --placeholder-color: #888888;
     --button-background-color: #003366;
     --button-text-color: #FFFFFF;
     --button-hover-color: #87CEEB;
@@ -145,19 +147,7 @@ body[data-theme="dark"] {
     --input-border-color: #666666;
     --input-background-color: #2F2F2F;
     --input-text-color: #CCCCCC;
-    --button-background-color: #001F3F;
-    --button-text-color: #FFFFFF;
-    --button-hover-color: #2B6CA3;
-}
-
-body[data-theme="dark"] {
-    --background-gradient: linear-gradient(135deg, #2B6CA3, #001F3F);
-    --text-color: #f6f4f4;
-    --card-background-color: #2F2F2F;
-    --input-border-color: #666666;
-    /*
-    --input-background-color: #2F2F2F;*/
-    --input-text-color: #232323;
+    --placeholder-color: #BBBBBB;
     --button-background-color: #001F3F;
     --button-text-color: #FFFFFF;
     --button-hover-color: #2B6CA3;
