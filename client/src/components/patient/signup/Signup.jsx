@@ -1,113 +1,182 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Form, Button, Row, Col } from 'react-bootstrap';
-import { motion } from 'framer-motion';
-import './Signup.css'; // Import the custom CSS
+import React, { useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.css';
+import './Signup.css';
 
 const Signup = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    age: '',
+    gender: '',
+    mobile: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
 
-  useEffect(() => {
-    document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-  }, [isDarkMode]);
+  const [loading, setLoading] = useState(false);
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error('Passwords do not match!', {
+        position: 'top-center',
+        className: 'custom-toast',
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/patient/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('🎉 Signup successful!', {
+          position: 'top-center',
+          className: 'custom-toast',
+        });
+
+        setFormData({
+          name: '',
+          age: '',
+          gender: '',
+          mobile: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+        });
+      } else {
+        toast.error(data.error || '⚠️ Signup failed. Please try again.', {
+          position: 'top-center',
+          className: 'custom-toast',
+        });
+      }
+    } catch (error) {
+      toast.error(`Error: ${error.message}`, {
+        position: 'top-center',
+        className: 'custom-toast',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Container fluid className={`signup-container ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
-      <Row className="justify-content-center align-items-center min-vh-100">
-        <Col xs={12} sm={10} md={8} lg={6} xl={4}>
-          <Button onClick={toggleTheme} className="toggle-button" >
-            {isDarkMode ? '☀' : '🌙'}
-          </Button>
-          <motion.div
-            className="signup-card"
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
+    <div className="signup-page">
+      <div className="navbar">
+        <h3>mediConnect</h3>
+        <div className="navbar-content ">
+          <button>Login</button>
+        </div>
+      </div>
+      <div className="signup-container">
+        <form className="signup-form" onSubmit={handleSubmit}>
+          <h3 style={{ margintop: '8px' }}>Patient Signup</h3>
+
+          <label htmlFor="name">Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+
+          {/* <label htmlFor="age">Age</label>
+          <input
+            type="number"
+            id="age"
+            name="age"
+            value={formData.age}
+            onChange={handleChange}
+            required
+          /> */}
+
+          <label htmlFor="gender">Gender</label>
+          <select
+            id="gender"
+            name="gender"
+            value={formData.gender}
+            onChange={handleChange}
+            required
           >
-            <div className="signup-header">
-              Patient Signup
-            </div>
+            <option value="">Select your gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
 
-            <div className="signup-body">
-              <Form>
-                <Form.Group controlId="formName">
-                  <Form.Label className="form-label">Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter your name"
-                    required
-                    className="form-control"
-                  />
-                </Form.Group>
+          <label htmlFor="mobile">Mobile</label>
+          <input
+            type="tel"
+            id="mobile"
+            name="mobile"
+            value={formData.mobile}
+            onChange={handleChange}
+            required
+          />
 
-                <Form.Group controlId="formAge">
-                  <Form.Label className="form-label">Age</Form.Label>
-                  <Form.Control
-                    type="number"
-                    placeholder="Enter your age"
-                    required
-                    className="form-control"
-                  />
-                </Form.Group>
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
 
-                <Form.Group controlId="formGender">
-                  <Form.Label className="form-label">Gender</Form.Label>
-                  <Form.Control as="select" required className="form-control">
-                    <option value="">Select your gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                  </Form.Control>
-                </Form.Group>
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
 
-                <Form.Group controlId="formMobile">
-                  <Form.Label className="form-label">Mobile</Form.Label>
-                  <Form.Control
-                    type="tel"
-                    placeholder="Enter your mobile number"
-                    required
-                    className="form-control"
-                  />
-                </Form.Group>
+          <label htmlFor="confirmPassword">Re-enter Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+          />
 
-                <Form.Group controlId="formEmail">
-                  <Form.Label className="form-label">Email</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="Enter your email"
-                    required
-                    className="form-control"
-                  />
-                </Form.Group>
+          <button type="submit" disabled={loading}>
+            {loading ? 'Signing up...' : 'Signup'}
+          </button>
 
-                <Form.Group controlId="formPassword">
-                  <Form.Label className="form-label">Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Enter your password"
-                    required
-                    className="form-control"
-                  />
-                </Form.Group>
-
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button type="submit" className="button-custom mt-3">
-                    Signup
-                  </Button>
-                </motion.div>
-
-                <div className="notification mt-3">
-                  Please ensure all information is correct before submitting.
-                </div>
-              </Form>
-            </div>
-          </motion.div>
-        </Col>
-      </Row>
-    </Container>
+          {/* <div className="redirect-login">
+            Already have an account?{' '}
+            <Link to="/login" className="login-link">
+              Login here
+            </Link>
+          </div> */}
+        </form>
+        <ToastContainer />
+      </div>
+    </div>
   );
 };
 
