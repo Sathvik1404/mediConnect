@@ -1,0 +1,154 @@
+body {
+    background: var(--background-gradient);
+    color: var(--text-color);
+    font-family: 'Arial', sans-serif;
+    transition: background 0.3s, color 0.3s;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.signup-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+.signup-card {
+    position: relative;
+    width: 450px;
+    background-color: var(--card-background-color);
+    border: none;
+    margin-right: 700px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.signup-header {
+    background: var(--header-gradient);
+    padding: 20px;
+    text-align: center;
+    font-size: 1.5em;
+    color: #ffffff;
+    animation: gradientAnimation 5s ease infinite;
+}
+
+.signup-body {
+    padding: 20px;
+}
+
+label {
+    color: var(--text-color);
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="tel"],
+input[type="email"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid var(--input-border-color);
+    border-radius: 4px;
+    background-color: var(--input-background-color);
+    color: var(--input-text-color);
+    transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+}
+
+input::placeholder,
+select::placeholder {
+    color: var(--placeholder-color);
+    opacity: 1;
+    /* Ensures placeholder color is fully applied */
+}
+
+input[type="submit"],
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--button-background-color);
+    color: var(--button-text-color);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+input[type="submit"]:hover,
+button:hover {
+    background-color: var(--button-hover-color);
+}
+
+button.toggle-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: fit-content;
+    background: var(--button-background-color);
+    color: var(--button-text-color);
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.notification {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: var(--text-color);
+}
+
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Light Mode Variables */
+:root {
+    --background-gradient: linear-gradient(135deg, #87CEEB, #FFFFFF);
+    --text-color: #333333;
+    --card-background-color: #FFFFFF;
+    --header-gradient: linear-gradient(135deg, #87CEEB, #003366);
+    --input-border-color: #CCCCCC;
+    --input-background-color: #FFFFFF;
+    --input-text-color: #333333;
+    --placeholder-color: #888888;
+    --button-background-color: #003366;
+    --button-text-color: #FFFFFF;
+    --button-hover-color: #87CEEB;
+}
+
+/* Dark Mode Variables */
+body[data-theme="dark"] {
+    --background-gradient: linear-gradient(135deg, #1C1C1C, #2F2F2F);
+    --text-color: #CCCCCC;
+    --card-background-color: #2F2F2F;
+    --header-gradient: linear-gradient(135deg, #2B6CA3, #001F3F);
+    --input-border-color: #666666;
+    --input-background-color: #2F2F2F;
+    --input-text-color: #CCCCCC;
+    --placeholder-color: #BBBBBB;
+    --button-background-color: #001F3F;
+    --button-text-color: #FFFFFF;
+    --button-hover-color: #2B6CA3;
+}
