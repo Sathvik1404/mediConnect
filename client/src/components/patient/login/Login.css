@@ -2,78 +2,69 @@ body {
     background: var(--background-gradient);
     color: var(--text-color);
     font-family: 'Arial', sans-serif;
-    transition: background 0.3s, color 0.3s;
-    margin: 0;
-    height: 100vh;
-    overflow: hidden;
-}
-
-button.toggle-button {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: var(--button-background-color);
-    color: var(--button-text-color);
-    border: none;
-    padding: 10px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background-color 2s, color 2s;
-}
-
-.signup-container {
+    transition: background 2s, color 2s;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    margin: 0;
 }
 
-.signup-card {
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+.card {
     width: 350px;
     background-color: var(--card-background-color);
     border: none;
     border-radius: 10px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-    padding: 20px;
-    transition: background-color 0.3s, box-shadow 0.3s;
+    box-shadow: 0 8px 16px var(--card-background-color);
+    overflow: hidden;
+    transition: background-color 2s, box-shadow 2s;
 }
 
-.signup-header {
+.card-header {
     background: var(--header-gradient);
     padding: 20px;
     text-align: center;
     font-size: 1.5em;
     color: #ffffff;
-    animation: gradientAnimation 5s ease infinite;
+    animation: gradientAnimation 2s ease infinite;
 }
 
-.signup-body {
+.card-body {
     padding: 20px;
+    background-color: var(--card-background-color);
+    animation: gradientAnimation 5s ease infinite;
+    transition: background-color 2s, box-shadow 2s;
+    border: 1px solid var(--input-border-color);
 }
 
 label {
     color: var(--text-color);
     font-weight: bold;
+    font-size: large;
 }
 
 input[type="text"],
-input[type="number"],
-input[type="tel"],
-input[type="email"],
-input[type="password"],
-select {
+input[type="password"] {
     width: 100%;
-    padding: 10px;
-    margin: 10px 0;
+    padding: 0px;
+    margin: 5px 0;
+    height: 45px;
     border: 1px solid var(--input-border-color);
     border-radius: 4px;
     background-color: var(--input-background-color);
     color: var(--input-text-color);
-    transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+    transition: border-color 2s, background-color 2s, color 2s;
 }
 
-input[type="submit"],
-button {
+input[type="submit"] {
     width: 100%;
     padding: 10px;
     background-color: var(--button-background-color);
@@ -81,11 +72,10 @@ button {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
+    transition: background-color 2s, color 2s;
 }
 
-input[type="submit"]:hover,
-button:hover {
+input[type="submit"]:hover {
     background-color: var(--button-hover-color);
 }
 
@@ -99,13 +89,7 @@ button.toggle-button {
     padding: 10px;
     border-radius: 50%;
     cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-.notification {
-    margin-top: 10px;
-    font-size: 0.9em;
-    color: var(--text-color);
+    transition: background-color 2s, color 2s;
 }
 
 @keyframes gradientAnimation {
@@ -137,19 +121,6 @@ button.toggle-button {
 }
 
 /* Dark Mode Variables */
-body[data-theme="dark"] {
-    --background-gradient: linear-gradient(135deg, #1C1C1C, #2F2F2F);
-    --text-color: #CCCCCC;
-    --card-background-color: #2F2F2F;
-    --header-gradient: linear-gradient(135deg, #2B6CA3, #001F3F);
-    --input-border-color: #666666;
-    --input-background-color: #2F2F2F;
-    --input-text-color: #CCCCCC;
-    --button-background-color: #001F3F;
-    --button-text-color: #FFFFFF;
-    --button-hover-color: #2B6CA3;
-}
-
 body[data-theme="dark"] {
     --background-gradient: linear-gradient(135deg, #2B6CA3, #001F3F);
     --text-color: #f6f4f4;
