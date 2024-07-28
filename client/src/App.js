@@ -5,6 +5,7 @@ import Login from './components/patient/login/Login';
 import DLogin from './components/doctor/login/DLogin';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import DSignup from './components/doctor/signup/DSignup';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path='/patient/dashboard' element={<Dashboard />} />
           <Route path='/patient/login' element={<Login />} />
           <Route path='/doctor/login' element={<DLogin />} />
+          <Route path='/doctor/DSignup' element={<DSignup />} />
         </Routes>
       </BrowserRouter>
     </>

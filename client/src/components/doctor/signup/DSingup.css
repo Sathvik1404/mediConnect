@@ -21,9 +21,10 @@ body {
 
 .signup-card {
     position: relative;
-    width: 350px;
+    width: 450px;
     background-color: var(--card-background-color);
     border: none;
+    margin-right: 700px;
     border-radius: 10px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     padding: 20px;
@@ -32,20 +33,15 @@ body {
 
 .signup-header {
     background: var(--header-gradient);
-    padding: 20px;
+    padding: 5px;
     text-align: center;
     font-size: 1.5em;
     color: var(--input-text-color);
     animation: gradientAnimation 5s ease infinite;
 }
 
-.divcon {
-    margin: 0px;
-}
-
 .signup-body {
-    padding: 20px;
-    height: 600px;
+    padding: 10px;
 }
 
 label {
@@ -69,6 +65,13 @@ select {
     transition: border-color 0.3s, background-color 0.3s, color 0.3s;
 }
 
+input::placeholder,
+select::placeholder {
+    color: var(--placeholder-color);
+    opacity: 1;
+    /* Ensures placeholder color is fully applied */
+}
+
 input[type="submit"],
 button {
     width: 100%;
@@ -90,6 +93,7 @@ button.toggle-button {
     position: absolute;
     top: 20px;
     right: 20px;
+    width: 45px;
     background: var(--button-background-color);
     color: var(--button-text-color);
     border: none;
@@ -97,6 +101,12 @@ button.toggle-button {
     border-radius: 50%;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
+}
+
+
+.confit {
+    height: 35px;
+    margin: 0px;
 }
 
 .notification {
@@ -147,4 +157,22 @@ body[data-theme="dark"] {
     --button-background-color: #001F3F;
     --button-text-color: #FFFFFF;
     --button-hover-color: #2B6CA3;
+}
+
+.hospital-toast {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f8fb;
+    color: #2c3e50;
+    border: 1px solid #d6eaf8;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+    border-radius: 8px;
+}
+
+.hospital-toast .Toastify__toast-body {
+    padding: 16px;
+    text-align: left;
+}
+
+.hospital-toast .Toastify__close-button {
+    color: #2c3e50;
 }
