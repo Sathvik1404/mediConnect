@@ -2,7 +2,7 @@ body {
     background: var(--background-gradient);
     color: var(--text-color);
     font-family: 'Arial', sans-serif;
-    transition: background 2s, color 2s;
+    transition: background 0.3s, color 0.3s;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -23,25 +23,14 @@ body {
     background-color: var(--card-background-color);
     border: none;
     border-radius: 10px;
-    box-shadow: 0 8px 16px var(--card-background-color);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    transition: background-color 2s, box-shadow 2s;
-}
-
-.card-header {
-    background: var(--header-gradient);
-    padding: 20px;
-    text-align: center;
-    font-size: 1.5em;
-    color: #ffffff;
-    animation: gradientAnimation 2s ease infinite;
+    transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 .card-body {
     padding: 20px;
     background-color: var(--card-background-color);
-    animation: gradientAnimation 5s ease infinite;
-    transition: background-color 2s, box-shadow 2s;
     border: 1px solid var(--input-border-color);
 }
 
@@ -54,17 +43,17 @@ label {
 input[type="text"],
 input[type="password"] {
     width: 100%;
-    padding: 0px;
+    padding: 10px;
     margin: 5px 0;
     height: 45px;
     border: 1px solid var(--input-border-color);
     border-radius: 4px;
     background-color: var(--input-background-color);
     color: var(--input-text-color);
-    transition: border-color 2s, background-color 2s, color 2s;
+    transition: border-color 0.3s, background-color 0.3s, color 0.3s;
 }
 
-input[type="submit"] {
+button[type="submit"] {
     width: 100%;
     padding: 10px;
     background-color: var(--button-background-color);
@@ -72,11 +61,17 @@ input[type="submit"] {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 2s, color 2s;
+    transition: background-color 0.3s, color 0.3s;
+    position: relative;
 }
 
-input[type="submit"]:hover {
+button[type="submit"]:hover {
     background-color: var(--button-hover-color);
+}
+
+button[type="submit"]:disabled {
+    background-color: var(--button-background-color);
+    cursor: not-allowed;
 }
 
 button.toggle-button {
@@ -89,21 +84,7 @@ button.toggle-button {
     padding: 10px;
     border-radius: 50%;
     cursor: pointer;
-    transition: background-color 2s, color 2s;
-}
-
-@keyframes gradientAnimation {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
+    transition: background-color 0.3s, color 0.3s;
 }
 
 /* Light Mode Variables */
@@ -111,7 +92,6 @@ button.toggle-button {
     --background-gradient: linear-gradient(135deg, #87CEEB, #FFFFFF);
     --text-color: #333333;
     --card-background-color: #FFFFFF;
-    --header-gradient: linear-gradient(135deg, #87CEEB, #003366);
     --input-border-color: #CCCCCC;
     --input-background-color: #FFFFFF;
     --input-text-color: #333333;
@@ -126,9 +106,8 @@ body[data-theme="dark"] {
     --text-color: #f6f4f4;
     --card-background-color: #2F2F2F;
     --input-border-color: #666666;
-    /*
-    --input-background-color: #2F2F2F;*/
-    --input-text-color: #232323;
+    --input-background-color: #2F2F2F;
+    --input-text-color: #f6f4f4;
     --button-background-color: #001F3F;
     --button-text-color: #FFFFFF;
     --button-hover-color: #2B6CA3;
