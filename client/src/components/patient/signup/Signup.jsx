@@ -21,8 +21,8 @@ const Signup = () => {
             transition={{ duration: 0.5, ease: 'easeOut' }}
           >
             <h3>Patient Signup</h3>
-            <Button onClick={toggleTheme} className="toggle-theme-btn">
-              Switch to {isDarkMode ? 'Light' : 'Dark'} Mode
+            <Button onClick={toggleTheme} className="toggle-button">
+              {isDarkMode ? '☀' : '🌙'}
             </Button>
             <Form>
               <Form.Group controlId="formName">
