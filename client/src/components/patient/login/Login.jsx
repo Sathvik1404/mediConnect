@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './Login.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer, toast } from 'react-toastify';
@@ -6,21 +6,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const [theme, setTheme] = useState('light');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    document.body.setAttribute('data-theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,9 +52,6 @@ const Login = () => {
 
   return (
     <div className="container">
-      <button onClick={toggleTheme} className="toggle-button">
-        {theme === 'light' ? '🌙' : '☀️'}
-      </button>
       <div className="card">
         <div className="card-body">
           <form onSubmit={handleSubmit}>

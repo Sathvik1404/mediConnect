@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import './DSingup.css';
 
@@ -13,6 +13,7 @@ const Signup = () => {
     email: '',
     password: '',
     confirmPassword: '',
+    spec: ''
   });
 
   const [loading, setLoading] = useState(false);
@@ -36,7 +37,7 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/patient/signup', {
+      const response = await fetch('http://localhost:5000/api/doctor/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,6 +46,8 @@ const Signup = () => {
       });
 
       const data = await response.json();
+
+      console.log(data)
 
       if (response.ok) {
         toast.success('🎉 Signup successful!', {
@@ -60,6 +63,7 @@ const Signup = () => {
           email: '',
           password: '',
           confirmPassword: '',
+          spec: '',
         });
       } else {
         toast.error(data.error || '⚠️ Signup failed. Please try again.', {
