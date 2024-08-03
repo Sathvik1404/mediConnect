@@ -17,7 +17,7 @@ function App() {
           <Route path='/patient/signup' element={<Signup />} />
           <Route path='/patient/dashboard' element={<Dashboard />} />
           <Route path='/patient/login' element={<Login />} />
-          <Route path='/doctor/login' element={<DLogin />} />
+          <Route path='/doctor/dlogin' element={<DLogin />} />
           <Route path='/doctor/DSignup' element={<DSignup />} />
         </Routes>
       </BrowserRouter>

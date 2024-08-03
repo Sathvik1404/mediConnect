@@ -16,10 +16,10 @@ router.use(session({
 }));
 
 router.post('/signup', async (req, res) => {
-    const { name, email, password, age, mobile, gender, specialization } = req.body;
+    const { name, email, password, age, mobile, gender, spec } = req.body;
     try {
         const hash = await bcrypt.hash(password, 12);
-        await doctorModel.create({ name, email, password: hash, age, gender, mobile, specialization })
+        await doctorModel.create({ name, email, password: hash, age, gender, mobile, specialization: spec })
             .then(user => res.json({ success: true }))
             .catch(err => res.json(err))
     } catch (err) {
