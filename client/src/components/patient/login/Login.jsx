@@ -1,32 +1,36 @@
 import React, { useState } from 'react';
-import './Login.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer, toast } from 'react-toastify';
+// import { Link } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom';
-
+import './Login.css';
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error('Passwords do not match!', {
+        position: 'top-center',
+        className: 'custom-toast',
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/patient/login', {
+      const response = await fetch('http://localhost:5000/api/doctor/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,62 +40,70 @@ const Login = () => {
 
       const data = await response.json();
 
+      console.log(data)
+
       if (response.ok) {
-        toast.success('Login successful!');
-        // Redirect to the desired route after successful login
-        navigate('/patient/dashboard'); // Replace '/dashboard' with your target path
+        toast.success('🎉 Signup successful!', {
+          position: 'top-center',
+          className: 'custom-toast',
+        });
+
+        setFormData({
+          email: '',
+          password: '',
+        });
       } else {
-        toast.error(data.error || 'Login failed. Please try again.');
+        toast.error(data.error || '⚠️ Signup failed. Please try again.', {
+          position: 'top-center',
+          className: 'custom-toast',
+        });
       }
     } catch (error) {
-      toast.error(`Error: ${error.message}`);
+      toast.error(`Error: ${error.message}`, {
+        position: 'top-center',
+        className: 'custom-toast',
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container">
-      <div className="card">
-        <div className="card-body">
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label>Email</label>
-              <input
-                type="text"
-                name="email"
-                className="form-control"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>Password</label>
-              <input
-                type="password"
-                name="password"
-                className="form-control"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <button className="btn btn-primary" type="submit" disabled={loading}>
-              {loading ? (
-                <span
-                  className="spinner-border spinner-border-sm"
-                  role="status"
-                  aria-hidden="true"
-                ></span>
-              ) : (
-                'Login'
-              )}
-            </button>
-          </form>
+    <div className="login-page">
+      <div className="navbar">
+        <h3>mediConnect</h3>
+        <div className="navbar-content ">
+          <button>Signup</button>
         </div>
       </div>
-      <ToastContainer />
+      <div className="login-container">
+        <form className="login-form" onSubmit={handleSubmit}>
+          <h3 style={{ margintop: '8px' }}>Patient Login</h3>
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <button type="submit" disabled={loading}>
+            {loading ? 'Loggin in...' : 'Login'}
+          </button>
+        </form>
+        <ToastContainer />
+      </div>
     </div>
   );
 };
