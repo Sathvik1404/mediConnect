@@ -6,8 +6,7 @@ const PatientSchema = mongoose.Schema({
         required: true
     },
     age: {
-        type: Number,
-        required: true
+        type: Number
     },
     mobile: {
         type: String,

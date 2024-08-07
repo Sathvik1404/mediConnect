@@ -18,6 +18,12 @@ router.use(session({
 router.post('/signup', async (req, res) => {
     const { name, email, password, age, mobile, gender, spec } = req.body;
     try {
+        // Check if a user with the same email already exists
+        const existingUser = await doctorModel.findOne({ email });
+
+        if (existingUser) {
+            return res.status(400).json({ error: 'User already exists with this email' });
+        }
         const hash = await bcrypt.hash(password, 12);
         await doctorModel.create({ name, email, password: hash, age, gender, mobile, specialization: spec })
             .then(user => res.json({ success: true }))

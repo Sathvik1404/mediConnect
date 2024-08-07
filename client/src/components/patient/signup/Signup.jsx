@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import './Signup.css';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
     name: '',
-    age: '',
     gender: '',
     mobile: '',
     email: '',
@@ -16,6 +15,7 @@ const Signup = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,7 +54,6 @@ const Signup = () => {
 
         setFormData({
           name: '',
-          age: '',
           gender: '',
           mobile: '',
           email: '',
@@ -77,12 +76,16 @@ const Signup = () => {
     }
   };
 
+  const handleLoginClick = () => {
+    navigate('/patient/login');
+  }
+
   return (
     <div className="signup-page">
       <div className="navbar">
         <h3>mediConnect</h3>
         <div className="navbar-content ">
-          <button>Login</button>
+          <button onClick={handleLoginClick}>Login</button>
         </div>
       </div>
       <div className="signup-container">

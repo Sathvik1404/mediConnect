@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
-// import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import './Login.css';
 const Login = () => {
@@ -10,6 +10,7 @@ const Login = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,18 +20,10 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match!', {
-        position: 'top-center',
-        className: 'custom-toast',
-      });
-      return;
-    }
-
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/doctor/signup', {
+      const response = await fetch('http://localhost:5000/api/patient/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,10 +33,10 @@ const Login = () => {
 
       const data = await response.json();
 
-      console.log(data)
+      // console.log(data)
 
       if (response.ok) {
-        toast.success('🎉 Signup successful!', {
+        toast.success('🎉 Login successful!', {
           position: 'top-center',
           className: 'custom-toast',
         });
@@ -53,7 +46,7 @@ const Login = () => {
           password: '',
         });
       } else {
-        toast.error(data.error || '⚠️ Signup failed. Please try again.', {
+        toast.error(data.error || '⚠️ Login failed. Please try again.', {
           position: 'top-center',
           className: 'custom-toast',
         });
@@ -65,15 +58,20 @@ const Login = () => {
       });
     } finally {
       setLoading(false);
+      navigate('/patient/dashboard')
     }
   };
+
+  const handleSignupClick = () => {
+    navigate('/patient/signup');
+  }
 
   return (
     <div className="login-page">
       <div className="navbar">
         <h3>mediConnect</h3>
         <div className="navbar-content ">
-          <button>Signup</button>
+          <button onClick={handleSignupClick}>Signup</button>
         </div>
       </div>
       <div className="login-container">
