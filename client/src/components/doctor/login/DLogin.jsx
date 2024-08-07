@@ -4,6 +4,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './DLogin.css';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../AuthContext';
+
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
@@ -12,6 +14,7 @@ const Login = () => {
 
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const auth = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,19 +27,16 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/doctor/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      // console.log(formData)
+      const user = await auth.doctorLoginAction(formData);
 
-      const data = await response.json();
+      console.log(user)
 
-      console.log(data)
+      // const data = await response.json();
 
-      if (response.ok) {
+      // console.log(data)
+
+      if (user.ok) {
         toast.success('🎉 Login successful!', {
           position: 'top-center',
           className: 'custom-toast',
@@ -46,17 +46,18 @@ const Login = () => {
           email: '',
           password: '',
         });
+        navigate('/doctor/dashboard');
       } else {
-        toast.error(data.error || '⚠️ Login failed. Please try again.', {
+        toast.error(user.error || '⚠️ Login failed. Please try again.', {
           position: 'top-center',
           className: 'custom-toast',
         });
       }
     } catch (error) {
-      toast.error(`Error: ${error.message}`, {
-        position: 'top-center',
-        className: 'custom-toast',
-      });
+      // toast.error(`Error: ${error.message}`, {
+      //   position: 'top-center',
+      //   className: 'custom-toast',
+      // });
     } finally {
       setLoading(false);
     }

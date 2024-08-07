@@ -27,6 +27,11 @@ const PatientSchema = mongoose.Schema({
     },
     record: {
         type: Object
+    },
+    role: {
+        type: String,
+        required: true,
+        default: "patient"
     }
 });
 

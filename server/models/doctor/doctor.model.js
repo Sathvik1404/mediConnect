@@ -33,6 +33,11 @@ const DoctorSchema = mongoose.Schema({
     },
     hospitals: {
         type: [String]
+    },
+    role: {
+        type: String,
+        required: true,
+        default: "doctor"
     }
 });
 
