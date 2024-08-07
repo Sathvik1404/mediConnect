@@ -6,7 +6,10 @@ const LandingPage = () => {
         <div className="landing-page">
             <div className="card card-left">
                 <h1>medi</h1>
-                <p>Your Health</p>
+                <p>Your Health Is</p>
+            </div>
+            <div>
+                <p className="link"></p>
             </div>
             <div className="card card-right">
                 <h1>Connect</h1>

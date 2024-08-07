@@ -6,7 +6,7 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    background-color: #f0f4f8;
+    background-color: #003366;
 }
 
 .card {
@@ -54,23 +54,27 @@
     animation: linkGrow 3s forwards;
 }
 
+.link {
+    size: 20px;
+}
+
 @keyframes slideInLeft {
     0% {
-        left: -300px;
+        left: -50%;
     }
 
     100% {
-        left: calc(50% - 780px);
+        left: calc(50% - 635px);
     }
 }
 
 @keyframes slideInRight {
     0% {
-        right: -300px;
+        right: -50%;
     }
 
     100% {
-        right: calc(50% - 780px);
+        right: calc(50% - 650px);
     }
 }
 
