@@ -28,7 +28,7 @@ const Login = () => {
     try {
       const user = await auth.patientLoginAction(formData);
 
-      console.log(user)
+      // console.log(user)
 
       // const data = await response.json();
 
