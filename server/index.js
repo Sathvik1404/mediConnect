@@ -11,7 +11,7 @@ const app = express();
 
 app.use(cors({
     origin: ["http://localhost:3000"],
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }));
 
@@ -45,7 +45,7 @@ app.use('/api/patient/profile', patientProfileRouter);
 app.use('/api/patient/doctorslist', doctorsRouter);
 
 // Doctor End Points
-app.use('/api/doctor', doctorAuthenticationRouter);
+// app.use('/api/doctor', doctorAuthenticationRouter);
 app.use('/api/doctor/profile', doctorProfileRouter);
 
 // Hospital End Points
