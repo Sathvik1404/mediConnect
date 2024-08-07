@@ -1,5 +1,6 @@
 import React from 'react';
 import './LandingPage.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const LandingPage = () => {
     return (
@@ -9,13 +10,13 @@ const LandingPage = () => {
                 <p>Your Health Is</p>
             </div>
             <div>
-                <p className="link"></p>
             </div>
             <div className="card card-right">
                 <h1>Connect</h1>
                 <p>Our Priority</p>
             </div>
-            <div className="link-line"></div>
+            {/* <div className="link-line"> */}
+            <FontAwesomeIcon icon="fa-solid fa-link" />
         </div>
     );
 };
