@@ -25,6 +25,7 @@ app.use(express.json());
 
 const patientAuthenticationRouter = require('./routes/patientrouters/patientauthentication.router');
 const patientProfileRouter = require('./routes/patientrouters/patientprofile.router');
+const doctorsRouter = require('./routes/doctorrouters/doctorprofile.router')
 
 const doctorAuthenticationRouter = require('./routes/doctorrouters/doctorauthentication.router');
 const doctorProfileRouter = require('./routes/doctorrouters/doctorprofile.router');
@@ -41,6 +42,7 @@ mongoose.connect(db_url, {
 // Patient End Points
 app.use('/api/patient', patientAuthenticationRouter);
 app.use('/api/patient/profile', patientProfileRouter);
+app.use('/api/patient/doctorslist', doctorsRouter);
 
 // Doctor End Points
 app.use('/api/doctor', doctorAuthenticationRouter);

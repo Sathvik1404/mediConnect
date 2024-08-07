@@ -32,4 +32,14 @@ router.get('/:id', async (req, res) => {
     }
 })
 
+router.get('/', async (req, res) => {
+    const doctors = await doctorModel.find({})
+    if (!doctors) {
+        res.status(500).json({ message: "Server error" })
+    }
+    else {
+        res.status(200).json(doctors)
+    }
+})
+
 module.exports = router;
