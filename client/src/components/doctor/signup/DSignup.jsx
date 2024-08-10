@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import './DSingup.css';
 
@@ -12,10 +13,11 @@ const Signup = () => {
     mobile: '',
     email: '',
     password: '',
-    confirmPassword: '',
+    spec: ''
   });
 
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,7 +38,7 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/patient/signup', {
+      const response = await fetch('http://localhost:5000/api/doctor/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,6 +47,8 @@ const Signup = () => {
       });
 
       const data = await response.json();
+
+      console.log(data)
 
       if (response.ok) {
         toast.success('🎉 Signup successful!', {
@@ -59,7 +63,7 @@ const Signup = () => {
           mobile: '',
           email: '',
           password: '',
-          confirmPassword: '',
+          spec: '',
         });
       } else {
         toast.error(data.error || '⚠️ Signup failed. Please try again.', {
@@ -77,12 +81,16 @@ const Signup = () => {
     }
   };
 
+  const handleLoginClick = () => {
+    navigate('/doctor/dlogin')
+  }
+
   return (
     <div className="signup-page">
       <div className="navbar">
         <h3>mediConnect</h3>
         <div className="navbar-content ">
-          <button>Login</button>
+          <button onClick={handleLoginClick}>Login</button>
         </div>
       </div>
       <div className="signup-container">

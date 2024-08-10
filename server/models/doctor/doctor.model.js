@@ -6,13 +6,11 @@ const DoctorSchema = mongoose.Schema({
         required: true
     },
     age: {
-        type: Number,
-        required: true
+        type: Number
     },
     mobile: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     email: {
         type: String,
@@ -24,8 +22,7 @@ const DoctorSchema = mongoose.Schema({
         required: true
     },
     gender: {
-        type: String,
-        required: true
+        type: String
     },
     record: {
         type: Object
@@ -36,6 +33,14 @@ const DoctorSchema = mongoose.Schema({
     },
     hospitals: {
         type: [String]
+    },
+    patients: {
+        type: [String]
+    },
+    role: {
+        type: String,
+        required: true,
+        default: "doctor"
     }
 });
 

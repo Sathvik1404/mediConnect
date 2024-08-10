@@ -6,8 +6,7 @@ const PatientSchema = mongoose.Schema({
         required: true
     },
     age: {
-        type: Number,
-        required: true
+        type: Number
     },
     mobile: {
         type: String,
@@ -28,6 +27,17 @@ const PatientSchema = mongoose.Schema({
     },
     record: {
         type: Object
+    },
+    role: {
+        type: String,
+        required: true,
+        default: "patient"
+    },
+    address: {
+        type: String
+    },
+    doctors: {
+        type: [String]
     }
 });
 
