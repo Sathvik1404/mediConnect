@@ -7,8 +7,7 @@ const HospitalSchema = mongoose.Schema({
     },
     mobile: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     email: {
         type: String,
@@ -18,6 +17,14 @@ const HospitalSchema = mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    doctors: {
+        type: [String]
+    },
+    role: {
+        type: String,
+        required: true,
+        default: "hospital"
     }
 });
 

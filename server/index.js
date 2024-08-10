@@ -31,6 +31,7 @@ const doctorAuthenticationRouter = require('./routes/doctorrouters/doctorauthent
 const doctorProfileRouter = require('./routes/doctorrouters/doctorprofile.router');
 
 const hospitalAuthenticationRouter = require('./routes/hospitalrouters/hospitalauthentication.router');
+const hospitalsRouter = require('./routes/hospitalrouters/hospitalprofile.router');
 
 mongoose.connect(db_url, {
     tls: true,
@@ -43,10 +44,12 @@ mongoose.connect(db_url, {
 app.use('/api/patient', patientAuthenticationRouter);
 app.use('/api/patient/profile', patientProfileRouter);
 app.use('/api/patient/doctorslist', doctorsRouter);
+app.use('/api/patient/hospitals', hospitalsRouter);
 
 // Doctor End Points
-// app.use('/api/doctor', doctorAuthenticationRouter);
+app.use('/api/doctor', doctorAuthenticationRouter);
 app.use('/api/doctor/profile', doctorProfileRouter);
+app.use('/api/doctor/hospitals', hospitalsRouter);
 
 // Hospital End Points
 app.use('/api/hospital', hospitalAuthenticationRouter);
