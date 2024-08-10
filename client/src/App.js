@@ -11,6 +11,7 @@ import DSignup from './components/doctor/signup/DSignup';
 import AuthProvider from './components/AuthContext';
 import PatientProtected from './components/patient/PatientProtected';
 import DoctorProtected from './components/doctor/DoctorProtected';
+import PatientDetails from './components/doctor/dashboard/PatientDetails';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route element={<DoctorProtected />}>
               <Route path='/doctor/dashboard' element={<DDashboard />} />
             </Route>
+            <Route path="/doctor/dashboard/patient/:patientId" element={<PatientDetails />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
