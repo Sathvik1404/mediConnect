@@ -33,8 +33,8 @@ router.get('/:id', async (req, res) => {
 })
 
 router.put('/:id', async (req, res) => {
-    const { name, address, mobile, age, email } = req.body;
-    const patient = await patientModel.findOneAndUpdate({ _id: req.params.id }, { name, address, mobile, age, email }, { new: true })
+    const { name, address, mobile, age, email, doctors } = req.body;
+    const patient = await patientModel.findOneAndUpdate({ _id: req.params.id }, { name, address, mobile, age, email, doctors }, { new: true })
     res.status(200).json(patient)
 })
 

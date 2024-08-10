@@ -33,4 +33,12 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.put('/:id', async (req, res) => {
+    const { id } = req.params;
+    const { name, mobile, email, address, patients } = req.body;
+    await hospitalModel.findOneAndUpdate({ _id: id }, { name, mobile, email, address, patients })
+        .then(hos => res.status(200).json({ message: "Success" }))
+        .catch(err => res.status(500).json({ message: "Internal Server Error or No data" }))
+})
+
 module.exports = router;
