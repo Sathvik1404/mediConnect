@@ -10,6 +10,10 @@
     padding: 20px;
 }
 
+.signup-page {
+    height: 93vh;
+}
+
 .signup-form {
     background-color: #FFFFFF;
     /* White */
