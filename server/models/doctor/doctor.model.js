@@ -34,6 +34,9 @@ const DoctorSchema = mongoose.Schema({
     hospitals: {
         type: [String]
     },
+    patients: {
+        type: [String]
+    },
     role: {
         type: String,
         required: true,

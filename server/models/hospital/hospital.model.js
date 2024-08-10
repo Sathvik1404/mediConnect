@@ -21,10 +21,17 @@ const HospitalSchema = mongoose.Schema({
     doctors: {
         type: [String]
     },
+    patients: {
+        type: [String]
+    },
     role: {
         type: String,
         required: true,
         default: "hospital"
+    },
+    address: {
+        type: String,
+        required: true
     }
 });
 

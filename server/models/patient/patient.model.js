@@ -35,6 +35,9 @@ const PatientSchema = mongoose.Schema({
     },
     address: {
         type: String
+    },
+    doctors: {
+        type: [String]
     }
 });
 
