@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../AuthContext';
 import { useNavigate } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './Dashboard.css'
 
 const Dashboard = () => {
   const [patient, setPatient] = useState({});
@@ -80,114 +82,126 @@ const Dashboard = () => {
   if (error) {
     return <div>Error: {error}</div>;
   }
-
   return (
-    <div>
+    <div className="main">
       <div className="navbar">
         <h3>mediConnect</h3>
-        <div className="navbar-content">
+        <div className="navbar-content ">
           <button onClick={handleLogout}>Logout</button>
         </div>
       </div>
-      <h1>Dashboard</h1>
-      <h2>Your Details</h2>
-      {isEditing ? (
-        <div>
-          <div>
-            <label>
-              <strong>Name:</strong>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-              />
-            </label>
-          </div>
-          <div>
-            <label>
-              <strong>Email:</strong>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-              />
-            </label>
-          </div>
-          <div>
-            <label>
-              <strong>Age:</strong>
-              <input
-                type="number"
-                name="age"
-                value={formData.age}
-                onChange={handleInputChange}
-              />
-            </label>
-          </div>
-          <div>
-            <label>
-              <strong>Gender:</strong>
-              <input
-                type="text"
-                name="gender"
-                value={formData.gender}
-                onChange={handleInputChange}
-              />
-            </label>
-          </div>
-          <div>
-            <label>
-              <strong>Address:</strong>
-              <input
-                type="text"
-                name="address"
-                value={formData.address}
-                onChange={handleInputChange}
-              />
-            </label>
-          </div>
-          <div>
-            <label>
-              <strong>Phone:</strong>
-              <input
-                type="text"
-                name="mobile"
-                value={formData.mobile}
-                onChange={handleInputChange}
-              />
-            </label>
-          </div>
-          <button onClick={handleSaveChanges}>Save Changes</button>
-        </div>
-      ) : (
-        <div>
-          <div>
-            <strong>Name:</strong> {patient.name || 'N/A'}
-          </div>
-          <div>
-            <strong>Email:</strong> {patient.email || 'N/A'}
-          </div>
-          <div>
-            <strong>Age:</strong> {patient.age || 'N/A'}
-          </div>
-          <div>
-            <strong>Gender:</strong> {patient.gender || 'N/A'}
-          </div>
-          <div>
-            <strong>Address:</strong> {patient.address || 'N/A'}
-          </div>
-          <div>
-            <strong>Phone:</strong> {patient.mobile || 'N/A'}
+      <div className="contt">
+        <div className="sidebar">
+          <div className="sidebar-cell" onClick={handleEditToggle}>
+            {isEditing ? 'Cancel' : 'Edit'}
           </div>
         </div>
-      )}
-      <button onClick={handleEditToggle}>
-        {isEditing ? 'Cancel' : 'Edit'}
-      </button>
+        <div className="content-area">
+          <h2>Your Details</h2>
+          {isEditing ? (
+            <div className="cardd">
+              <div>
+                <label>
+                  <strong>Name:</strong>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="form-control"
+                  />
+                </label>
+              </div>
+              <div>
+                <label>
+                  <strong>Email:</strong>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="form-control"
+                  />
+                </label>
+              </div>
+              <div>
+                <label>
+                  <strong>Age:</strong>
+                  <input
+                    type="number"
+                    name="age"
+                    value={formData.age}
+                    onChange={handleInputChange}
+                    className="form-control"
+                  />
+                </label>
+              </div>
+              <div>
+                <label>
+                  <strong>Gender:</strong>
+                  <input
+                    type="text"
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleInputChange}
+                    className="form-control"
+                  />
+                </label>
+              </div>
+              <div>
+                <label>
+                  <strong>Address:</strong>
+                  <input
+                    type="text"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    className="form-control"
+                  />
+                </label>
+              </div>
+              <div>
+                <label>
+                  <strong>Phone:</strong>
+                  <input
+                    type="text"
+                    name="mobile"
+                    value={formData.mobile}
+                    onChange={handleInputChange}
+                    className="form-control"
+                  />
+                </label>
+              </div>
+              <button className="btn btn-success mt-3" onClick={handleSaveChanges}>
+                Save Changes
+              </button>
+            </div>
+          ) : (
+            <div className="cardd">
+              <div>
+                <strong>Name:</strong> {patient.name || 'N/A'}
+              </div>
+              <div>
+                <strong>Email:</strong> {patient.email || 'N/A'}
+              </div>
+              <div>
+                <strong>Age:</strong> {patient.age || 'N/A'}
+              </div>
+              <div>
+                <strong>Gender:</strong> {patient.gender || 'N/A'}
+              </div>
+              <div>
+                <strong>Address:</strong> {patient.address || 'N/A'}
+              </div>
+              <div>
+                <strong>Phone:</strong> {patient.mobile || 'N/A'}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
+
   );
 };
-
 export default Dashboard;
