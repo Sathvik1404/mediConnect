@@ -17,7 +17,10 @@ const Dashboard = () => {
     gender: '',
     address: '',
     mobile: '',
+    record: ''
   });
+
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const navigate = useNavigate();
   const auth = useAuth();
@@ -32,6 +35,7 @@ const Dashboard = () => {
         gender: auth.user.gender || '',
         address: auth.user.address || '',
         mobile: auth.user.mobile || '',
+        record: auth.user.record || '',
       });
       setLoading(false);
     } else {
@@ -39,6 +43,39 @@ const Dashboard = () => {
       setLoading(false);
     }
   }, [auth.user]);
+
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
+
+  const handleFileUpload = async () => {
+    if (!selectedFile) {
+      alert('Please select a file to upload.');
+      return;
+    }
+
+    const fileData = new FormData();
+    fileData.append('record', selectedFile);
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/patient/profile/uploadrecord/${auth.user._id}`, {
+        method: 'PUT',
+        body: fileData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert('File uploaded successfully');
+        // Update the state with the uploaded file details
+        setPatient({ ...patient, record: result.filePath });
+        setFormData({ ...formData, record: result.filePath });
+      } else {
+        alert('Failed to upload file');
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -51,8 +88,14 @@ const Dashboard = () => {
 
   const handleSaveChanges = async () => {
     try {
-      // Simulate an API call to update patient details
-      // await new Promise((resolve) => setTimeout(resolve, 500));
+      // Fetch the latest patient details to get the current record path
+      const response = await fetch(`http://localhost:5000/api/patient/profile/${auth.user._id}`);
+      const patientData = await response.json();
+
+      // Include the existing record path in the formData if no new file is uploaded
+      if (!selectedFile) {
+        formData.record = patientData.record;
+      }
 
       await fetch(`http://localhost:5000/api/patient/profile/${auth.user._id}`, {
         method: 'PUT',
@@ -60,14 +103,17 @@ const Dashboard = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
-      })
+      });
 
-      // Assume success and update the patient state
       setPatient({ ...patient, ...formData });
       setIsEditing(false);
     } catch (error) {
       setError('Failed to update details');
     }
+  };
+
+  const viewMedicalRecord = () => {
+    window.open(`http://localhost:5000/api/patient/profile/downloadrecord/${auth.user._id}`, '_blank');
   };
 
   const handleLogout = () => {
@@ -82,6 +128,7 @@ const Dashboard = () => {
   if (error) {
     return <div>Error: {error}</div>;
   }
+
   return (
     <div className="main">
       <div className="navbar">
@@ -172,8 +219,17 @@ const Dashboard = () => {
                   />
                 </label>
               </div>
+              <div>
+                <label>
+                  <strong>Upload Medical Record:</strong>
+                  <input type="file" name='record' onChange={handleFileChange} />
+                </label>
+              </div>
               <button className="btn btn-success mt-3" onClick={handleSaveChanges}>
                 Save Changes
+              </button>
+              <button className="btn btn-primary mt-3" onClick={handleFileUpload}>
+                Upload Medical Record
               </button>
             </div>
           ) : (
@@ -196,12 +252,20 @@ const Dashboard = () => {
               <div>
                 <strong>Phone:</strong> {patient.mobile || 'N/A'}
               </div>
+              {patient.record && (
+                <div>
+                  <strong>Medical Record:</strong>
+                  <button className="btn btn-link" onClick={viewMedicalRecord}>
+                    View Medical Record
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
     </div>
-
   );
 };
+
 export default Dashboard;

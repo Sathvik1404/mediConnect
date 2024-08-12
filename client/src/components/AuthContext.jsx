@@ -1,5 +1,5 @@
-import React, { useEffect, useContext, createContext, useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import React, { useContext, createContext, useState } from 'react';
+import { toast } from 'react-toastify';
 
 const AuthContext = createContext();
 
@@ -48,7 +48,7 @@ const AuthProvider = ({ children }) => {
     };
 
     const doctorLoginAction = async (data) => {
-        console.log(data)
+        // console.log(data)
         try {
             const response = await fetch('http://localhost:5000/api/doctor/login', {
                 method: 'POST',

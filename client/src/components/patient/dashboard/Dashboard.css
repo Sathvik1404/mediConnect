@@ -44,7 +44,7 @@
     background-color: #ffffff;
     /* Add a background color to differentiate the content area */
     display: flex;
-    height: 91vh;
+    height: fit-content;
     flex-direction: column;
     justify-content: center;
     align-items: center;

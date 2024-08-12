@@ -1,6 +1,6 @@
 import React from 'react';
 import './LandingPage.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import img from './user-doctor-solid (1).svg'
 import { useNavigate } from 'react-router-dom';
 import pat from './hospital-user-solid (1).svg'

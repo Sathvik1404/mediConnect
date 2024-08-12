@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
-import { FaUserMd, FaClipboardList, FaCalendarCheck, FaPrescriptionBottleAlt } from 'react-icons/fa';
+import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
+import { FaUserMd, FaClipboardList, FaCalendarCheck, FaPrescriptionBottleAlt, FaUserEdit } from 'react-icons/fa';
 import './Dashboard.css'; // Custom CSS file for additional styling
 import { useAuth } from '../../AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -9,13 +9,28 @@ const Dashboard = () => {
   const [doctor, setDoctor] = useState('');
   const [selectedSection, setSelectedSection] = useState(''); // State to track the selected section
   const [patients, setPatients] = useState([]); // State to store fetched patient data
+  const [updatedDoctor, setUpdatedDoctor] = useState({ specialization: [] }); // State for storing updated doctor details
 
   const navigate = useNavigate();
   const auth = useAuth();
 
+  const specializationsList = [
+    'Cardiology',
+    'Dermatology',
+    'Neurology',
+    'Orthopedics',
+    'Pediatrics',
+    'Psychiatry',
+    'Radiology',
+  ];
+
   useEffect(() => {
     if (auth.user) {
       setDoctor(auth.user);
+      setUpdatedDoctor({
+        ...auth.user,
+        specializations: auth.user.specialization || [],
+      });
     }
   }, [auth.user]);
 
@@ -57,6 +72,55 @@ const Dashboard = () => {
     navigate('/doctor/dlogin');
   };
 
+  const handleInputChange = (e) => {
+    setUpdatedDoctor({
+      ...updatedDoctor,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSpecializationChange = (e) => {
+    const value = e.target.value;
+    setUpdatedDoctor((prevState) => {
+      if (prevState.specialization.includes(value)) {
+        return {
+          ...prevState,
+          specialization: prevState.specialization.filter((spec) => spec !== value),
+        };
+      } else {
+        return {
+          ...prevState,
+          specialization: [...prevState.specialization, value],
+        };
+      }
+    });
+  };
+
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`http://localhost:5000/api/doctor/profile/${doctor._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedDoctor),
+      });
+
+      if (response.ok) {
+        const updatedData = await response.json();
+        setDoctor(updatedData);
+        // auth.setUser(updatedData); // Update user in AuthContext
+        alert('Profile updated successfully!');
+      } else {
+        alert('Failed to update profile.');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('An error occurred while updating your profile.');
+    }
+  };
+
   return (
     <Container fluid className="dashboard-container">
       <div className="navbar">
@@ -71,7 +135,7 @@ const Dashboard = () => {
         </Col>
       </Row>
       <Row className="dashboard-main">
-        <Col md={3}>
+        <Col md={2}>
           <Card className="dashboard-card" onClick={() => handleCardClick('Patients')}>
             <Card.Body>
               <FaUserMd className="dashboard-icon" />
@@ -81,7 +145,7 @@ const Dashboard = () => {
             </Card.Body>
           </Card>
         </Col>
-        <Col md={3}>
+        <Col md={2}>
           <Card className="dashboard-card" onClick={() => handleCardClick('Appointments')}>
             <Card.Body>
               <FaClipboardList className="dashboard-icon" />
@@ -91,7 +155,7 @@ const Dashboard = () => {
             </Card.Body>
           </Card>
         </Col>
-        <Col md={3}>
+        <Col md={2}>
           <Card className="dashboard-card" onClick={() => handleCardClick('Schedule')}>
             <Card.Body>
               <FaCalendarCheck className="dashboard-icon" />
@@ -101,13 +165,23 @@ const Dashboard = () => {
             </Card.Body>
           </Card>
         </Col>
-        <Col md={3}>
+        <Col md={2}>
           <Card className="dashboard-card" onClick={() => handleCardClick('Prescriptions')}>
             <Card.Body>
               <FaPrescriptionBottleAlt className="dashboard-icon" />
               <Card.Title>Prescriptions</Card.Title>
               <Card.Text>Manage and view prescriptions</Card.Text>
               <Button variant="primary">View Prescriptions</Button>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={2}>
+          <Card className="dashboard-card" onClick={() => handleCardClick('Profile')}>
+            <Card.Body>
+              <FaUserEdit className="dashboard-icon" />
+              <Card.Title>Profile</Card.Title>
+              <Card.Text>Update your profile details</Card.Text>
+              <Button variant="primary">Update Profile</Button>
             </Card.Body>
           </Card>
         </Col>
@@ -144,6 +218,51 @@ const Dashboard = () => {
             <div>
               <h3>Prescriptions</h3>
               <p>Here you can manage and view prescriptions.</p>
+            </div>
+          )}
+          {selectedSection === 'Profile' && (
+            <div>
+              <h3>Update Profile</h3>
+              <Form onSubmit={handleProfileUpdate}>
+                <Form.Group controlId="formName">
+                  <Form.Label>Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="name"
+                    value={updatedDoctor.name || ''}
+                    onChange={handleInputChange}
+                    placeholder="Enter your name"
+                  />
+                </Form.Group>
+                <Form.Group controlId="formEmail">
+                  <Form.Label>Email</Form.Label>
+                  <Form.Control
+                    type="email"
+                    name="email"
+                    value={updatedDoctor.email || ''}
+                    onChange={handleInputChange}
+                    placeholder="Enter your email"
+                  />
+                </Form.Group>
+                <Form.Group controlId="formSpecializations">
+                  <Form.Label>Specializations</Form.Label>
+                  <div>
+                    {specializationsList.map((specialization, index) => (
+                      <Form.Check
+                        key={index}
+                        type="checkbox"
+                        label={specialization}
+                        value={specialization}
+                        checked={updatedDoctor.specialization.includes(specialization)}
+                        onChange={handleSpecializationChange}
+                      />
+                    ))}
+                  </div>
+                </Form.Group>
+                <Button variant="primary" type="submit">
+                  Save Changes
+                </Button>
+              </Form>
             </div>
           )}
         </Col>

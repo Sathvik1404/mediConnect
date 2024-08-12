@@ -43,13 +43,32 @@
 }
 
 .dashboard-main {
-    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px;
+    /* Add spacing between cards */
 }
 
 .dashboard-card {
-    cursor: pointer;
     margin-bottom: 20px;
+    flex: 1;
+    min-width: 220px;
+    /* Ensures the cards have a minimum width */
+    max-width: 250px;
+    /* Ensures the cards have a maximum width */
+    text-align: center;
 }
+
+.dashboard-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.dashboard-details {
+    margin-top: 30px;
+}
+
 
 .dashboard-details {
     background-color: #f8f9fa;

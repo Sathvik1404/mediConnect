@@ -30,7 +30,7 @@ const Login = () => {
       // console.log(formData)
       const user = await auth.doctorLoginAction(formData);
 
-      console.log(user)
+      // console.log(user)
 
       // const data = await response.json();
 
