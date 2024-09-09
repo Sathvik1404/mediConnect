@@ -5,6 +5,7 @@ import Landing from './components/LandingPage';
 import Dashboard from './components/patient/dashboard/Dashboard';
 import Signup from './components/patient/signup/Signup';
 import Login from './components/patient/login/Login';
+import Pprofile from './components/patient/pprofile/Pprofile';
 import DDashboard from './components/doctor/dashboard/Dashboard';
 import DLogin from './components/doctor/login/DLogin';
 import DSignup from './components/doctor/signup/DSignup';
@@ -24,6 +25,7 @@ function App() {
             <Route path='/patient/login' element={<Login />} />
             <Route element={<PatientProtected />}>
               <Route path='/patient/dashboard' element={<Dashboard />} />
+              <Route path='/patient/profile' element={<Pprofile />} />
             </Route>
             <Route path='/doctor/dlogin' element={<DLogin />} />
             <Route path='/doctor/DSignup' element={<DSignup />} />

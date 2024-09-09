@@ -53,5 +53,6 @@ app.use('/api/doctor/hospitals', hospitalsRouter);
 
 // Hospital End Points
 app.use('/api/hospital', hospitalAuthenticationRouter);
+app.use('/api/hospitals', hospitalsRouter);
 
 app.listen(port, () => console.log(`Server is running on ${port}`));

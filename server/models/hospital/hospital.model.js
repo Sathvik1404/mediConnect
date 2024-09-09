@@ -29,9 +29,12 @@ const HospitalSchema = mongoose.Schema({
         required: true,
         default: "hospital"
     },
-    address: {
+    location: {
         type: String,
         required: true
+    },
+    rating: {
+        type: Number
     }
 });
 

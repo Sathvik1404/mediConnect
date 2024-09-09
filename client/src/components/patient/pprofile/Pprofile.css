@@ -1,0 +1,69 @@
+.navbar {
+    background-color: #003366;
+    color: #ffffff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.contt {
+    display: flex;
+    height: 85vh;
+}
+
+.sidebar {
+    background-color: #f8f9fa;
+    width: 300px;
+    /* Ensure the sidebar is wide enough */
+    height: 91vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    /* Add padding to push the content down */
+}
+
+.sidebar-cell {
+    background-color: #007bff;
+    /* Bootstrap primary color */
+    color: #ffffff;
+    width: 80%;
+    /* Make the button smaller than the sidebar width */
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 20px;
+    /* Add spacing below the button */
+}
+
+.content-area {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #ffffff;
+    /* Add a background color to differentiate the content area */
+    display: flex;
+    height: fit-content;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.cardd {
+    position: relative;
+    display: block;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+    margin-top: 20px;
+    width: 77%;
+    height: 75%;
+    padding: 50px;
+}
+
+.navbar-content h1 {
+    margin: 0;
+    font-size: 24px;
+}
