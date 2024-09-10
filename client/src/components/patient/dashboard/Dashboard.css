@@ -97,3 +97,76 @@
     color: #666;
     margin-bottom: 5px;
 }
+
+/* Doctor card styling */
+
+.doctor-card {
+    background-color: white;
+    /* Light background for visibility */
+    border: 1px solid #ddd;
+    /* Subtle border for separation */
+    border-radius: 8px;
+    /* Rounded corners for a modern look */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Shadow for elevation */
+    padding: 16px;
+    /* Space inside the card */
+    margin: 16px 0;
+    /* Space between cards */
+    width: 100%;
+    /* Responsive width */
+    transition: transform 0.2s;
+    /* Add smooth transition for hover effect */
+    cursor: pointer;
+    /* Indicate clickable cards */
+}
+
+.doctor-card:hover {
+    transform: translateY(-5px);
+    /* Slightly lift the card on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    /* Increase shadow on hover */
+}
+
+.doctor-card h4 {
+    font-size: 18px;
+    /* Adjust font size */
+    margin-bottom: 8px;
+    /* Space between title and content */
+    color: #333;
+    /* Dark text color */
+}
+
+.doctor-card p {
+    font-size: 14px;
+    /* Adjust paragraph font size */
+    margin: 4px 0;
+    /* Reduce space between lines */
+    color: #555;
+    /* Subtle color for text */
+}
+
+.doctors-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    /* Space between cards */
+    max-width: 600px;
+    /* Limit width for better readability */
+    margin: 0 auto;
+    /* Center the content */
+}
+
+.back-btn {
+    background-color: #f44336;
+    /* Red color for back button */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.back-btn:hover {
+    background-color: #d32f2f;
+}
