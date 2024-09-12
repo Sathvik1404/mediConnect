@@ -4,25 +4,35 @@ import { useParams } from 'react-router-dom';
 
 function App() {
     const [doctor, setDoctor] = useState('');
+    const [user, setUser] = useState(null);
     const [date, setDate] = useState('');
     const [patientName, setPatientName] = useState('');
     const [email, setEmail] = useState('');
     const [appointmentTime, setAppointmentTime] = useState('');
 
     const { doctorId } = useParams();
+    const userId = localStorage.getItem('user');  // Assuming the user's ID is stored in localStorage
 
-    useEffect(() => {
-        fetchDoctor();
-    }, []);
+    // Fetch user details to prefill patient name and email
+    const fetchUser = async () => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/patient/profile/${userId}`);
+            const data = await response.json();
+            setUser(data);
+            setPatientName(data.name);   // Prefill patient name from user data
+            setEmail(data.email);        // Prefill email from user data
+        } catch (error) {
+            console.error('Error fetching user details:', error);
+        }
+    };
 
     // Fetch doctor details using doctorId from URL params
     const fetchDoctor = async () => {
         try {
             const response = await fetch(`http://localhost:5000/api/doctor/profile/${doctorId}`);
             const data = await response.json();
-
             if (response.ok) {
-                setDoctor(data.name); // Assuming 'name' is a key in the doctor profile data
+                setDoctor(data.name);  // Set doctor name from API
             } else {
                 console.error('Error fetching doctor:', data.message);
             }
@@ -31,20 +41,49 @@ function App() {
         }
     };
 
-    const handleSubmit = (e) => {
+    // UseEffect hook to fetch data on component mount
+    useEffect(() => {
+        fetchDoctor();
+        fetchUser();
+    }, []);
+
+    // Handle appointment submission using FormData
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // In a real application, you'd send the data to a backend here
-        // Example: axios.post('/api/book-appointment', { doctor, date, patientName, email, appointmentTime });
+        // Create FormData object
+        const formData = new FormData();
+        formData.append('doctorId', doctorId);        // Add doctor ID to formData
+        formData.append('patientId', userId);            // Add user ID to formData
+        formData.append('doctorName', doctor);        // Add doctor name
+        formData.append('patientName', patientName);  // Add patient name
+        formData.append('email', email);              // Add email
+        formData.append('date', date);                // Add appointment date
+        formData.append('time', appointmentTime);  // Add appointment time
 
-        alert(`Appointment booked with Dr. ${doctor} on ${date} at ${appointmentTime} for ${patientName} (${email})`);
+        try {
+            console.log(formData)
+            const response = await fetch(`http://localhost:5000/api/appointment`, {
+                method: 'POST',
+                body: formData,  // Send formData in the body
+            });
 
-        // Reset the form
-        setDoctor('');
-        setDate('');
-        setPatientName('');
-        setEmail('');
-        setAppointmentTime('');
+            if (response.ok) {
+                alert(`Appointment booked with Dr. ${doctor} on ${date} at ${appointmentTime} for ${patientName} (${email})`);
+
+                // Reset the form fields
+                setDoctor('');
+                setDate('');
+                setPatientName('');
+                setEmail('');
+                setAppointmentTime('');
+            } else {
+                const data = await response.json();
+                console.error('Error booking appointment:', data.message);
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+        }
     };
 
     return (
@@ -53,7 +92,6 @@ function App() {
             <form onSubmit={handleSubmit}>
                 <div>
                     <label>Doctor: </label>
-                    {/* Automatically populates the doctor name fetched from the API */}
                     <input type="text" value={doctor} disabled />
                 </div>
                 <div>

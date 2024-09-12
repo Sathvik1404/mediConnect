@@ -33,6 +33,8 @@ const doctorProfileRouter = require('./routes/doctorrouters/doctorprofile.router
 const hospitalAuthenticationRouter = require('./routes/hospitalrouters/hospitalauthentication.router');
 const hospitalsRouter = require('./routes/hospitalrouters/hospitalprofile.router');
 
+const appointmentRouter = require('./routes/appointmentrouters/appointment.router');
+
 mongoose.connect(db_url, {
     tls: true,
 })
@@ -54,5 +56,8 @@ app.use('/api/doctor/hospitals', hospitalsRouter);
 // Hospital End Points
 app.use('/api/hospital', hospitalAuthenticationRouter);
 app.use('/api/hospitals', hospitalsRouter);
+
+//Appointment End Ponints
+app.use('/api/appointment', appointmentRouter);
 
 app.listen(port, () => console.log(`Server is running on ${port}`));

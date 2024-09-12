@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Router } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Landing from './components/LandingPage';
@@ -28,7 +28,7 @@ function App() {
             <Route element={<PatientProtected />}>
               <Route path='/patient/dashboard' element={<Dashboard />} />
               <Route path='/patient/profile' element={<Pprofile />} />
-              <Route path="/patient/appointment/:id" element={<Appointment />}></Route>
+              <Route path="/patient/appointment/:doctorId" element={<Appointment />}></Route>
             </Route>
             <Route path='/doctor/dlogin' element={<DLogin />} />
             <Route path='/doctor/DSignup' element={<DSignup />} />
