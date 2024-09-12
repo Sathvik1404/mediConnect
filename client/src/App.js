@@ -28,6 +28,7 @@ function App() {
             <Route element={<PatientProtected />}>
               <Route path='/patient/dashboard' element={<Dashboard />} />
               <Route path='/patient/profile' element={<Pprofile />} />
+              <Route path="/patient/appointment/:id" element={<Appointment />}></Route>
             </Route>
             <Route path='/doctor/dlogin' element={<DLogin />} />
             <Route path='/doctor/DSignup' element={<DSignup />} />
@@ -35,7 +36,6 @@ function App() {
               <Route path='/doctor/dashboard' element={<DDashboard />} />
             </Route>
             <Route path="/doctor/dashboard/patient/:patientId" element={<PatientDetails />} />
-            <Route path="/patient/dashboard/appointment" element={<Appointment />}></Route>
             <Route path="/hospital/signup" element={<HospitalDetails />} />
           </Routes>
 

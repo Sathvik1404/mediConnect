@@ -1,6 +1,6 @@
-// App.js
-import React, { useState } from 'react';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import './appointment.css';
+import { useParams } from 'react-router-dom';
 
 function App() {
     const [doctor, setDoctor] = useState('');
@@ -8,6 +8,28 @@ function App() {
     const [patientName, setPatientName] = useState('');
     const [email, setEmail] = useState('');
     const [appointmentTime, setAppointmentTime] = useState('');
+
+    const { doctorId } = useParams();
+
+    useEffect(() => {
+        fetchDoctor();
+    }, []);
+
+    // Fetch doctor details using doctorId from URL params
+    const fetchDoctor = async () => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/doctor/profile/${doctorId}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                setDoctor(data.name); // Assuming 'name' is a key in the doctor profile data
+            } else {
+                console.error('Error fetching doctor:', data.message);
+            }
+        } catch (error) {
+            console.error('Error fetching doctor:', error);
+        }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -30,14 +52,9 @@ function App() {
             <h2>Book Doctor Appointment</h2>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label>Select Doctor: </label>
-                    <select value={doctor} onChange={(e) => setDoctor(e.target.value)} required>
-                        <option value="" disabled>Select a Doctor</option>
-                        <option value="Smith">Dr. Smith</option>
-                        <option value="Johnson">Dr. Johnson</option>
-                        <option value="Brown">Dr. Brown</option>
-                        {/* Add more doctors here */}
-                    </select>
+                    <label>Doctor: </label>
+                    {/* Automatically populates the doctor name fetched from the API */}
+                    <input type="text" value={doctor} disabled />
                 </div>
                 <div>
                     <label>Appointment Date: </label>

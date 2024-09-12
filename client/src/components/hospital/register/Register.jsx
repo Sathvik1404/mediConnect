@@ -1,69 +1,193 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react';
 import './Register.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 const Register = () => {
   const navigate = useNavigate();
-  const handleChange = () => {
-    navigate('/hospital/login')
-  };
+
   const [formData, setFormData] = useState({
     name: '',
-    locatiton: '',
-    telephone: '',
+    location: '',
+    mobile: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
-  const handlesubmit = () => {
-    toast.success("Hospital Added Succesfully!")
-  }
+
+  const [loading, setLoading] = useState(false); // Loading state
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validation for password match
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+
+    // Validation for mobile number
+    if (!/^\d+$/.test(formData.mobile)) {
+      toast.error("Invalid mobile number. Please enter digits only.");
+      return;
+    }
+
+    setLoading(true); // Start loading
+
+    try {
+      const response = await fetch('http://localhost:5000/api/hospital/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('🎉 Signup successful!', {
+          position: 'top-center',
+          className: 'custom-toast',
+        });
+
+        setFormData({
+          name: '',
+          location: '',
+          mobile: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+        });
+      } else {
+        toast.error(data.error || '⚠️ Signup failed. Please try again.', {
+          position: 'top-center',
+          className: 'custom-toast',
+        });
+      }
+    } catch (error) {
+      toast.error(`Error: ${error.message}`, {
+        position: 'top-center',
+        className: 'custom-toast',
+      });
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  };
+
+  const handleLogout = () => {
+    navigate('/hospital/login');
+  };
 
   return (
     <>
-      {/* <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"></link> */}
-
       <div className="signup-page">
         <div className="navbar">
           <h3>mediConnect</h3>
           <div className="navbar-content">
-            <button className="logout-btn" onClick={handleChange}>Logout</button>
+            <button className="logout-btn" onClick={handleLogout}>Logout</button>
           </div>
         </div>
+
         <div className="signup-container">
-          <form action="" className="signup-form">
+          <form className="signup-form" onSubmit={handleSubmit}>
             <label htmlFor="name">Hospital Name:</label>
-            <div class="input-group mb-3">
-              <input type="text" class="form-control" placeholder="Ex.Gandhi" aria-label="Username" required />
+            <div className="input-group mb-3">
+              <input
+                type="text"
+                className="form-control"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Ex.Gandhi"
+                required
+              />
             </div>
-            <label htmlFor="location">Location :</label>
-            <div class="input-group mb-3">
-              <input type="text" class="form-control" placeholder="Ex.Hyderabad" aria-label="Username" required />
+
+            <label htmlFor="location">Location:</label>
+            <div className="input-group mb-3">
+              <input
+                type="text"
+                className="form-control"
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+                placeholder="Ex.Hyderabad"
+                required
+              />
             </div>
-            <label htmlFor="number">Telephone :</label>
-            <div class="input-group mb-3">
-              <input type="text" class="form-control" placeholder="Ex. 040-2346723" aria-label="Username" required />
+
+            <label htmlFor="mobile">Telephone:</label>
+            <div className="input-group mb-3">
+              <input
+                type="text"
+                className="form-control"
+                name="mobile"
+                value={formData.mobile}
+                onChange={handleChange}
+                placeholder="Ex. 040-2346723"
+                required
+              />
             </div>
-            <label htmlFor="email">Email</label>
-            <div class="input-group mb-3">
-              <input type="text" class="form-control" placeholder="Ex.abc@gmail.com" aria-label="Username" required />
+
+            <label htmlFor="email">Email:</label>
+            <div className="input-group mb-3">
+              <input
+                type="email"
+                className="form-control"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Ex.abc@gmail.com"
+                required
+              />
             </div>
-            <label htmlFor="email">Password</label>
-            <div class="input-group mb-3">
-              <input type="password" class="form-control" placeholder="Ex.*******" aria-label="Username" required />
+
+            <label htmlFor="password">Password:</label>
+            <div className="input-group mb-3">
+              <input
+                type="password"
+                className="form-control"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Ex.*******"
+                required
+              />
             </div>
-            <label htmlFor="email">Confirm Password</label>
-            <div class="input-group mb-3">
-              <input type="text" class="form-control" placeholder="Ex.********" aria-label="Username" required />
+
+            <label htmlFor="confirmPassword">Confirm Password:</label>
+            <div className="input-group mb-3">
+              <input
+                type="password"
+                className="form-control"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Ex.********"
+                required
+              />
             </div>
-            <button class="btn btn-outline-success" onClick={handlesubmit}>Submit</button>
+
+            <button type="submit" className="btn btn-outline-success" disabled={loading}>
+              {loading ? 'Submitting...' : 'Submit'}
+            </button>
           </form>
         </div>
+        <ToastContainer />
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;

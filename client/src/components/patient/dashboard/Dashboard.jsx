@@ -10,11 +10,6 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const auth = useAuth();
 
-  useEffect(() => {
-    console.log('Doctors state updated:', doctors[0]);
-  }, [doctors]);
-
-
   // Function to handle logout
   const handleLogout = () => {
     auth.logout();
@@ -56,8 +51,6 @@ const Dashboard = () => {
 
       setDoctors(doctorsDetails);  // Set the full doctors data in state
       setSelectedHospital(data.name);  // Set selected hospital name for display
-
-      console.log('Fetched doctors:', doctorsDetails); // Log the full doctor details
     } catch (error) {
       console.error('Error fetching hospital details or doctors:', error);
     }
@@ -74,9 +67,11 @@ const Dashboard = () => {
     setSelectedHospital(null);  // Clear selected hospital
   };
 
-  const handleappointment = () => {
-    navigate('/patient/appointment')
-  }
+  // Updated function to handle appointment booking and pass doctor name via URL params
+  const handleappointment = (doctorId) => {
+    navigate(`/patient/appointment/${doctorId}`);
+  };
+
   return (
     <div className="dashboard-container">
       <div className="navbar">
@@ -99,7 +94,6 @@ const Dashboard = () => {
             <button onClick={goBackToHospitals} className="back-btn">Back to Hospitals</button>
             {doctors.length > 0 ? (
               doctors.map((doctor, index) => {
-                console.log(doctor.specialization);  // Check if each doctor object is correct
                 return (
                   <div key={index} className="doctor-card" style={{ color: 'black' }}>
                     <h4>{doctor.name ? doctor.name : 'Unknown Name'}</h4>  {/* Fallback if name is missing */}
@@ -115,7 +109,9 @@ const Dashboard = () => {
                       )}
                     </p>
                     <p>Experience : {doctor.experience ? doctor.experience : 'N/A'} years</p>
-                    <button className="btn btn-primary" onClick={handleappointment}>Book Appointment</button>
+                    <button className="btn btn-primary" onClick={() => handleappointment(doctor._id)}>
+                      Book Appointment
+                    </button> {/* Pass doctor name to handleappointment */}
                   </div>
                 );
               })

@@ -22,10 +22,10 @@ router.use(session({
 }));
 
 router.post('/signup', async (req, res) => {
-    const { name, email, password, mobile } = req.body;
+    const { name, email, password, mobile, location } = req.body;
     try {
         const hash = await bcrypt.hash(password, 12);
-        await hospitalModel.create({ name, email, password: hash, mobile })
+        await hospitalModel.create({ name, email, password: hash, mobile, location })
             .then(user => res.json({ success: true }))
             .catch(err => res.json(err))
     } catch (err) {
