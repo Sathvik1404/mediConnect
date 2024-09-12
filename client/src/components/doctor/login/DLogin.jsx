@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './DLogin.css';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../AuthContext';
+import 'bootstrap/dist/css/bootstrap.css';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -79,24 +80,29 @@ const Login = () => {
         <form className="login-form" onSubmit={handleSubmit}>
           <h3 style={{ margintop: '8px' }}>Doctor Login</h3>
           <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+          <div className="input-group mb-3">
+            <input
+              className="form-control"
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
           <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+          <div className="input-group mb-3">
+            <input
+              className="form-control"
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            /></div>
           <button type="submit" disabled={loading}>
             {loading ? 'Loggin in...' : 'Login'}
           </button>

@@ -4,6 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 // import { Link } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import './DSingup.css';
+import 'bootstrap/dist/css/bootstrap.css';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -23,7 +24,9 @@ const Signup = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
+  const handleothers = () => {
+    document.querySelector(".hideapp").style.display = "inherit";
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -98,25 +101,40 @@ const Signup = () => {
           <h3 style={{ margintop: '8px' }}>Doctor Signup</h3>
 
           <label htmlFor="name">Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-
+          <div className="input-group mb-3">
+            <input
+              className="form-contorl"
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
           <label htmlFor="spec">Specialization</label>
-          <input
-            type="text"
-            id="spec"
-            name="spec"
-            value={formData.spec}
-            onChange={handleChange}
-            required
-          />
-
+          <select class="form-select" aria-label="Default select example">
+            <option selected><b>Select Specialization</b></option>
+            <option value="1">Cardiology</option>
+            <option value="2">Dermatology</option>
+            <option value="3">Nuerology</option>
+            <option value="4">Orthopedics</option>
+            <option value="5">Pediatrics</option>
+            <option value="6">General Physician</option>
+            <option value="7">Psychiatry</option>
+            <option value="8">Radiology</option>
+            <option value="9" onClick={handleothers}>Others</option>
+          </select>
+          <div className="hideadd">
+            <label htmlFor="speci">Add Speciliazation</label>
+            <div className="input-group mb-3">
+              <input
+                className="form-contorl"
+                type="text"
+                required
+              ></input>
+            </div>
+          </div>
           {/* <label htmlFor="gender">Gender</label>
           <select
             id="gender"
@@ -132,44 +150,52 @@ const Signup = () => {
           </select> */}
 
           <label htmlFor="mobile">Mobile</label>
-          <input
-            type="tel"
-            id="mobile"
-            name="mobile"
-            value={formData.mobile}
-            onChange={handleChange}
-            required
-          />
+          <div className="input-group mb-3">
+            <input
+              className="form-contol"
+              type="tel"
+              id="mobile"
+              name="mobile"
+              value={formData.mobile}
+              onChange={handleChange}
+              required
+            /></div>
 
           <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+          <div className="input-group mb-3">
+            <input
+              className="form-contol"
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            /></div>
 
           <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+          <div className="input-group mb-3">
+            <input
+              className="form-contol"
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            /></div>
 
           <label htmlFor="confirmPassword">Re-enter Password</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-          />
+          <div className="input-group mb-3">
+            <input
+              className="form-contol"
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+            /></div>
 
           <button type="submit" disabled={loading}>
             {loading ? 'Signing up...' : 'Signup'}
@@ -183,8 +209,8 @@ const Signup = () => {
           </div> */}
         </form>
         <ToastContainer />
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

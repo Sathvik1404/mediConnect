@@ -9,6 +9,26 @@
     background-color: #003366;
 }
 
+.logo {
+    padding-left: 15px;
+    padding-top: 10px;
+    height: 15px;
+    width: 10%;
+    align-items: center;
+}
+
+.marquee {
+    padding-top: 1%;
+    height: 35px;
+    font-family: sans-serif;
+    width: 100%;
+}
+
+.footer {
+    display: flex;
+    flex-direction: row;
+}
+
 .doctor-card,
 .patient-card {
     padding: 10%;

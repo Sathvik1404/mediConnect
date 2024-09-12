@@ -93,14 +93,16 @@ const Signup = () => {
           <h3 style={{ margintop: '8px' }}>Patient Signup</h3>
 
           <label htmlFor="name">Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
+          <div className="input-group mb-3">
+            <input
+              className="form-control"
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            /></div>
 
           {/* <label htmlFor="age">Age</label>
           <input
@@ -111,15 +113,17 @@ const Signup = () => {
             onChange={handleChange}
             required
           /> */}
-
-          <label htmlFor="gender">Gender</label>
-          <select
-            id="gender"
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            required
-          >
+          <div className="input-group mb-3">
+            <label htmlFor="gender">Gender</label>
+            <div
+              id="gender"
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              required
+            ></div>
+          </div>
+          <select name="" id="">
             <option value="">Select your gender</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
@@ -127,44 +131,52 @@ const Signup = () => {
           </select>
 
           <label htmlFor="mobile">Mobile</label>
-          <input
-            type="tel"
-            id="mobile"
-            name="mobile"
-            value={formData.mobile}
-            onChange={handleChange}
-            required
-          />
+          <div className="input-group mb-3">
+            <input
+              className="form-control"
+              type="tel"
+              id="mobile"
+              name="mobile"
+              value={formData.mobile}
+              onChange={handleChange}
+              required
+            /></div>
 
           <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+          <div className="input-group mb-3">
+            <input
+              className="form-control"
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            /></div>
 
           <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+          <div className="input-group mb-3">
+            <input
+              className="form-control"
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            /></div>
 
           <label htmlFor="confirmPassword">Re-enter Password</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-          />
+          <div className="input-group mb-3">
+            <input
+              className="form-control"
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+            /></div>
 
           <button type="submit" disabled={loading}>
             {loading ? 'Signing up...' : 'Signup'}

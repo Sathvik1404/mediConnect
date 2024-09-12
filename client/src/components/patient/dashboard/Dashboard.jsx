@@ -74,6 +74,9 @@ const Dashboard = () => {
     setSelectedHospital(null);  // Clear selected hospital
   };
 
+  const handleappointment = () => {
+    navigate('/patient/appointment')
+  }
   return (
     <div className="dashboard-container">
       <div className="navbar">
@@ -112,6 +115,7 @@ const Dashboard = () => {
                       )}
                     </p>
                     <p>Experience : {doctor.experience ? doctor.experience : 'N/A'} years</p>
+                    <button className="btn btn-primary" onClick={handleappointment}>Book Appointment</button>
                   </div>
                 );
               })
@@ -135,7 +139,7 @@ const Dashboard = () => {
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 };
 

@@ -155,7 +155,7 @@ const Dashboard = () => {
             </Card.Body>
           </Card>
         </Col>
-        <Col md={2}>
+        {/* <Col md={2}>
           <Card className="dashboard-card" onClick={() => handleCardClick('Schedule')}>
             <Card.Body>
               <FaCalendarCheck className="dashboard-icon" />
@@ -164,7 +164,7 @@ const Dashboard = () => {
               <Button variant="primary">View Schedule</Button>
             </Card.Body>
           </Card>
-        </Col>
+        </Col> */}
         <Col md={2}>
           <Card className="dashboard-card" onClick={() => handleCardClick('Prescriptions')}>
             <Card.Body>

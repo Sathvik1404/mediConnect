@@ -125,6 +125,10 @@
     font-size: 24px;
 }
 
+.hideadd {
+    display: none;
+}
+
 .navbar-content button {
     background-color: #ff6f61;
     /* Coral */

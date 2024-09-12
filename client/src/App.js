@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Router } from 'react-router-dom';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Landing from './components/LandingPage';
@@ -13,6 +13,8 @@ import AuthProvider from './components/AuthContext';
 import PatientProtected from './components/patient/PatientProtected';
 import DoctorProtected from './components/doctor/DoctorProtected';
 import PatientDetails from './components/doctor/dashboard/PatientDetails';
+import HospitalDetails from './components/hospital/register/Register';
+import Appointment from './components/patient/dashboard/appointment';
 
 function App() {
   return (
@@ -33,7 +35,10 @@ function App() {
               <Route path='/doctor/dashboard' element={<DDashboard />} />
             </Route>
             <Route path="/doctor/dashboard/patient/:patientId" element={<PatientDetails />} />
+            <Route path="/patient/dashboard/appointment" element={<Appointment />}></Route>
+            <Route path="/hospital/signup" element={<HospitalDetails />} />
           </Routes>
+
         </BrowserRouter>
       </AuthProvider>
     </div>
