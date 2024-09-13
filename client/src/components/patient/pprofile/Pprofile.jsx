@@ -3,6 +3,7 @@ import { useAuth } from '../../AuthContext';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Pprofile.css'
+import { FaArrowLeft } from 'react-icons/fa';
 
 const Pprofile = () => {
   const [patient, setPatient] = useState({});
@@ -139,7 +140,9 @@ const Pprofile = () => {
       </div>
       <div className="contt">
         <div className="sidebar">
-          <button type="button" onClick={() => navigate(-1)}>Go Back</button>
+          <button type="button" onClick={() => navigate(-1)} className="back-btn">
+            <FaArrowLeft /> Back
+          </button>
           <div className="sidebar-cell" onClick={handleEditToggle}>
             {isEditing ? 'Cancel' : 'Edit'}
           </div>

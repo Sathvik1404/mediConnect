@@ -124,8 +124,8 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="dashboard-container">
-      <div className="navbar">
+    <div className="dashboard-conta">
+      <div className="navba">
         <h3>mediConnect</h3>
         <div className="navbar-content">
           <button onClick={handleLogout} className="logout-btn">Logout</button>

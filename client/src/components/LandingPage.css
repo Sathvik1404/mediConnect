@@ -1,95 +1,125 @@
-/* General styling for the landing page */
 .landing-page {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
+    position: relative;
+    width: 100%;
     height: 100vh;
-    background: linear-gradient(135deg, #ffffff, #c3e0e5);
-    padding: 20px;
-    flex-wrap: wrap;
-}
-
-/* Styling for the cards */
-.doctor-card,
-.patient-card {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    padding: 20px;
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
-    cursor: pointer;
-}
-
-.doctor-card:hover,
-.patient-card:hover {
-    transform: scale(1.1);
-    box-shadow: 0px 15px 40px rgba(0, 0, 0, 0.2);
-}
-
-.doctor-card img,
-.patient-card img {
-    margin-bottom: 15px;
-}
-
-h1 {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.5rem;
-    color: #333;
-}
-
-/* Responsive behavior for smaller screens */
-@media (max-width: 768px) {
-    .landing-page {
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    .doctor-card,
-    .patient-card {
-        margin-bottom: 20px;
-        width: 100%;
-        max-width: 300px;
-    }
-}
-
-/* Styling for the marquee footer */
-.footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background-color: #333;
+    overflow: hidden;
     background-color: #003366;
 }
 
-.marquee {
-    font-size: 1rem;
-    color: #e0e0e0;
+.doctor {
+    margin-top: 35%;
+    color: whitesmoke;
 }
 
-/* Left and right card sections */
+
+.second {
+    display: flex;
+    flex-direction: row;
+    gap: 35%;
+    margin-top: 2px;
+    margin-left: 20%;
+}
+
+.hospital-card {
+    margin-top: 35%;
+    color: black;
+}
+
+.patient-card {
+    margin-top: 35%;
+    color: whitesmoke;
+    transition: transform 0.3s ease;
+}
+
+
+.patient-card:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+}
+
 .card {
     position: absolute;
-    bottom: 20px;
-    padding: 20px;
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.1);
+    width: 280px;
+    height: 170px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1.5em;
+    color: #333;
+    animation-duration: 3s;
+    animation-fill-mode: forwards;
+    transition: transform 0.3s ease;
+}
+
+
+.card:hover {
+    transform: scale(1.05);
 }
 
 .card-left {
-    left: 20px;
+    left: -300px;
+    animation-name: slideInLeft;
 }
 
 .card-right {
-    right: 20px;
+    right: -300px;
+    animation-name: slideInRight;
 }
 
-.App {
-    padding: none;
+.link-line {
+    position: absolute;
+    width: 0;
+    height: 3px;
+    background-color: #007bff;
+    top: 50%;
+    z-index: -1;
+    animation: linkGrow 3s forwards;
 }
 
-@keyframes movee {}
+.link {
+    size: 20px;
+}
+
+@keyframes slideInLeft {
+    0% {
+        left: -50%;
+    }
+
+    100% {
+        left: calc(50% - 1000px);
+        margin-bottom: 30%;
+    }
+}
+
+@keyframes slideInRight {
+    0% {
+        right: -50%;
+    }
+
+    100% {
+        right: calc(50% - 300px);
+        margin-bottom: 30%;
+    }
+}
+
+@keyframes linkGrow {
+    0% {
+        width: 0;
+        left: 50%;
+    }
+
+    100% {
+        width: 50px;
+        left: calc(50% - 550px);
+    }
+}

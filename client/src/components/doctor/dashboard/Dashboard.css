@@ -1,8 +1,15 @@
-.dashboard-container {
-    background-color: #f8f9fa;
-    padding: 30px;
-    height: 100vh;
+.dashboard-content {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    /* Remove max-width to allow full-width */
+    max-width: none;
+    /* Ensure no margin is restricting the width */
+    margin: 0;
 }
+
 
 .dashboard-header {
     margin-bottom: 30px;
@@ -81,4 +88,16 @@
 
 .App {
     padding: none;
+}
+
+.navba {
+    background-color: #003366;
+    color: #ffffff;
+    padding: 10px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    /* Remove max-width to allow full-width */
+    max-width: none;
 }

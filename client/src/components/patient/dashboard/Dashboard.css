@@ -1,26 +1,36 @@
-.dashboard-container {
+.dashboard-conta {
     font-family: 'Arial', sans-serif;
     min-height: 100vh;
     background-color: #f7f9fc;
     color: #333;
-    padding: 0px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* padding: 20px; */
 }
 
-.navbar {
+body {
+    width: 100%;
+}
+
+.navba {
     background-color: #003366;
     color: #ffffff;
-    padding: 10px 20px;
+    padding: 10px 25px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
+    /* Remove max-width to allow full-width */
+    max-width: none;
 }
 
-.navbar h3 {
+
+.navba h3 {
     font-size: 24px;
 }
 
-.navbar-content .logout-btn {
-    /* background-color: #ff4d4d; */
+.navba-content .logout-btn {
     border: none;
     color: white;
     padding: 10px 20px;
@@ -29,7 +39,7 @@
     transition: background-color 0.3s ease;
 }
 
-.navbar-content .logout-btn:hover {
+.navba-content .logout-btn:hover {
     background-color: #e60000;
 }
 
@@ -38,6 +48,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
+    /* Remove max-width to allow full-width */
+    max-width: none;
+    /* Ensure no margin is restricting the width */
+    margin: 0;
 }
 
 .header {
@@ -72,6 +87,9 @@
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
     width: 100%;
+    max-width: 1200px;
+    /* Limit grid width */
+    margin: 0 auto;
 }
 
 .hospital-card {
@@ -102,64 +120,44 @@
 
 .doctor-card {
     background-color: white;
-    /* Light background for visibility */
     border: 1px solid #ddd;
-    /* Subtle border for separation */
     border-radius: 8px;
-    /* Rounded corners for a modern look */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    /* Shadow for elevation */
     padding: 16px;
-    /* Space inside the card */
     margin: 16px 0;
-    /* Space between cards */
     width: 100%;
-    /* Responsive width */
     transition: transform 0.2s;
-    /* Add smooth transition for hover effect */
     cursor: pointer;
-    /* Indicate clickable cards */
 }
 
 .doctor-card:hover {
     transform: translateY(-5px);
-    /* Slightly lift the card on hover */
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    /* Increase shadow on hover */
 }
 
 .doctor-card h4 {
     font-size: 18px;
-    /* Adjust font size */
     margin-bottom: 8px;
-    /* Space between title and content */
     color: #333;
-    /* Dark text color */
 }
 
 .doctor-card p {
     font-size: 14px;
-    /* Adjust paragraph font size */
     margin: 4px 0;
-    /* Reduce space between lines */
     color: #555;
-    /* Subtle color for text */
 }
 
 .doctors-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    /* Space between cards */
+    width: 100%;
     max-width: 600px;
-    /* Limit width for better readability */
     margin: 0 auto;
-    /* Center the content */
 }
 
 .back-btn {
     background-color: #f44336;
-    /* Red color for back button */
     color: white;
     padding: 10px 20px;
     border: none;
@@ -168,5 +166,45 @@
 }
 
 .back-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Appointments Section */
+.appointments-section {
+    width: 100%;
+    max-width: 800px;
+    /* Limit width for better readability */
+    margin: 2rem auto;
+}
+
+.appointments-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.appointments-section li {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.appointments-section li p {
+    margin: 0.5rem 0;
+    color: #555;
+}
+
+.btn-danger {
+    background-color: #f44336;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
     background-color: #d32f2f;
 }

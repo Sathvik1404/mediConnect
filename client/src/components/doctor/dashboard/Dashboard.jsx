@@ -169,8 +169,8 @@ const Dashboard = () => {
   };
 
   return (
-    <Container fluid className="dashboard-container">
-      <div className="navbar">
+    <Container fluid className="dashboard-contain">
+      <div className="navba">
         <h3>mediConnect</h3>
         <div className="navbar-content">
           <button onClick={handleLogout}>Logout</button>
