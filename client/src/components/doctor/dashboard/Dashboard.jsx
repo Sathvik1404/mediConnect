@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
+import { FaUserMd, FaClipboardList, FaCalendarCheck, FaPrescriptionBottleAlt, FaUserEdit } from 'react-icons/fa';
 import './Dashboard.css'; // Custom CSS file for additional styling
 import { useAuth } from '../../AuthContext';
 import { useNavigate } from 'react-router-dom';
