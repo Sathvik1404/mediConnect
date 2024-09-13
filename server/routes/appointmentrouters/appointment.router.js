@@ -28,6 +28,13 @@ router.get('/', async (req, res) => {
     } else {
         res.status(200).json(response)
     }
+});
+
+router.put('/:id', async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    const appointment = await AppointmentModel.findOneAndUpdate({ _id: id }, { status }, { new: true });
+    res.status(200).json(appointment);
 })
 
 module.exports = router;

@@ -4,87 +4,123 @@ import { useAuth } from '../../AuthContext';
 import './Dashboard.css';
 
 const Dashboard = () => {
-  const [hospitals, setHospitals] = useState([]);  // State for hospitals
-  const [doctors, setDoctors] = useState([]);      // State for doctors in the selected hospital
-  const [selectedHospital, setSelectedHospital] = useState(null);  // State for selected hospital
-  const [loading, setLoading] = useState(false);   // Loading state
-  const [error, setError] = useState(null);        // Error state
+  const [hospitals, setHospitals] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [selectedHospital, setSelectedHospital] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [appointments, setAppointments] = useState([]); // State for active appointments
+
   const navigate = useNavigate();
   const auth = useAuth();
 
-  // Function to handle logout
   const handleLogout = () => {
     auth.logout();
     navigate('/patient/login');
   };
 
-  // Function to navigate to the Profile page
   const goProfile = () => {
     navigate('/patient/profile');
   };
 
-  // Function to fetch hospitals from the API
   const fetchHospitals = async () => {
     try {
-      setLoading(true); // Set loading state
+      setLoading(true);
       const response = await fetch('http://localhost:5000/api/hospitals');
       if (!response.ok) throw new Error('Failed to fetch hospitals');
       const data = await response.json();
-      setHospitals(data);  // Set the hospitals data in state
-      setError(null); // Clear error
+      setHospitals(data);
+      setError(null);
     } catch (error) {
       console.error('Error fetching hospitals:', error);
       setError('Error fetching hospitals');
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
-  // Function to fetch doctors of a selected hospital from the API
   const fetchDoctors = async (id) => {
     try {
-      setLoading(true); // Set loading state
+      setLoading(true);
       const response = await fetch(`http://localhost:5000/api/hospitals/${id}`);
       if (!response.ok) throw new Error('Failed to fetch hospital details');
       const data = await response.json();
 
-      // Assuming data.doctors is an array of doctor IDs
       const doctorIds = data.doctors;
-
-      // Fetch details for each doctor by their ID
       const doctorsDetails = await Promise.all(
         doctorIds.map(async (doctorId) => {
           const doctorResponse = await fetch(`http://localhost:5000/api/doctor/profile/${doctorId}`);
           if (!doctorResponse.ok) throw new Error(`Failed to fetch doctor with id ${doctorId}`);
-          return await doctorResponse.json(); // Assuming this returns a single doctor's data
+          return await doctorResponse.json();
         })
       );
 
-      setDoctors(doctorsDetails);  // Set the full doctors data in state
-      setSelectedHospital(data.name);  // Set selected hospital name for display
-      setError(null); // Clear error
+      setDoctors(doctorsDetails);
+      setSelectedHospital(data.name);
+      setError(null);
     } catch (error) {
       console.error('Error fetching hospital details or doctors:', error);
       setError('Error fetching hospital details or doctors');
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
-  // useEffect to fetch hospitals when the component loads
-  useEffect(() => {
-    fetchHospitals();
-  }, []);
-
-  // Function to go back to the hospitals list
-  const goBackToHospitals = () => {
-    setDoctors([]);  // Clear the doctors data
-    setSelectedHospital(null);  // Clear selected hospital
+  const fetchAppointments = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:5000/api/appointment'); // Adjust URL as needed
+      if (!response.ok) throw new Error('Failed to fetch appointments');
+      const data = await response.json();
+      // Filter appointments to include only those belonging to the current patient
+      const filteredAppointments = data.filter(appointment => appointment.patientId === auth.user._id); // Assuming auth.user.id holds the patient ID
+      setAppointments(filteredAppointments);
+      setError(null);
+    } catch (error) {
+      console.error('Error fetching appointments:', error);
+      setError('Error fetching appointments');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Updated function to handle appointment booking
+  const cancelAppointment = async (appointmentId) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`http://localhost:5000/api/appointment/${appointmentId}`, {
+        method: 'PUT', // Assuming you're using DELETE for cancellation
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: "Cancelled" })
+      });
+      if (!response.ok) throw new Error('Failed to cancel appointment');
+
+      // Remove the cancelled appointment from the state
+      setAppointments((prevAppointments) =>
+        prevAppointments.filter((appointment) => appointment._id !== appointmentId)
+      );
+      setError(null);
+    } catch (error) {
+      console.error('Error cancelling appointment:', error);
+      setError('Error cancelling appointment');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchHospitals();
+    fetchAppointments();
+  }, []);
+
+  const goBackToHospitals = () => {
+    setDoctors([]);
+    setSelectedHospital(null);
+  };
+
   const handleappointment = (doctorId) => {
-    navigate(`/patient/appointment/${doctorId}`); // No need to cast ObjectId
+    navigate(`/patient/appointment/${doctorId}`);
   };
 
   return (
@@ -102,38 +138,34 @@ const Dashboard = () => {
           <button onClick={goProfile} className="profile-btn">View Profile</button>
         </div>
 
-        {/* Show loading spinner or error if needed */}
         {loading && <p>Loading...</p>}
         {error && <p className="error-message">{error}</p>}
 
-        {/* Conditional rendering based on whether a hospital is selected */}
         {selectedHospital ? (
           <div className="doctors-list">
             <h3>Doctors at {selectedHospital}</h3>
             <button onClick={goBackToHospitals} className="back-btn">Back to Hospitals</button>
             {doctors.length > 0 ? (
-              doctors.map((doctor, index) => {
-                return (
-                  <div key={index} className="doctor-card" style={{ color: 'black' }}>
-                    <h4>{doctor.name ? doctor.name : 'Unknown Name'}</h4>  {/* Fallback if name is missing */}
-                    <p>
-                      Specialization : {doctor.specialization && doctor.specialization.length > 0 ? (
-                        doctor.specialization.map((spec, idx) => (
-                          <span key={idx}>
-                            {spec}{idx < doctor.specialization.length - 1 && ', '}
-                          </span>
-                        ))
-                      ) : (
-                        'N/A'
-                      )}
-                    </p>
-                    <p>Experience : {doctor.experience ? doctor.experience : 'N/A'} years</p>
-                    <button className="btn btn-primary" onClick={() => handleappointment(doctor._id)}>
-                      Book Appointment
-                    </button> {/* Pass doctor ID to handleappointment */}
-                  </div>
-                );
-              })
+              doctors.map((doctor, index) => (
+                <div key={index} className="doctor-card" style={{ color: 'black' }}>
+                  <h4>{doctor.name ? doctor.name : 'Unknown Name'}</h4>
+                  <p>
+                    Specialization : {doctor.specialization && doctor.specialization.length > 0 ? (
+                      doctor.specialization.map((spec, idx) => (
+                        <span key={idx}>
+                          {spec}{idx < doctor.specialization.length - 1 && ', '}
+                        </span>
+                      ))
+                    ) : (
+                      'N/A'
+                    )}
+                  </p>
+                  <p>Experience : {doctor.experience ? doctor.experience : 'N/A'} years</p>
+                  <button className="btn btn-primary" onClick={() => handleappointment(doctor._id)}>
+                    Book Appointment
+                  </button>
+                </div>
+              ))
             ) : (
               <p>No doctors available for this hospital.</p>
             )}
@@ -153,6 +185,30 @@ const Dashboard = () => {
             )}
           </div>
         )}
+
+        {/* Active Appointments Section */}
+        <div className="appointments-section">
+          <h3>Active Appointments</h3>
+          {loading && <p>Loading...</p>}
+          {error && <p className="error-message">{error}</p>}
+          {appointments.length > 0 ? (
+            <ul>
+              {appointments.map((appointment, index) => (
+                <li key={index}>
+                  <p><strong>Doctor:</strong> {appointment.doctorName}</p>
+                  <p><strong>Date:</strong> {new Date(appointment.date).toLocaleDateString()}</p>
+                  <p><strong>Time:</strong> {appointment.time}</p>
+                  <p><strong>Status:</strong> {appointment.status}</p>
+                  <button className="btn btn-danger" onClick={() => cancelAppointment(appointment._id)}>
+                    Cancel Appointment
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No active appointments.</p>
+          )}
+        </div>
       </div>
     </div>
   );
