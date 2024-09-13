@@ -18,7 +18,7 @@ import Appointment from './components/patient/dashboard/appointment';
 
 function App() {
   return (
-    <div className='App'>
+    <div className='App' style={{ padding: "none" }}>
       <AuthProvider>
         <BrowserRouter>
           <Routes>

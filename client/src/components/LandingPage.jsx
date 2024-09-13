@@ -26,14 +26,7 @@ const LandingPage = () => {
                 </marquee>
             </div>
             <div className="landing-page">
-                <div className="doctor-card" onClick={toDoc}>
-                    <img src={img} alt="doctor" height={"125px"} width={"125px"} />
-                    <h1>Doctor</h1>
-                </div>
-                <div className="patient-card" onClick={toPatient}>
-                    <img src={pat} alt="patient" height={"125px"} width={"125px"} />
-                    <h1>Patient</h1>
-                </div>
+
                 <div className="card card-left">
                     <h1>medi</h1>
                     <p>Your Health Is</p>
@@ -41,6 +34,14 @@ const LandingPage = () => {
                 <div className="card card-right">
                     <h1>Connect</h1>
                     <p>Our Priority</p>
+                </div>
+                <div className="doctor-card" onClick={toDoc}>
+                    <img src={img} alt="doctor" height={"125px"} width={"125px"} />
+                    <h1>Doctor</h1>
+                </div>
+                <div className="patient-card" onClick={toPatient}>
+                    <img src={pat} alt="patient" height={"125px"} width={"125px"} />
+                    <h1>Patient</h1>
                 </div>
             </div>
         </>

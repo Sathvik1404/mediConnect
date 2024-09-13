@@ -146,3 +146,7 @@
     background-color: #e65b54;
     /* Slightly darker coral for hover effect */
 }
+
+.App {
+    padding: 0px;
+}

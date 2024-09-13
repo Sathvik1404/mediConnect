@@ -62,7 +62,7 @@ h1 {
     align-items: center;
     padding: 10px;
     background-color: #333;
-    color: white;
+    background-color: #003366;
 }
 
 .marquee {
@@ -87,3 +87,9 @@ h1 {
 .card-right {
     right: 20px;
 }
+
+.App {
+    padding: none;
+}
+
+@keyframes movee {}
