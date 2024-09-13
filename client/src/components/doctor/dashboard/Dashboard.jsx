@@ -187,7 +187,7 @@ const Dashboard = () => {
             </Card.Body>
           </Card>
         </Col> */}
-        <Col md={2}>
+        {/* <Col md={2}>
           <Card className="dashboard-card" onClick={() => handleCardClick('Prescriptions')}>
             <Card.Body>
               <FaPrescriptionBottleAlt className="dashboard-icon" />
@@ -196,7 +196,7 @@ const Dashboard = () => {
               <Button variant="primary">View Prescriptions</Button>
             </Card.Body>
           </Card>
-        </Col>
+        </Col> */}
         <Col md={2}>
           <Card className="dashboard-card" onClick={() => handleCardClick('Profile')}>
             <Card.Body>
@@ -233,8 +233,9 @@ const Dashboard = () => {
                     <li key={index}>
                       <p><strong>Patient:</strong> {appointment.patientName}</p>
                       <p><strong>Date:</strong> {new Date(appointment.date).toLocaleDateString()}</p>
-                      <p><strong>Time:</strong> {new Date(appointment.time).toLocaleTimeString()}</p>
+                      <p><strong>Time:</strong> {appointment.time}</p>
                       <p><strong>Status:</strong> {appointment.status}</p>
+                      <hr />
                     </li>
                   ))
                 ) : (

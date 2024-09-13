@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './appointment.css';
 import { useParams } from 'react-router-dom';
+import { useAuth } from '../../AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 function App() {
     const [doctor, setDoctor] = useState('');
@@ -9,30 +11,32 @@ function App() {
     const [patientName, setPatientName] = useState('');
     const [email, setEmail] = useState('');
     const [appointmentTime, setAppointmentTime] = useState('');
+    const [minTime, setMinTime] = useState('');
 
     const { doctorId } = useParams();
-    const userId = localStorage.getItem('user');  // Assuming the user's ID is stored in localStorage
+    const userId = localStorage.getItem('user');
 
-    // Fetch user details to prefill patient name and email
+    const navigate = useNavigate();
+    const auth = useAuth();
+
     const fetchUser = async () => {
         try {
             const response = await fetch(`http://localhost:5000/api/patient/profile/${userId}`);
             const data = await response.json();
             setUser(data);
-            setPatientName(data.name);   // Prefill patient name from user data
-            setEmail(data.email);        // Prefill email from user data
+            setPatientName(data.name);
+            setEmail(data.email);
         } catch (error) {
             console.error('Error fetching user details:', error);
         }
     };
 
-    // Fetch doctor details using doctorId from URL params
     const fetchDoctor = async () => {
         try {
             const response = await fetch(`http://localhost:5000/api/doctor/profile/${doctorId}`);
             const data = await response.json();
             if (response.ok) {
-                setDoctor(data.name);  // Set doctor name from API
+                setDoctor(data.name);
             } else {
                 console.error('Error fetching doctor:', data.message);
             }
@@ -41,17 +45,35 @@ function App() {
         }
     };
 
-    // UseEffect hook to fetch data on component mount
     useEffect(() => {
         fetchDoctor();
         fetchUser();
+
+        // Set the minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        setDate(today);
+
+        // Set the minimum time for today's date to the current time
+        const currentTime = new Date().toTimeString().slice(0, 5);
+        setMinTime(currentTime);
     }, []);
 
-    // Handle appointment submission using FormData
+    const handleDateChange = (e) => {
+        const selectedDate = e.target.value;
+        setDate(selectedDate);
+
+        // If the selected date is today, set the minimum time to the current time
+        const today = new Date().toISOString().split('T')[0];
+        if (selectedDate === today) {
+            const currentTime = new Date().toTimeString().slice(0, 5);
+            setMinTime(currentTime);
+        } else {
+            setMinTime('00:00');  // Reset to midnight for other dates
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Create an object with the data to send
         const appointmentData = {
             doctorId: doctorId,
             patientId: userId,
@@ -65,15 +87,13 @@ function App() {
             const response = await fetch(`http://localhost:5000/api/appointment`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json', // Ensure the content type is set
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(appointmentData), // Send the object as JSON
+                body: JSON.stringify(appointmentData),
             });
 
             if (response.ok) {
                 alert(`Appointment booked with Dr. ${doctor} on ${date} at ${appointmentTime} for ${patientName} (${email})`);
-
-                // Reset the form fields
                 setDoctor('');
                 setDate('');
                 setPatientName('');
@@ -88,9 +108,19 @@ function App() {
         }
     };
 
+    const handleLogout = () => {
+        auth.logout();
+        navigate('/doctor/dlogin');
+    };
 
     return (
         <div className="App">
+            <div className="navbar">
+                <h3>mediConnect</h3>
+                <div className="navbar-content">
+                    <button onClick={handleLogout}>Logout</button>
+                </div>
+            </div>
             <h2>Book Doctor Appointment</h2>
             <form onSubmit={handleSubmit}>
                 <div>
@@ -102,7 +132,8 @@ function App() {
                     <input
                         type="date"
                         value={date}
-                        onChange={(e) => setDate(e.target.value)}
+                        onChange={handleDateChange}
+                        min={new Date().toISOString().split('T')[0]} // Set minimum date to today
                         required
                     />
                 </div>
@@ -112,6 +143,7 @@ function App() {
                         type="time"
                         value={appointmentTime}
                         onChange={(e) => setAppointmentTime(e.target.value)}
+                        min={date === new Date().toISOString().split('T')[0] ? minTime : '00:00'} // Set minimum time for today
                         required
                     />
                 </div>
@@ -133,7 +165,10 @@ function App() {
                         required
                     />
                 </div>
-                <button type="submit">Book Appointment</button>
+                <div className="actions">
+                    <button type="button" onClick={() => navigate(-1)}>Go Back</button>
+                    <button type="submit">Book Appointment</button>
+                </div>
             </form>
         </div>
     );

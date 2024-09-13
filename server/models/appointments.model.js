@@ -18,6 +18,10 @@ const AppointmentShema = mongoose.Schema({
     },
     patientId: {
         type: String
+    },
+    status: {
+        type: String,
+        default: "Not Completed"
     }
 });
 
