@@ -8,9 +8,9 @@ import { useNavigate } from 'react-router-dom';
 const Dashboard = () => {
   const [doctor, setDoctor] = useState('');
   const [appointments, setAppointments] = useState([]);
-  const [selectedSection, setSelectedSection] = useState(''); // State to track the selected section
-  const [patients, setPatients] = useState([]); // State to store fetched patient data
-  const [updatedDoctor, setUpdatedDoctor] = useState({ specialization: [] }); // State for storing updated doctor details
+  const [selectedSection, setSelectedSection] = useState('');
+  const [patients, setPatients] = useState([]);
+  const [updatedDoctor, setUpdatedDoctor] = useState({ specialization: [] });
 
   const navigate = useNavigate();
   const auth = useAuth();
@@ -59,9 +59,8 @@ const Dashboard = () => {
   const handleCardClick = (section) => {
     setSelectedSection(section);
     if (section === 'Patients') {
-      fetchPatients(); // Fetch patients when the "Patients" card is clicked
-    }
-    else if (section === 'Appointments') {
+      fetchPatients();
+    } else if (section === 'Appointments') {
       fetchAppointments();
     }
   };
@@ -114,7 +113,6 @@ const Dashboard = () => {
       if (response.ok) {
         const updatedData = await response.json();
         setDoctor(updatedData);
-        // auth.setUser(updatedData); // Update user in AuthContext
         alert('Profile updated successfully!');
       } else {
         alert('Failed to update profile.');
@@ -130,7 +128,6 @@ const Dashboard = () => {
       const response = await fetch('http://localhost:5000/api/appointment');
       if (response.ok) {
         const allAppointments = await response.json();
-        // Assuming doctor._id is a string and appointments have a doctorId field
         const filteredAppointments = allAppointments.filter(appointment =>
           appointment.doctorId === doctor._id
         );
@@ -140,6 +137,34 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error('Error fetching appointments:', error);
+    }
+  };
+
+  // Function to handle updating the appointment status
+  const updateAppointmentStatus = async (appointmentId, newStatus) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/appointment/${appointmentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (response.ok) {
+        // Update appointment status in frontend
+        setAppointments(prevAppointments =>
+          prevAppointments.map(appointment =>
+            appointment._id === appointmentId ? { ...appointment, status: newStatus } : appointment
+          )
+        );
+        alert(`Appointment marked as ${newStatus}`);
+      } else {
+        alert('Failed to update appointment status.');
+      }
+    } catch (error) {
+      console.error('Error updating appointment status:', error);
+      alert('An error occurred while updating the appointment.');
     }
   };
 
@@ -177,26 +202,6 @@ const Dashboard = () => {
             </Card.Body>
           </Card>
         </Col>
-        {/* <Col md={2}>
-          <Card className="dashboard-card" onClick={() => handleCardClick('Schedule')}>
-            <Card.Body>
-              <FaCalendarCheck className="dashboard-icon" />
-              <Card.Title>Schedule</Card.Title>
-              <Card.Text>Check your weekly schedule</Card.Text>
-              <Button variant="primary">View Schedule</Button>
-            </Card.Body>
-          </Card>
-        </Col> */}
-        {/* <Col md={2}>
-          <Card className="dashboard-card" onClick={() => handleCardClick('Prescriptions')}>
-            <Card.Body>
-              <FaPrescriptionBottleAlt className="dashboard-icon" />
-              <Card.Title>Prescriptions</Card.Title>
-              <Card.Text>Manage and view prescriptions</Card.Text>
-              <Button variant="primary">View Prescriptions</Button>
-            </Card.Body>
-          </Card>
-        </Col> */}
         <Col md={2}>
           <Card className="dashboard-card" onClick={() => handleCardClick('Profile')}>
             <Card.Body>
@@ -235,66 +240,61 @@ const Dashboard = () => {
                       <p><strong>Date:</strong> {new Date(appointment.date).toLocaleDateString()}</p>
                       <p><strong>Time:</strong> {appointment.time}</p>
                       <p><strong>Status:</strong> {appointment.status}</p>
+
+                      {/* Only show buttons if the status is neither 'Completed' nor 'Cancelled' */}
+                      {appointment.status !== 'Completed' && appointment.status !== 'Cancelled' && (
+                        <>
+                          <Button
+                            variant="success"
+                            onClick={() => updateAppointmentStatus(appointment._id, 'Completed')}
+                          >
+                            Mark as Completed
+                          </Button>
+                          <Button
+                            variant="danger"
+                            onClick={() => updateAppointmentStatus(appointment._id, 'Cancelled')}
+                          >
+                            Cancel Appointment
+                          </Button>
+                        </>
+                      )}
                       <hr />
                     </li>
                   ))
                 ) : (
                   <p>No appointments available.</p>
                 )}
+
               </ul>
             </div>
           )}
 
-          {selectedSection === 'Schedule' && (
-            <div>
-              <h3>Schedule</h3>
-              <p>Here you can check your weekly schedule.</p>
-            </div>
-          )}
-          {selectedSection === 'Prescriptions' && (
-            <div>
-              <h3>Prescriptions</h3>
-              <p>Here you can manage and view prescriptions.</p>
-            </div>
-          )}
+          {/* Profile Section */}
           {selectedSection === 'Profile' && (
             <div>
               <h3>Update Profile</h3>
               <Form onSubmit={handleProfileUpdate}>
-                <Form.Group controlId="formName">
+                <Form.Group controlId="doctorName">
                   <Form.Label>Name</Form.Label>
                   <Form.Control
                     type="text"
                     name="name"
                     value={updatedDoctor.name || ''}
                     onChange={handleInputChange}
-                    placeholder="Enter your name"
                   />
                 </Form.Group>
-                <Form.Group controlId="formEmail">
-                  <Form.Label>Email</Form.Label>
-                  <Form.Control
-                    type="email"
-                    name="email"
-                    value={updatedDoctor.email || ''}
-                    onChange={handleInputChange}
-                    placeholder="Enter your email"
-                  />
-                </Form.Group>
-                <Form.Group controlId="formSpecializations">
-                  <Form.Label>Specializations</Form.Label>
-                  <div>
-                    {specializationsList.map((specialization, index) => (
-                      <Form.Check
-                        key={index}
-                        type="checkbox"
-                        label={specialization}
-                        value={specialization}
-                        checked={updatedDoctor.specialization.includes(specialization)}
-                        onChange={handleSpecializationChange}
-                      />
-                    ))}
-                  </div>
+                <Form.Group controlId="doctorSpecialization">
+                  <Form.Label>Specialization</Form.Label>
+                  {specializationsList.map((specialization) => (
+                    <Form.Check
+                      key={specialization}
+                      type="checkbox"
+                      label={specialization}
+                      value={specialization}
+                      checked={updatedDoctor.specialization.includes(specialization)}
+                      onChange={handleSpecializationChange}
+                    />
+                  ))}
                 </Form.Group>
                 <Button variant="primary" type="submit">
                   Save Changes

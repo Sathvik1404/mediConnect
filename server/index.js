@@ -25,7 +25,8 @@ app.use(express.json());
 
 const patientAuthenticationRouter = require('./routes/patientrouters/patientauthentication.router');
 const patientProfileRouter = require('./routes/patientrouters/patientprofile.router');
-const doctorsRouter = require('./routes/doctorrouters/doctorprofile.router')
+const doctorsRouter = require('./routes/doctorrouters/doctorprofile.router');
+// const paymentRouter = require('./routes/patientrouters/payment.router');
 
 const doctorAuthenticationRouter = require('./routes/doctorrouters/doctorauthentication.router');
 const doctorProfileRouter = require('./routes/doctorrouters/doctorprofile.router');
@@ -47,6 +48,7 @@ app.use('/api/patient', patientAuthenticationRouter);
 app.use('/api/patient/profile', patientProfileRouter);
 app.use('/api/patient/doctorslist', doctorsRouter);
 app.use('/api/patient/hospitals', hospitalsRouter);
+// app.use('/api/patient/appointment', paymentRouter);
 
 // Doctor End Points
 app.use('/api/doctor', doctorAuthenticationRouter);
