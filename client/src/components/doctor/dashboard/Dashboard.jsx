@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const [doctor, setDoctor] = useState('');
+  const [appointments, setAppointments] = useState([]);
   const [selectedSection, setSelectedSection] = useState(''); // State to track the selected section
   const [patients, setPatients] = useState([]); // State to store fetched patient data
   const [updatedDoctor, setUpdatedDoctor] = useState({ specialization: [] }); // State for storing updated doctor details
@@ -59,6 +60,9 @@ const Dashboard = () => {
     setSelectedSection(section);
     if (section === 'Patients') {
       fetchPatients(); // Fetch patients when the "Patients" card is clicked
+    }
+    else if (section === 'Appointments') {
+      fetchAppointments();
     }
   };
 
@@ -118,6 +122,24 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error updating profile:', error);
       alert('An error occurred while updating your profile.');
+    }
+  };
+
+  const fetchAppointments = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/appointment');
+      if (response.ok) {
+        const allAppointments = await response.json();
+        // Assuming doctor._id is a string and appointments have a doctorId field
+        const filteredAppointments = allAppointments.filter(appointment =>
+          appointment.doctorId === doctor._id
+        );
+        setAppointments(filteredAppointments);
+      } else {
+        console.error('Failed to fetch appointments');
+      }
+    } catch (error) {
+      console.error('Error fetching appointments:', error);
     }
   };
 
@@ -205,9 +227,23 @@ const Dashboard = () => {
           {selectedSection === 'Appointments' && (
             <div>
               <h3>Appointments</h3>
-              <p>Here you can view and manage your appointments.</p>
+              <ul>
+                {appointments.length > 0 ? (
+                  appointments.map((appointment, index) => (
+                    <li key={index}>
+                      <p><strong>Patient:</strong> {appointment.patientName}</p>
+                      <p><strong>Date:</strong> {new Date(appointment.date).toLocaleDateString()}</p>
+                      <p><strong>Time:</strong> {new Date(appointment.time).toLocaleTimeString()}</p>
+                      <p><strong>Status:</strong> {appointment.status}</p>
+                    </li>
+                  ))
+                ) : (
+                  <p>No appointments available.</p>
+                )}
+              </ul>
             </div>
           )}
+
           {selectedSection === 'Schedule' && (
             <div>
               <h3>Schedule</h3>
