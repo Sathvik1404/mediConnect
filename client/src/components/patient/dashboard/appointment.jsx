@@ -51,21 +51,23 @@ function App() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Create FormData object
-        const formData = new FormData();
-        formData.append('doctorId', doctorId);        // Add doctor ID to formData
-        formData.append('patientId', userId);            // Add user ID to formData
-        formData.append('doctorName', doctor);        // Add doctor name
-        formData.append('patientName', patientName);  // Add patient name
-        formData.append('email', email);              // Add email
-        formData.append('date', date);                // Add appointment date
-        formData.append('time', appointmentTime);  // Add appointment time
+        // Create an object with the data to send
+        const appointmentData = {
+            doctorId: doctorId,
+            patientId: userId,
+            patientName: patientName,
+            patientEmail: email,
+            date: date,
+            time: appointmentTime
+        };
 
         try {
-            console.log(formData)
             const response = await fetch(`http://localhost:5000/api/appointment`, {
                 method: 'POST',
-                body: formData,  // Send formData in the body
+                headers: {
+                    'Content-Type': 'application/json', // Ensure the content type is set
+                },
+                body: JSON.stringify(appointmentData), // Send the object as JSON
             });
 
             if (response.ok) {
@@ -85,6 +87,7 @@ function App() {
             console.error('Error submitting form:', error);
         }
     };
+
 
     return (
         <div className="App">
