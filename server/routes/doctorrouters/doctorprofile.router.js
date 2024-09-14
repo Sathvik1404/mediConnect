@@ -44,7 +44,7 @@ router.get('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const { name, email, mobile, age, record, specialization, hospitals, patients } = req.body;
-    // console.log(hospitals)
+    console.log(hospitals)
 
     let iterator = hospitals.values();
 
