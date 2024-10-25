@@ -9,6 +9,24 @@
     background-color: #003366;
 }
 
+h6 {
+    width: 10%;
+    background-color: #e6dfdf;
+    height: 35px;
+}
+
+.name {
+    display: flex;
+    flex-direction: row;
+    height: 35px;
+}
+
+.marquee {
+    background-color: #F5F5DC;
+    color: whitesmoke;
+    color: #4B3F2F;
+}
+
 .doctor {
     margin-top: 35%;
     color: whitesmoke;

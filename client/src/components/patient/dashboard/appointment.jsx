@@ -93,7 +93,8 @@ function App() {
             });
 
             if (response.ok) {
-                alert(`Appointment booked with Dr. ${doctor} on ${date} at ${appointmentTime} for ${patientName} (${email})`);
+                window.location.href = 'https://rzp.io/rzp/5SJnOPV'
+                // alert(`Appointment booked with Dr. ${doctor} on ${date} at ${appointmentTime} for ${patientName} (${email})`);
                 setDoctor('');
                 setDate('');
                 setPatientName('');
@@ -121,8 +122,8 @@ function App() {
                     <button onClick={handleLogout}>Logout</button>
                 </div>
             </div>
-            <h2>Book Doctor Appointment</h2>
             <form onSubmit={handleSubmit}>
+                <h2>Book Doctor Appointment</h2>
                 <div>
                     <label>Doctor: </label>
                     <input type="text" value={doctor} disabled />

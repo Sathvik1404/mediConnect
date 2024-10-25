@@ -19,9 +19,12 @@ const LandingPage = () => {
     }
     return (
         <>
-            <marquee behavior="" direction="" className="marquee">
-                mediConnect: Where Patients and Doctors Connect Together
-            </marquee>
+            <div className="name">
+                <h6>mediConnect</h6>
+                <marquee behavior="" direction="" className="marquee">
+                    mediConnect: Where Patients and Doctors Connect Together
+                </marquee>
+            </div>
             <div className="landing-page">
                 <div className="second">
                     <div className="patient-card" onClick={toPatient}>
