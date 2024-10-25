@@ -3,63 +3,83 @@
     width: 100%;
     height: 100vh;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     overflow: hidden;
     background-color: #003366;
 }
 
-h6 {
-    width: 10%;
-    background-color: #e6dfdf;
-    height: 35px;
-}
-
 .name {
     display: flex;
+    align-items: center;
     flex-direction: row;
-    height: 35px;
+    color: white;
+    width: -290px;
 }
 
-.marquee {
-    background-color: #F5F5DC;
-    color: whitesmoke;
-    color: #4B3F2F;
-}
-
-.doctor {
-    margin-top: 35%;
-    color: whitesmoke;
-}
-
-
-.second {
-    display: flex;
-    flex-direction: row;
-    gap: 35%;
-    margin-top: 2px;
-    margin-left: 20%;
-}
-
-.hospital-card {
-    margin-top: 35%;
+.name>h6 {
+    margin-left: -80%;
+    margin-top: -20%;
+    padding: 10px;
+    font-size: 20px;
+    background-color: beige;
     color: black;
 }
 
-.patient-card {
-    margin-top: 35%;
-    color: whitesmoke;
-    transition: transform 0.3s ease;
+.name>marquee {
+    margin-top: -22%;
 }
 
+.tagline-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px;
+    /* Center the tagline cards */
+    margin: 1rem 0;
+    /* Space above and below */
+}
 
-.patient-card:hover {
+.cards-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-top: 2rem;
+    /* Adjust if needed */
+}
+
+.patient-card,
+.hospital-card,
+.doctor-card {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    padding: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
-    transform: scale(1.05);
+    flex: 1;
+    /* Make cards grow equally */
+    max-width: 200px;
+    /* Limit max width for better layout */
+}
+
+.patient-card:hover,
+.hospital-card:hover,
+.doctor-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.cards-container img {
+    height: 100px;
+    width: 100px;
+    margin-bottom: 0.5rem;
 }
 
 .card {
-    position: absolute;
     width: 280px;
     height: 170px;
     background-color: #ffffff;
@@ -76,36 +96,32 @@ h6 {
     color: #333;
     animation-duration: 3s;
     animation-fill-mode: forwards;
-    transition: transform 0.3s ease;
-}
-
-
-.card:hover {
-    transform: scale(1.05);
 }
 
 .card-left {
-    left: -300px;
     animation-name: slideInLeft;
 }
 
 .card-right {
-    right: -300px;
     animation-name: slideInRight;
 }
 
-.link-line {
-    position: absolute;
-    width: 0;
-    height: 3px;
-    background-color: #007bff;
-    top: 50%;
-    z-index: -1;
-    animation: linkGrow 3s forwards;
+.cards-container {
+    margin-top: 5%;
 }
 
-.link {
-    size: 20px;
+.tagline-container {
+    margin-top: 2%;
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
 }
 
 @keyframes slideInLeft {
@@ -114,8 +130,7 @@ h6 {
     }
 
     100% {
-        left: calc(50% - 1000px);
-        margin-bottom: 30%;
+        left: 10%;
     }
 }
 
@@ -125,19 +140,6 @@ h6 {
     }
 
     100% {
-        right: calc(50% - 300px);
-        margin-bottom: 30%;
-    }
-}
-
-@keyframes linkGrow {
-    0% {
-        width: 0;
-        left: 50%;
-    }
-
-    100% {
-        width: 50px;
-        left: calc(50% - 550px);
+        right: 10%;
     }
 }
