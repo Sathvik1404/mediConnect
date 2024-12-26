@@ -20,6 +20,7 @@ const Login = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -46,8 +47,8 @@ const Login = () => {
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center">
-              <span className="text-2xl font-bold text-indigo-600">mediConnect</span>
+            <div className="flex items-center" onClick={() => { navigate('/') }} style={{ cursor: 'pointer' }}>
+              <span className="text-2xl font-bold text-indigo-600" >mediConnect</span>
             </div>
             <button
               onClick={() => { navigate('/patient/signup') }} // Navigation logic would go here

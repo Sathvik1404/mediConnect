@@ -17,7 +17,7 @@ const LandingPage = () => {
     };
 
     const toHospital = () => {
-        navigate('/hospital/signup');
+        navigate('/hospital/login');
     };
 
     return (

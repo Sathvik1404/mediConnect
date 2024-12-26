@@ -1,18 +1,22 @@
 .landing-page {
-    background: linear-gradient(to right, #e0f7fa, #fce4ec); /* Soft gradient background */
+    background: linear-gradient(to right, #e0f7fa, #fce4ec);
+    /* Soft gradient background */
     min-height: 100vh;
 }
 
 header {
-    background-color: #007bff; /* Primary blue for header */
+    background-color: #007bff;
+    /* Primary blue for header */
     color: white;
     padding: 20px;
     border-radius: 10px;
 }
 
 .hero-section {
-    background-color: #e7f0ff; /* Light soft blue for hero section */
-    color: #333; /* Dark text for contrast */
+    background-color: #e7f0ff;
+    /* Light soft blue for hero section */
+    color: #333;
+    /* Dark text for contrast */
     padding: 40px;
     border-radius: 10px;
 }
@@ -38,15 +42,18 @@ header {
 .patient-card img,
 .hospital-card img,
 .doctor-card img {
-    height: 120px; /* Adjust based on your image size */
+    height: 120px;
+    /* Adjust based on your image size */
 }
 
 .card-body {
-    background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white */
+    background-color: rgba(255, 255, 255, 0.9);
+    /* Slightly transparent white */
 }
 
 footer {
-    background-color: #343a40; /* Dark footer for contrast */
+    background-color: #343a40;
+    /* Dark footer for contrast */
     color: white;
     padding: 20px;
 }
