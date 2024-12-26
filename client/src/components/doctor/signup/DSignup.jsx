@@ -1,40 +1,45 @@
 import React, { useState } from 'react';
+import { ChevronRight, Mail, Lock, User, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-// import { Link } from 'react-router-dom';
-import 'react-toastify/dist/ReactToastify.css';
-import './DSingup.css';
-import 'bootstrap/dist/css/bootstrap.css';
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
-    age: '',
-    gender: '',
+    specialization: '',
+    otherSpec: '',
     mobile: '',
     email: '',
     password: '',
-    spec: ''
+    confirmPassword: ''
   });
-
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [showOtherSpec, setShowOtherSpec] = useState(false);
+
+  const specializations = [
+    'Cardiology',
+    'Dermatology',
+    'Neurology',
+    'Orthopedics',
+    'Pediatrics',
+    'General Physician',
+    'Psychiatry',
+    'Radiology'
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'specialization' && value === 'Others') {
+      setShowOtherSpec(true);
+    }
   };
-  const handleothers = () => {
-    document.querySelector(".hideapp").style.display = "inherit";
-  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match!', {
-        position: 'top-center',
-        className: 'custom-toast',
-      });
+      window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'Passwords do not match!', type: 'error' } }));
       return;
     }
 
@@ -51,13 +56,8 @@ const Signup = () => {
 
       const data = await response.json();
 
-      console.log(data)
-
       if (response.ok) {
-        toast.success('🎉 Signup successful!', {
-          position: 'top-center',
-          className: 'custom-toast',
-        });
+        window.dispatchEvent(new CustomEvent('notify', { detail: { message: '🎉 Signup successful!', type: 'success' } }));
 
         setFormData({
           name: '',
@@ -69,148 +69,153 @@ const Signup = () => {
           spec: '',
         });
       } else {
-        toast.error(data.error || '⚠️ Signup failed. Please try again.', {
-          position: 'top-center',
-          className: 'custom-toast',
-        });
+        window.dispatchEvent(new CustomEvent('notify', { detail: { message: data.error || '⚠️ Signup failed. Please try again.', type: 'error' } }));
       }
     } catch (error) {
-      toast.error(`Error: ${error.message}`, {
-        position: 'top-center',
-        className: 'custom-toast',
-      });
+      window.dispatchEvent(new CustomEvent('notify', { detail: { message: `Error: ${error.message}`, type: 'error' } }));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLoginClick = () => {
-    navigate('/doctor/dlogin')
-  }
 
   return (
-    <div className="signup-page">
-      <div className="navbar">
-        <h3>mediConnect</h3>
-        <div className="navbar-content ">
-          <button onClick={handleLoginClick}>Login</button>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+      <nav className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex items-center">
+              <span className="text-2xl font-bold text-indigo-600">mediConnect</span>
+            </div>
+            <button
+              onClick={() => navigate('/doctor/dlogin')}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+            >
+              Login <ChevronRight className="ml-2 h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-md mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-xl shadow-xl p-8">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">Join mediConnect</h2>
+            <p className="mt-2 text-gray-600">Create your doctor account</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-4">
+              <div className="relative flex items-center">
+                <User className="absolute left-3 h-5 w-5 text-gray-400" />
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Full Name"
+                  className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  required
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
+                  Specialization
+                </label>
+                <select
+                  name="specialization"
+                  value={formData.specialization}
+                  onChange={handleChange}
+                  className="w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  required
+                >
+                  <option value="">Select Specialization</option>
+                  {specializations.map(spec => (
+                    <option key={spec} value={spec}>{spec}</option>
+                  ))}
+                  <option value="Others">Others</option>
+                </select>
+              </div>
+
+              {showOtherSpec && (
+                <div className="relative flex items-center">
+                  <input
+                    type="text"
+                    name="otherSpec"
+                    value={formData.otherSpec}
+                    onChange={handleChange}
+                    placeholder="Enter Specialization"
+                    className="w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    required
+                  />
+                </div>
+              )}
+
+              <div className="relative flex items-center">
+                <Phone className="absolute left-3 h-5 w-5 text-gray-400" />
+                <input
+                  type="tel"
+                  name="mobile"
+                  value={formData.mobile}
+                  onChange={handleChange}
+                  placeholder="Mobile Number"
+                  className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  required
+                />
+              </div>
+
+              <div className="relative flex items-center">
+                <Mail className="absolute left-3 h-5 w-5 text-gray-400" />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Email Address"
+                  className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  required
+                />
+              </div>
+
+              <div className="relative flex items-center">
+                <Lock className="absolute left-3 h-5 w-5 text-gray-400" />
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  required
+                />
+              </div>
+
+              <div className="relative flex items-center">
+                <Lock className="absolute left-3 h-5 w-5 text-gray-400" />
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Confirm Password"
+                  className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  required
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            >
+              {loading ? 'Creating Account...' : 'Create Account'}
+            </button>
+          </form>
         </div>
       </div>
-      <div className="signup-container">
-        <form className="signup-form" onSubmit={handleSubmit}>
-          <h3 style={{ margintop: '8px' }}>Doctor Signup</h3>
-
-          <label htmlFor="name">Name</label>
-          <div className="input-group mb-3">
-            <input
-              className="form-contorl"
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <label htmlFor="spec">Specialization</label>
-          <select class="form-select" aria-label="Default select example">
-            <option selected><b>Select Specialization</b></option>
-            <option value="1">Cardiology</option>
-            <option value="2">Dermatology</option>
-            <option value="3">Nuerology</option>
-            <option value="4">Orthopedics</option>
-            <option value="5">Pediatrics</option>
-            <option value="6">General Physician</option>
-            <option value="7">Psychiatry</option>
-            <option value="8">Radiology</option>
-            <option value="9" onClick={handleothers}>Others</option>
-          </select>
-          <div className="hideadd">
-            <label htmlFor="speci">Add Speciliazation</label>
-            <div className="input-group mb-3">
-              <input
-                className="form-contorl"
-                type="text"
-                required
-              ></input>
-            </div>
-          </div>
-          {/* <label htmlFor="gender">Gender</label>
-          <select
-            id="gender"
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select your gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select> */}
-
-          <label htmlFor="mobile">Mobile</label>
-          <div className="input-group mb-3">
-            <input
-              className="form-contol"
-              type="tel"
-              id="mobile"
-              name="mobile"
-              value={formData.mobile}
-              onChange={handleChange}
-              required
-            /></div>
-
-          <label htmlFor="email">Email</label>
-          <div className="input-group mb-3">
-            <input
-              className="form-contol"
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            /></div>
-
-          <label htmlFor="password">Password</label>
-          <div className="input-group mb-3">
-            <input
-              className="form-contol"
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            /></div>
-
-          <label htmlFor="confirmPassword">Re-enter Password</label>
-          <div className="input-group mb-3">
-            <input
-              className="form-contol"
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-            /></div>
-
-          <button type="submit" disabled={loading}>
-            {loading ? 'Signing up...' : 'Signup'}
-          </button>
-
-          {/* <div className="redirect-login">
-            Already have an account?{' '}
-            <Link to="/login" className="login-link">
-              Login here
-            </Link>
-          </div> */}
-        </form>
-        <ToastContainer />
-      </div >
-    </div >
+    </div>
   );
 };
 
