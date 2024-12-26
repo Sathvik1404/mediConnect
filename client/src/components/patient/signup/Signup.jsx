@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { User, Phone, Mail, Lock, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import 'react-toastify/dist/ReactToastify.css';
-import './Signup.css';
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     gender: '',
@@ -15,43 +14,33 @@ const Signup = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match!', {
-        position: 'top-center',
-        className: 'custom-toast',
-      });
+      setError('Passwords do not match');
       return;
     }
 
     setLoading(true);
-
     try {
       const response = await fetch('http://localhost:5000/api/patient/signup', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
       const data = await response.json();
-
       if (response.ok) {
-        toast.success('🎉 Signup successful!', {
-          position: 'top-center',
-          className: 'custom-toast',
-        });
-
+        setSuccess(true);
         setFormData({
           name: '',
           gender: '',
@@ -60,136 +49,149 @@ const Signup = () => {
           password: '',
           confirmPassword: '',
         });
+        // Navigate to login page after successful signup
+        setTimeout(() => {
+          navigate('/patient/login');
+        }, 2000);
       } else {
-        toast.error(data.error || '⚠️ Signup failed. Please try again.', {
-          position: 'top-center',
-          className: 'custom-toast',
-        });
+        setError(data.error || 'Signup failed. Please try again.');
       }
-    } catch (error) {
-      toast.error(`Error: ${error.message}`, {
-        position: 'top-center',
-        className: 'custom-toast',
-      });
+    } catch (err) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLoginClick = () => {
-    navigate('/patient/login');
-  }
-
   return (
-    <div className="signup-page">
-      <div className="navbar">
-        <h3>mediConnect</h3>
-        <div className="navbar-content ">
-          <button onClick={handleLoginClick}>Login</button>
-        </div>
-      </div>
-      <div className="signup-container">
-        <form className="signup-form" onSubmit={handleSubmit}>
-          <h3 style={{ margintop: '8px' }}>Patient Signup</h3>
-
-          <label htmlFor="name">Name</label>
-          <div className="input-group mb-3">
-            <input
-              className="form-control"
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            /></div>
-
-          {/* <label htmlFor="age">Age</label>
-          <input
-            type="number"
-            id="age"
-            name="age"
-            value={formData.age}
-            onChange={handleChange}
-            required
-          /> */}
-          <div className="input-group mb-3">
-            <label htmlFor="gender">Gender</label>
-            <div
-              id="gender"
-              name="gender"
-              value={formData.gender}
-              onChange={handleChange}
-              required
-            ></div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+      {/* Navbar */}
+      <nav className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex items-center">
+              <span className="text-2xl font-bold text-indigo-600">mediConnect</span>
+            </div>
+            <button
+              onClick={() => { navigate('/patient/login') }}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+            >
+              Login <ChevronRight className="ml-2 h-4 w-4" />
+            </button>
           </div>
-          <select name="" id="">
-            <option value="">Select your gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
+        </div>
+      </nav>
 
-          <label htmlFor="mobile">Mobile</label>
-          <div className="input-group mb-3">
-            <input
-              className="form-control"
-              type="tel"
-              id="mobile"
-              name="mobile"
-              value={formData.mobile}
-              onChange={handleChange}
-              required
-            /></div>
+      {/* Main Content */}
+      <div className="max-w-md mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-xl shadow-xl p-8">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">Join mediConnect</h2>
+            <p className="mt-2 text-gray-600">Create your patient account to get started</p>
+          </div>
 
-          <label htmlFor="email">Email</label>
-          <div className="input-group mb-3">
-            <input
-              className="form-control"
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            /></div>
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md flex items-center">
+              <span>{error}</span>
+            </div>
+          )}
 
-          <label htmlFor="password">Password</label>
-          <div className="input-group mb-3">
-            <input
-              className="form-control"
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            /></div>
+          {success && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-md flex items-center">
+              <span>Account created successfully!</span>
+            </div>
+          )}
 
-          <label htmlFor="confirmPassword">Re-enter Password</label>
-          <div className="input-group mb-3">
-            <input
-              className="form-control"
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-            /></div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-4">
+              <div className="relative flex items-center">
+                <User className="absolute left-3 h-5 w-5 text-gray-400" />
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Full Name"
+                  className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors duration-200"
+                  required
+                />
+              </div>
 
-          <button type="submit" disabled={loading}>
-            {loading ? 'Signing up...' : 'Signup'}
-          </button>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                className="w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors duration-200"
+                required
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
 
-          {/* <div className="redirect-login">
-            Already have an account?{' '}
-            <Link to="/login" className="login-link">
-              Login here
-            </Link>
-          </div> */}
-        </form>
-        <ToastContainer />
+              <div className="relative flex items-center">
+                <Phone className="absolute left-3 h-5 w-5 text-gray-400" />
+                <input
+                  type="tel"
+                  name="mobile"
+                  value={formData.mobile}
+                  onChange={handleChange}
+                  placeholder="Mobile Number"
+                  className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors duration-200"
+                  required
+                />
+              </div>
+
+              <div className="relative flex items-center">
+                <Mail className="absolute left-3 h-5 w-5 text-gray-400" />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Email Address"
+                  className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors duration-200"
+                  required
+                />
+              </div>
+
+              <div className="relative flex items-center">
+                <Lock className="absolute left-3 h-5 w-5 text-gray-400" />
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors duration-200"
+                  required
+                />
+              </div>
+
+              <div className="relative flex items-center">
+                <Lock className="absolute left-3 h-5 w-5 text-gray-400" />
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Confirm Password"
+                  className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors duration-200"
+                  required
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            >
+              {loading ? 'Creating Account...' : 'Create Account'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
