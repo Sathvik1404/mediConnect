@@ -21,39 +21,60 @@ const LandingPage = () => {
     };
 
     return (
-        <div className="landing-page">
-            <header className="name">
-                <h6>mediConnect</h6>
-                <marquee>Where Patients and Doctors Connect Together</marquee>
+        <div className="landing-page container-fluid">
+            <header className="text-center my-4">
+                <h1 className="display-4">mediConnect</h1>
+                <marquee className="text-warning">Where Patients and Doctors Connect Together</marquee>
             </header>
 
-            {/* Tagline Container Positioning */}
-            <div className="tagline-container">
-                <div className="card card-left">
-                    <h1>medi</h1>
-                    <p>Your Health Is</p>
-                </div>
-                <div className="card card-right">
-                    <h1>Connect</h1>
-                    <p>Our Priority</p>
-                </div>
+            <div className="hero-section text-center mb-5">
+                <h2>Welcome to Your Health Hub</h2>
+                <p>Connecting Patients, Doctors, and Hospitals for Better Care</p>
+                <button className="btn btn-light btn-lg" onClick={toPatient}>Get Started</button>
             </div>
 
             {/* Cards Container */}
-            <div className="cards-container">
-                <div className="patient-card" onClick={toPatient}>
-                    <img src={pat} alt="Illustration of a patient" />
-                    <h1>Patient</h1>
+            <div className="row justify-content-center mb-5">
+                <div className="col-md-4 mb-4">
+                    <div className="card text-center hospital-card" onClick={toPatient}>
+                        <img src={pat} alt="Illustration of a patient" className="card-img-top" />
+                        <div className="card-body">
+                            <h5 className="card-title">Patient</h5>
+                            <p>Access your health records and connect with doctors.</p>
+                        </div>
+                    </div>
                 </div>
-                <div className="hospital-card" onClick={toHospital}>
-                    <img src={hsp} alt="Illustration of a hospital" />
-                    <h1>Hospital</h1>
+                <div className="col-md-4 mb-4">
+                    <div className="card text-center hospital-card" onClick={toHospital}>
+                        <img src={hsp} alt="Illustration of a hospital" className="card-img-top" />
+                        <div className="card-body">
+                            <h5 className="card-title">Hospital</h5>
+                            <p>Manage your hospital's operations efficiently.</p>
+                        </div>
+                    </div>
                 </div>
-                <div className="doctor-card" onClick={toDoc}>
-                    <img src={img} alt="Illustration of a doctor" />
-                    <h1>Doctor</h1>
+                <div className="col-md-4 mb-4">
+                    <div className="card text-center hospital-card" onClick={toDoc}>
+                        <img src={img} alt="Illustration of a doctor" className="card-img-top" />
+                        <div className="card-body">
+                            <h5 className="card-title">Doctor</h5>
+                            <p>Consult with patients and manage appointments.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            {/* Testimonials Section */}
+            <section className="testimonials text-center mb-5">
+                <h3>What Our Users Say</h3>
+                {/* Add testimonial content here */}
+            </section>
+
+            {/* Footer */}
+            <footer className="text-center mt-5">
+                <p>&copy; 2024 mediConnect. All Rights Reserved.</p>
+                {/* Add social media links here */}
+            </footer>
         </div>
     );
 };

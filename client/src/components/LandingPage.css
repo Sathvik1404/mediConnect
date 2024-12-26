@@ -1,145 +1,52 @@
 .landing-page {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    background-color: #003366;
+    background: linear-gradient(to right, #e0f7fa, #fce4ec); /* Soft gradient background */
+    min-height: 100vh;
 }
 
-.name {
-    display: flex;
-    align-items: center;
-    flex-direction: row;
+header {
+    background-color: #007bff; /* Primary blue for header */
     color: white;
-    width: -290px;
+    padding: 20px;
+    border-radius: 10px;
 }
 
-.name>h6 {
-    margin-left: -80%;
-    margin-top: -20%;
-    padding: 10px;
-    font-size: 20px;
-    background-color: beige;
-    color: black;
+.hero-section {
+    background-color: #e7f0ff; /* Light soft blue for hero section */
+    color: #333; /* Dark text for contrast */
+    padding: 40px;
+    border-radius: 10px;
 }
 
-.name>marquee {
-    margin-top: -22%;
+.hero-section h2 {
+    font-size: 2.5rem;
 }
 
-.tagline-container {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 800px;
-    /* Center the tagline cards */
-    margin: 1rem 0;
-    /* Space above and below */
+.hero-section p {
+    font-size: 1.2rem;
 }
 
-.cards-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 2rem;
-    margin-top: 2rem;
-    /* Adjust if needed */
-}
-
-.patient-card,
-.hospital-card,
-.doctor-card {
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    padding: 1rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.cards-container .card {
     cursor: pointer;
-    flex: 1;
-    /* Make cards grow equally */
-    max-width: 200px;
-    /* Limit max width for better layout */
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.patient-card:hover,
-.hospital-card:hover,
-.doctor-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+.cards-container .card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-.cards-container img {
-    height: 100px;
-    width: 100px;
-    margin-bottom: 0.5rem;
+.patient-card img,
+.hospital-card img,
+.doctor-card img {
+    height: 120px; /* Adjust based on your image size */
 }
 
-.card {
-    width: 280px;
-    height: 170px;
-    background-color: #ffffff;
-    border-radius: 12px;
-    border: 1px solid #e0e0e0;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 1.5em;
-    color: #333;
-    animation-duration: 3s;
-    animation-fill-mode: forwards;
+.card-body {
+    background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white */
 }
 
-.card-left {
-    animation-name: slideInLeft;
-}
-
-.card-right {
-    animation-name: slideInRight;
-}
-
-.cards-container {
-    margin-top: 5%;
-}
-
-.tagline-container {
-    margin-top: 2%;
-}
-
-@keyframes scroll {
-    0% {
-        transform: translateX(100%);
-    }
-
-    100% {
-        transform: translateX(-100%);
-    }
-}
-
-@keyframes slideInLeft {
-    0% {
-        left: -50%;
-    }
-
-    100% {
-        left: 10%;
-    }
-}
-
-@keyframes slideInRight {
-    0% {
-        right: -50%;
-    }
-
-    100% {
-        right: 10%;
-    }
+footer {
+    background-color: #343a40; /* Dark footer for contrast */
+    color: white;
+    padding: 20px;
 }
