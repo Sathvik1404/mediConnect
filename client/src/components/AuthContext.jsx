@@ -1,5 +1,4 @@
-import React, { useContext, createContext, useState } from 'react';
-import { toast } from 'react-toastify';
+import React, { useContext, createContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
@@ -8,16 +7,18 @@ const AuthProvider = ({ children }) => {
     const [role, setRole] = useState("");
     const [user, setUser] = useState(null);
 
-    // useEffect(() => {
-    //     const storedToken = localStorage.getItem('token');
-    //     const storedRole = localStorage.getItem('role');
-    //     // console.log(storedRole, storedToken);
+    useEffect(() => {
+        // Restore authentication state from localStorage
+        const storedToken = localStorage.getItem('token');
+        const storedRole = localStorage.getItem('role');
+        const storedUser = localStorage.getItem('user');
 
-    //     if (storedToken && storedRole) {
-    //         setToken(storedToken);
-    //         setRole(storedRole);
-    //     }
-    // }, []);
+        if (storedToken && storedRole && storedUser) {
+            setToken(storedToken);
+            setRole(storedRole);
+            setUser(JSON.parse(storedUser));
+        }
+    }, []);
 
     const patientLoginAction = async (data) => {
         try {
@@ -28,27 +29,38 @@ const AuthProvider = ({ children }) => {
                 },
                 body: JSON.stringify(data),
             });
+
             const responseData = await response.json();
-            // console.log(responseData)
+
             if (response.ok) {
                 setToken(responseData.token);
                 setRole(responseData.role);
                 setUser(responseData.patient);
+
+                // Store auth state
                 localStorage.setItem('token', responseData.token);
-                localStorage.setItem('user', responseData.patient._id);
-                return response;
+                localStorage.setItem('role', responseData.role);
+                localStorage.setItem('user', JSON.stringify(responseData.patient));
+
+                return {
+                    ok: true,
+                    data: responseData
+                };
             }
-            throw new Error(responseData.message);
+
+            return {
+                ok: false,
+                error: responseData.message || 'Invalid credentials'
+            };
         } catch (err) {
-            toast.error(`No record or Invalid credentials`, {
-                position: 'top-center',
-                className: 'custom-toast',
-            });
+            return {
+                ok: false,
+                error: 'No record or Invalid credentials'
+            };
         }
     };
 
     const doctorLoginAction = async (data) => {
-        // console.log(data)
         try {
             const response = await fetch('http://localhost:5000/api/doctor/login', {
                 method: 'POST',
@@ -57,35 +69,70 @@ const AuthProvider = ({ children }) => {
                 },
                 body: JSON.stringify(data),
             });
+
             const responseData = await response.json();
-            // console.log(response)
+
             if (response.ok) {
                 setToken(responseData.token);
                 setRole(responseData.role);
                 setUser(responseData.doctor);
+
+                // Store auth state
                 localStorage.setItem('token', responseData.token);
-                localStorage.setItem('user', responseData.doctor._id);
-                return response;
+                localStorage.setItem('role', responseData.role);
+                localStorage.setItem('user', JSON.stringify(responseData.doctor));
+
+                return {
+                    ok: true,
+                    data: responseData
+                };
             }
-            throw new Error(responseData.message);
+
+            return {
+                ok: false,
+                error: responseData.message || 'Invalid credentials'
+            };
         } catch (err) {
-            toast.error(`No record or Invalid credentials`, {
-                position: 'top-center',
-                className: 'custom-toast',
-            });
+            return {
+                ok: false,
+                error: 'No record or Invalid credentials'
+            };
         }
     };
 
     const logout = () => {
+        // Clear state
         setToken("");
         setRole("");
         setUser(null);
+
+        // Clear stored data
         localStorage.removeItem('token');
+        localStorage.removeItem('role');
         localStorage.removeItem('user');
     };
 
+    // Additional helper methods
+    const isAuthenticated = () => !!token;
+
+    const getAuthHeaders = () => ({
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    });
+
     return (
-        <AuthContext.Provider value={{ token, role, user, patientLoginAction, doctorLoginAction, logout }}>
+        <AuthContext.Provider
+            value={{
+                token,
+                role,
+                user,
+                patientLoginAction,
+                doctorLoginAction,
+                logout,
+                isAuthenticated,
+                getAuthHeaders
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );
@@ -94,5 +141,9 @@ const AuthProvider = ({ children }) => {
 export default AuthProvider;
 
 export const useAuth = () => {
-    return useContext(AuthContext);
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
 };
