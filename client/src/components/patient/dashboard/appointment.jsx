@@ -33,6 +33,7 @@ function App() {
 
     const fetchDoctor = async () => {
         try {
+            console.log(doctorId)
             const response = await fetch(`http://localhost:5000/api/doctor/profile/${doctorId}`);
             const data = await response.json();
             if (response.ok) {
