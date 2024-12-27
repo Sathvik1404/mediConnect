@@ -22,6 +22,12 @@ const AppointmentShema = mongoose.Schema({
     status: {
         type: String,
         default: "Not Completed"
+    },
+    doctorName: {
+        type: String
+    },
+    hospitalName: {
+        type: String
     }
 });
 
