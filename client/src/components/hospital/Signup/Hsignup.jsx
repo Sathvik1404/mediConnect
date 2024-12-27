@@ -9,7 +9,8 @@ const Hsignup = () => {
         mobile: '',
         email: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        location: ''
     });
     const [loading, setLoading] = useState(false);
     // const [showOtherSpec, setShowOtherSpec] = useState(false);
@@ -31,7 +32,7 @@ const Hsignup = () => {
         setLoading(true);
 
         try {
-            const response = await fetch('http://localhost:5000/api/doctor/signup', {
+            const response = await fetch('http://localhost:5000/api/hospital/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -40,6 +41,7 @@ const Hsignup = () => {
             });
 
             const data = await response.json();
+            console.log(data)
 
             if (response.ok) {
                 window.dispatchEvent(new CustomEvent('notify', { detail: { message: '🎉 Signup successful!', type: 'success' } }));
@@ -49,7 +51,8 @@ const Hsignup = () => {
                     mobile: '',
                     email: '',
                     password: '',
-                    pincode: '',
+                    confirmPassword: '',
+                    location: ''
                 });
             } else {
                 window.dispatchEvent(new CustomEvent('notify', { detail: { message: data.error || '⚠️ Signup failed. Please try again.', type: 'error' } }));
@@ -151,6 +154,18 @@ const Hsignup = () => {
                                     value={formData.confirmPassword}
                                     onChange={handleChange}
                                     placeholder="Confirm Password"
+                                    className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                    required
+                                />
+                            </div>
+                            <div className="relative flex items-center">
+                                {/* <Lock className="absolute left-3 h-5 w-5 text-gray-400" /> */}
+                                <input
+                                    type="text"
+                                    name="location"
+                                    value={formData.location}
+                                    onChange={handleChange}
+                                    placeholder="Location"
                                     className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                     required
                                 />

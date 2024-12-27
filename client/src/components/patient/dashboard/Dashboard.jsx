@@ -15,6 +15,11 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const auth = useAuth();
 
+  useEffect(() => {
+    fetchHospitals();
+    fetchAppointments();
+  }, []);
+
   const handleLogout = () => {
     auth.logout();
     navigate('/patient/login');
@@ -111,11 +116,6 @@ const Dashboard = () => {
     }
   };
 
-  useEffect(() => {
-    fetchHospitals();
-    fetchAppointments();
-  }, []);
-
   const renderAppointmentButton = (appointment) => {
     const isCancelled = appointment.status === "Cancelled";
 
@@ -208,8 +208,8 @@ const Dashboard = () => {
                   <p><strong>Time:</strong> {appointment.time}</p>
                   <p><strong>Status:</strong>
                     <span className={`ml-2 px-2 py-1 rounded-full text-sm ${appointment.status === "Cancelled"
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-green-100 text-green-800'
+                      ? 'bg-red-100 text-red-800'
+                      : 'bg-green-100 text-green-800'
                       }`}>
                       {appointment.status}
                     </span>
