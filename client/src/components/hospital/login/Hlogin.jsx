@@ -51,7 +51,7 @@ const Login = () => {
                             <span className="text-2xl font-bold text-indigo-600">mediConnect</span>
                         </div>
                         <button
-                            onClick={() => navigate('/hospital/signup')}
+                            onClick={() => navigate('/hospital/Hsignup')}
                             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
                         >
                             Register <ChevronRight className="ml-2 h-4 w-4" />
