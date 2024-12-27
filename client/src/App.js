@@ -40,8 +40,8 @@ function App() {
               <Route path='/doctor/dashboard' element={<DDashboard />} />
             </Route>
             <Route path="/doctor/dashboard/patient/:patientId" element={<PatientDetails />} />
-            <Route path="/hospital/signup" element={<Hsignup />} />
-            <Route path='/hospital/login' element={<Hlogin />} />
+            <Route path="/hospital/Hsignup" element={<Hsignup />} />
+            <Route path='/hospital/Hlogin' element={<Hlogin />} />
             <Route element={<HospitalProtected />}>
               <Route path='/hospital/Dashboard' element={<HDashboard />} />
             </Route>

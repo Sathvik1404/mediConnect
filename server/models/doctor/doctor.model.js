@@ -44,6 +44,11 @@ const DoctorSchema = mongoose.Schema({
     },
     experience: {
         type: String
+    },
+    status: {
+        type: String,
+        required: true,
+        default: "On Leave"
     }
 });
 

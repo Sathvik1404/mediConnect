@@ -63,7 +63,7 @@ const Login = () => {
             <div className="max-w-md mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <div className="bg-white rounded-xl shadow-xl p-8">
                     <div className="text-center mb-8">
-                        <h2 className="text-2xl font-bold text-gray-900">Welcome Back, /*hosiptalname*/</h2>
+                        <h2 className="text-2xl font-bold text-gray-900">Welcome Back!</h2>
                         <p className="mt-2 text-gray-600">Login to your account</p>
                     </div>
 

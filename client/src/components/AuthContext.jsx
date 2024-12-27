@@ -7,18 +7,18 @@ const AuthProvider = ({ children }) => {
     const [role, setRole] = useState("");
     const [user, setUser] = useState(null);
 
-    useEffect(() => {
-        // Restore authentication state from localStorage
-        const storedToken = localStorage.getItem('token');
-        const storedRole = localStorage.getItem('role');
-        const storedUser = localStorage.getItem('user');
+    // useEffect(() => {
+    //     // Restore authentication state from localStorage
+    //     const storedToken = localStorage.getItem('token');
+    //     const storedRole = localStorage.getItem('role');
+    //     const storedUser = localStorage.getItem('user');
 
-        if (storedToken && storedRole && storedUser) {
-            setToken(storedToken);
-            setRole(storedRole);
-            setUser(JSON.parse(storedUser));
-        }
-    }, []);
+    //     if (storedToken && storedRole && storedUser) {
+    //         setToken(storedToken);
+    //         setRole(storedRole);
+    //         setUser(JSON.parse(storedUser));
+    //     }
+    // }, []);
 
     const patientLoginAction = async (data) => {
         try {
@@ -115,12 +115,12 @@ const AuthProvider = ({ children }) => {
             if (response.ok) {
                 setToken(responseData.token);
                 setRole(responseData.role);
-                // setUser(responseData.doctor);
+                setUser(responseData.hospital);
 
                 // Store auth state
                 localStorage.setItem('token', responseData.token);
                 localStorage.setItem('role', responseData.role);
-                // localStorage.setItem('user', JSON.stringify(responseData.doctor));
+                localStorage.setItem('user', JSON.stringify(responseData.hospital));
 
                 return {
                     ok: true,
@@ -168,6 +168,7 @@ const AuthProvider = ({ children }) => {
                 user,
                 patientLoginAction,
                 doctorLoginAction,
+                hospitalLoginAction,
                 logout,
                 isAuthenticated,
                 getAuthHeaders
