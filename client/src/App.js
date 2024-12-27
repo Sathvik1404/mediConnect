@@ -17,6 +17,8 @@ import HospitalDetails from './components/hospital/register/Register';
 import Appointment from './components/patient/dashboard/appointment';
 import Hlogin from './components/hospital/login/Hlogin';
 import Hsignup from './components/hospital/Signup/Hsignup';
+import HospitalProtected from './components/hospital/HospitalProtected';
+import HDashboard from './components/hospital/dashboard/Dashboard';
 
 function App() {
   return (
@@ -32,7 +34,6 @@ function App() {
               <Route path='/patient/profile' element={<Pprofile />} />
               <Route path="/patient/appointment/:doctorId" element={<Appointment />}></Route>
             </Route>
-            <Route path='/hospital/login' element={<Hlogin />} />
             <Route path='/doctor/dlogin' element={<DLogin />} />
             <Route path='/doctor/DSignup' element={<DSignup />} />
             <Route element={<DoctorProtected />}>
@@ -40,6 +41,10 @@ function App() {
             </Route>
             <Route path="/doctor/dashboard/patient/:patientId" element={<PatientDetails />} />
             <Route path="/hospital/signup" element={<Hsignup />} />
+            <Route path='/hospital/login' element={<Hlogin />} />
+            <Route element={<HospitalProtected />}>
+              <Route path='/hospital/Dashboard' element={<HDashboard />} />
+            </Route>
           </Routes>
 
         </BrowserRouter>

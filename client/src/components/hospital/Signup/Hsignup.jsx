@@ -12,7 +12,7 @@ const Hsignup = () => {
         confirmPassword: ''
     });
     const [loading, setLoading] = useState(false);
-    const [showOtherSpec, setShowOtherSpec] = useState(false);
+    // const [showOtherSpec, setShowOtherSpec] = useState(false);
 
 
     const handleChange = (e) => {

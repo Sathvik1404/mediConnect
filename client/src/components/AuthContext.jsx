@@ -100,6 +100,46 @@ const AuthProvider = ({ children }) => {
         }
     };
 
+    const hospitalLoginAction = async (data) => {
+        try {
+            const response = await fetch('http://localhost:5000/api/hospital/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            const responseData = await response.json();
+
+            if (response.ok) {
+                setToken(responseData.token);
+                setRole(responseData.role);
+                // setUser(responseData.doctor);
+
+                // Store auth state
+                localStorage.setItem('token', responseData.token);
+                localStorage.setItem('role', responseData.role);
+                // localStorage.setItem('user', JSON.stringify(responseData.doctor));
+
+                return {
+                    ok: true,
+                    data: responseData
+                };
+            }
+
+            return {
+                ok: false,
+                error: responseData.message || 'Invalid credentials'
+            };
+        } catch (err) {
+            return {
+                ok: false,
+                error: 'No record or Invalid credentials'
+            };
+        }
+    };
+
     const logout = () => {
         // Clear state
         setToken("");

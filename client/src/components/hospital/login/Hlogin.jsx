@@ -26,7 +26,7 @@ const Login = () => {
         setNotification({ message: '', type: '' }); // Reset notification
 
         try {
-            const user = await auth.doctorLoginAction(formData);
+            const user = await auth.hospitalLoginAction(formData);
 
             if (user.ok) {
                 setNotification({ message: '🎉 Login successful!', type: 'success' });
