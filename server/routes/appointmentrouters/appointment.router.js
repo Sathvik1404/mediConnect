@@ -14,8 +14,8 @@ router.use(session({
 
 router.post('/', async (req, res) => {
     // console.log(req.body)
-    const { doctorId, date, time, patientName, patientEmail, patientId } = req.body;
-    await AppointmentModel.create({ doctorId, date, time, patientEmail, patientId, patientName })
+    const { doctorId, date, time, patientName, patientEmail, patientId, doctorName, hospitalName } = req.body;
+    await AppointmentModel.create({ doctorId, date, time, patientEmail, patientId, patientName, doctorName, hospitalName })
         .then(user => res.json(user))
         .catch(err => res.status(500).json({ error: 'Failed to create one' }));
 });

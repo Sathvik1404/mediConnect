@@ -116,6 +116,28 @@ const Dashboard = () => {
     fetchAppointments();
   }, []);
 
+  const renderAppointmentButton = (appointment) => {
+    const isCancelled = appointment.status === "Cancelled";
+
+    return (
+      <button
+        onClick={() => cancelAppointment(appointment._id)}
+        disabled={isCancelled}
+        className={`
+          mt-2 inline-flex items-center px-4 py-[8px] border border-transparent 
+          text-sm font-medium rounded-md text-white
+          transition duration-200
+          ${isCancelled
+            ? 'bg-gray-400 cursor-not-allowed opacity-50'
+            : 'bg-red-600 hover:bg-red-700 focus:outline-none'
+          }
+        `}
+      >
+        {isCancelled ? 'Cancelled' : 'Cancel Appointment'}
+      </button>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
       {/* Navbar */}
@@ -177,19 +199,26 @@ const Dashboard = () => {
 
           {/* Active Appointments Section */}
           <div className="appointments-section mt-8">
-            <h3 className="text-xl font-semibold">Active Appointments</h3>
+            <h3 className="text-xl font-semibold">Your Appointments</h3>
             {appointments.length > 0 ? (
               appointments.map((appointment, index) => (
                 <div key={index} className="appointment-card bg-gray-100 p-4 rounded-lg shadow-md my-4">
                   <p><strong>Doctor:</strong> {appointment.doctorName}</p>
                   <p><strong>Date:</strong> {new Date(appointment.date).toLocaleDateString()}</p>
                   <p><strong>Time:</strong> {appointment.time}</p>
-                  <p><strong>Status:</strong> {appointment.status}</p>
-                  <button onClick={() => cancelAppointment(appointment._id)} className="mt-2 inline-flex items-center px-4 py-[8px] border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none transition duration=200">Cancel Appointment</button>
+                  <p><strong>Status:</strong>
+                    <span className={`ml-2 px-2 py-1 rounded-full text-sm ${appointment.status === "Cancelled"
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-green-100 text-green-800'
+                      }`}>
+                      {appointment.status}
+                    </span>
+                  </p>
+                  {renderAppointmentButton(appointment)}
                 </div>
               ))
             ) : (
-              <p>No active appointments.</p>
+              <p className="text-gray-600 mt-4">No appointments found.</p>
             )}
           </div>
         </div>

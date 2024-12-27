@@ -14,10 +14,10 @@ function App() {
     const [minTime, setMinTime] = useState('');
 
     const { doctorId } = useParams();
-    const userId = localStorage.getItem('user');
 
     const navigate = useNavigate();
     const auth = useAuth();
+    const userId = auth.user._id;
 
     const fetchUser = async () => {
         try {
@@ -33,7 +33,7 @@ function App() {
 
     const fetchDoctor = async () => {
         try {
-            console.log(doctorId)
+            // console.log(doctorId)
             const response = await fetch(`http://localhost:5000/api/doctor/profile/${doctorId}`);
             const data = await response.json();
             if (response.ok) {
@@ -81,7 +81,8 @@ function App() {
             patientName: patientName,
             patientEmail: email,
             date: date,
-            time: appointmentTime
+            time: appointmentTime,
+            doctorName: doctor
         };
 
         try {
