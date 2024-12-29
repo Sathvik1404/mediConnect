@@ -52,41 +52,34 @@ const Dashboard = () => {
       const response = await fetch(`http://localhost:5000/api/hospitals/${hospitalId}/apply`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           doctorId: doctor._id,
           doctorName: doctor.name,
           specialization: doctor.specialization,
-          experience: doctor.experience
-        })
+          experience: doctor.experience,
+        }),
       });
 
-      if (!response.ok) throw new Error('Failed to submit application');
+      const data = await response.json();
+      console.log(data);
 
-      // Update the local state to reflect the pending status
-      setHospitals(prevHospitals =>
-        prevHospitals.map(hospital =>
-          hospital._id === hospitalId
-            ? { ...hospital, applicationStatus: 'Pending' }
-            : hospital
-        )
-      );
+      if (!response.ok) throw new Error(data.message || 'Failed to submit application');
 
-      // Update doctor's pending hospitals
-      setDoctor(prevDoctor => ({
-        ...prevDoctor,
-        pendingHospitals: [...(prevDoctor.pendingHospitals || []), hospitalId]
+      setDoctor((prev) => ({
+        ...prev,
+        pendingHospitals: [...(prev.pendingHospitals || []), hospitalId],
       }));
-
       setError(null);
     } catch (error) {
       console.error('Error applying to hospital:', error);
-      setError('Failed to submit application');
+      setError(error.message);
     } finally {
       setLoading(false);
     }
   };
+
 
   const fetchPatients = async () => {
     if (doctor?.patients?.length > 0) {
@@ -299,8 +292,8 @@ const Dashboard = () => {
                         {new Date(appointment.date).toLocaleDateString()} at {appointment.time}
                       </p>
                       <span className={`inline-block px-2 py-1 rounded-full text-xs ${appointment.status === 'Completed' ? 'bg-green-100 text-green-800' :
-                          appointment.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                            'bg-blue-100 text-blue-800'
+                        appointment.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
+                          'bg-blue-100 text-blue-800'
                         }`}>
                         {appointment.status}
                       </span>
