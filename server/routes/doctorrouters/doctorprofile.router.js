@@ -43,12 +43,13 @@ router.get('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { name, email, mobile, age, record, specialization, hospitals, patients } = req.body;
-    console.log(hospitals)
+    const { name, email, mobile, age, record, specialization, hospitals, patients, status } = req.body;
+    // console.log(hospitals)
+    // console.log(id);
 
     let iterator = hospitals.values();
 
-    await doctorModel.findOneAndUpdate({ _id: id }, { name, email, mobile, age, record, specialization, hospitals, patients })
+    await doctorModel.findOneAndUpdate({ _id: id }, { name, email, mobile, age, record, specialization, hospitals, patients, status })
         .then(doc => res.status(200).json({ message: "Success" }))
         .catch(err => res.status(500).json({ message: "Internal Server Error" }))
 

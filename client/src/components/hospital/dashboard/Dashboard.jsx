@@ -42,14 +42,15 @@ const Dashboard = () => {
     }
   };
 
-  const handleRequest = async (requestId, status) => {
+  const handleRequest = async (request, status) => {
+    // console.log(request)
     try {
-      const response = await fetch(`http://localhost:5000/api/hospitals/${userId}/requests/${requestId}`, {
+      const response = await fetch(`http://localhost:5000/api/doctor/profile/${request.doctorId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ status, hospitals: [userId] }),
       });
 
       if (!response.ok) throw new Error('Failed to update request');
@@ -100,6 +101,7 @@ const Dashboard = () => {
         throw new Error('Failed to fetch hospital details');
       }
       const hospitalData = await hospitalResponse.json();
+      // console.log(hospitalData.doctors)
 
       const doctorsPromises = hospitalData.doctors.map(async (doctorId) => {
         const doctorResponse = await fetch(`http://localhost:5000/api/doctor/profile/${doctorId}`);
@@ -130,7 +132,7 @@ const Dashboard = () => {
         </div>
         <div className="flex space-x-2">
           <button
-            onClick={() => handleRequest(request._id, 'accepted')}
+            onClick={() => handleRequest(request, 'accepted')}
             className="p-2 bg-green-100 text-green-600 rounded-full hover:bg-green-200"
           >
             <Check className="h-4 w-4" />
