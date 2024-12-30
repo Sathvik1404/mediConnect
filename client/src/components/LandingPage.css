@@ -1,7 +1,9 @@
 .landing-page {
     background: linear-gradient(to right, #e0f7fa, #fce4ec);
     /* Soft gradient background */
-    min-height: 100vh;
+    min-height: 100%;
+    position: absolute;
+    top: 0px;
 }
 
 header {
@@ -9,6 +11,8 @@ header {
     /* Primary blue for header */
     color: white;
     padding: 20px;
+    /* position: relative;
+    margin-top: 0px; */
     border-radius: 10px;
 }
 
@@ -30,6 +34,7 @@ header {
 }
 
 .cards-container .card {
+
     cursor: pointer;
     transition: transform 0.3s, box-shadow 0.3s;
 }
