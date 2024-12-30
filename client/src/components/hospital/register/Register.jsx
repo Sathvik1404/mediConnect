@@ -36,9 +36,13 @@ const Register = () => {
       return;
     }
 
-    // Validation for mobile number
-    if (!/^\d+$/.test(formData.mobile)) {
-      toast.error("Invalid mobile number. Please enter digits only.");
+    if (formData.mobile.length !== 10 || !/^[0-9]+$/.test(formData.mobile)) {
+      window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'cross check your mobile number!', type: 'error' } }));
+      return;
+    }
+
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+]).{8,}$/.test(formData.password)) {
+      window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'Password must contain at least one number, one lowercase letter, one uppercase letter, and one special character', type: 'error' } }));
       return;
     }
 

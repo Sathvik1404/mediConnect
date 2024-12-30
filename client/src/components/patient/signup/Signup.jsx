@@ -29,6 +29,18 @@ const Signup = () => {
       setError('Passwords do not match');
       return;
     }
+    if (formData.mobile.length !== 10 || !/^[0-9]+$/.test(formData.mobile)) {
+      setError('Invalid mobile number');
+      return;
+    }
+
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+]).{8,}$/.test(formData.password)) {
+      setError('Password must contain at least one number, one lowercase letter, one uppercase letter, and one special character');
+      return;
+    }
+
+
+
 
     setLoading(true);
     try {
