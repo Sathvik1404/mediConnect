@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import './appointment.css';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
     const [doctor, setDoctor] = useState('');
@@ -12,69 +13,116 @@ function App() {
     const [email, setEmail] = useState('');
     const [appointmentTime, setAppointmentTime] = useState('');
     const [minTime, setMinTime] = useState('');
-
     const { doctorId } = useParams();
 
     const navigate = useNavigate();
     const auth = useAuth();
-    const userId = auth.user._id;
-
-    const fetchUser = async () => {
-        try {
-            const response = await fetch(`http://localhost:5000/api/patient/profile/${userId}`);
-            const data = await response.json();
-            setUser(data);
-            setPatientName(data.name);
-            setEmail(data.email);
-        } catch (error) {
-            console.error('Error fetching user details:', error);
-        }
-    };
-
-    const fetchDoctor = async () => {
-        try {
-            // console.log(doctorId)
-            const response = await fetch(`http://localhost:5000/api/doctor/profile/${doctorId}`);
-            const data = await response.json();
-            if (response.ok) {
-                setDoctor(data.name);
-            } else {
-                console.error('Error fetching doctor:', data.message);
-            }
-        } catch (error) {
-            console.error('Error fetching doctor:', error);
-        }
-    };
+    const userId = auth.user?._id;
 
     useEffect(() => {
-        fetchDoctor();
-        fetchUser();
+        if (!userId) {
+            navigate('/login'); // Redirect if user is not authenticated
+            return;
+        }
 
-        // Set the minimum date to today
+        const fetchData = async () => {
+            try {
+                const [userResponse, doctorResponse] = await Promise.all([
+                    fetch(`http://localhost:5000/api/patient/profile/${userId}`),
+                    fetch(`http://localhost:5000/api/doctor/profile/${doctorId}`)
+                ]);
+
+                const userData = await userResponse.json();
+                const doctorData = await doctorResponse.json();
+
+                if (userResponse.ok) {
+                    setUser(userData);
+                    setPatientName(userData.name);
+                    setEmail(userData.email);
+                } else {
+                    console.error('Error fetching user:', userData.message);
+                }
+
+                if (doctorResponse.ok) {
+                    setDoctor(doctorData.name);
+                } else {
+                    console.error('Error fetching doctor:', doctorData.message);
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+
         const today = new Date().toISOString().split('T')[0];
         setDate(today);
 
-        // Set the minimum time for today's date to the current time
         const currentTime = new Date().toTimeString().slice(0, 5);
         setMinTime(currentTime);
-    }, []);
+    }, [userId, doctorId, navigate]);
 
     const handleDateChange = (e) => {
         const selectedDate = e.target.value;
         setDate(selectedDate);
 
-        // If the selected date is today, set the minimum time to the current time
         const today = new Date().toISOString().split('T')[0];
-        if (selectedDate === today) {
-            const currentTime = new Date().toTimeString().slice(0, 5);
-            setMinTime(currentTime);
-        } else {
-            setMinTime('00:00');  // Reset to midnight for other dates
-        }
+        setMinTime(selectedDate === today ? new Date().toTimeString().slice(0, 5) : '00:00');
     };
+
+
+
+
+    const amount = 300; // Example amount in paise (₹50.00)
+    const loadRazorpay = () => {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => console.log('Razorpay SDK loaded successfully');
+        script.onerror = () => console.error('Razorpay SDK failed to load');
+        document.body.appendChild(script);
+    };
+    loadRazorpay();
+
+
+
+
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const [userResponse] = await Promise.all([
+            fetch(`http://localhost:5000/api/patient/profile/${userId}`)
+        ]);
+
+        const userData = await userResponse.json();
+        const options = {
+            key: 'rzp_test_BxN4zyfawxKOr3', // Replace with your Razorpay Key ID
+            amount: amount * 100, // Amount in paise
+            currency: 'INR',
+            name: 'mediConnect',
+            image: 'https://s3.ap-south-1.amazonaws.com/rzp-prod-merchant-assets/payment-link/description/pdggkocyrqji6v.jpeg',
+            description: 'Consultation Fee',
+            handler: (response) => {
+                // Handle successful payment
+                console.log('Payment successful:', response);
+                toast.success('Payment successful! Payment ID: ' + response.razorpay_payment_id);
+            },
+            prefill: {
+                name: userData.name,
+                email: userData.email,
+                contact: userData.mobile,
+            },
+            notes: {
+                address: userData.address,
+            },
+            theme: {
+                color: '#3399cc',
+            },
+        };
+
+        const paymentObject = new window.Razorpay(options);
+        paymentObject.open();
         const appointmentData = {
             doctorId: doctorId,
             patientId: userId,
@@ -82,21 +130,18 @@ function App() {
             patientEmail: email,
             date: date,
             time: appointmentTime,
-            doctorName: doctor
+            doctorName: doctor,
         };
 
         try {
-            const response = await fetch(`http://localhost:5000/api/appointment`, {
+            const response = await fetch('http://localhost:5000/api/appointment', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(appointmentData),
             });
 
             if (response.ok) {
-                window.location.href = 'https://rzp.io/rzp/5SJnOPV'
-                // alert(`Appointment booked with Dr. ${doctor} on ${date} at ${appointmentTime} for ${patientName} (${email})`);
+                // Reset state
                 setDoctor('');
                 setDate('');
                 setPatientName('');
@@ -105,6 +150,7 @@ function App() {
             } else {
                 const data = await response.json();
                 console.error('Error booking appointment:', data.message);
+                alert(`Error: ${data.message}`);
             }
         } catch (error) {
             console.error('Error submitting form:', error);
@@ -118,6 +164,7 @@ function App() {
 
     return (
         <div className="App">
+            <ToastContainer />
             <div className="navbar">
                 <h3>mediConnect</h3>
                 <div className="navbar-content">
@@ -136,7 +183,7 @@ function App() {
                         type="date"
                         value={date}
                         onChange={handleDateChange}
-                        min={new Date().toISOString().split('T')[0]} // Set minimum date to today
+                        min={new Date().toISOString().split('T')[0]}
                         required
                     />
                 </div>
@@ -146,7 +193,7 @@ function App() {
                         type="time"
                         value={appointmentTime}
                         onChange={(e) => setAppointmentTime(e.target.value)}
-                        min={date === new Date().toISOString().split('T')[0] ? minTime : '00:00'} // Set minimum time for today
+                        min={date === new Date().toISOString().split('T')[0] ? minTime : '00:00'}
                         required
                     />
                 </div>
