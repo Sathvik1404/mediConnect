@@ -224,14 +224,14 @@ const Pprofile = () => {
                 </div>
               ) : (
                 <div className="space-y-6">
-                  {Object.entries(patient).map(([key, value]) => (
-                    key !== 'record' && (
+                  {Object.entries(patient)
+                    .filter(([key]) => key !== 'record' && key !== '_id' && key !== '__v' && key !== "doctors" && key !== 'password')
+                    .map(([key, value]) => (
                       <div key={key} className="flex border-b border-gray-100 pb-4">
                         <span className="w-1/3 text-sm font-medium text-gray-500 capitalize">{key}:</span>
                         <span className="flex-1 text-sm text-gray-900">{value || 'N/A'}</span>
                       </div>
-                    )
-                  ))}
+                    ))}
 
                   {patient.record && (
                     <div className="flex border-b border-gray-100 pb-4">

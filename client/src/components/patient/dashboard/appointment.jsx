@@ -106,7 +106,7 @@ function App() {
             handler: (response) => {
                 // Handle successful payment
                 console.log('Payment successful:', response);
-                toast.success('Payment successful! Payment ID: ' + response.razorpay_payment_id);
+                toast.success('Appointment Booked Successfully 👩🏻‍⚕️Payment ID: ' + response.razorpay_payment_id);
             },
             prefill: {
                 name: userData.name,

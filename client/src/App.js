@@ -9,6 +9,8 @@ import Pprofile from './components/patient/pprofile/Pprofile';
 import DDashboard from './components/doctor/dashboard/Dashboard';
 import DLogin from './components/doctor/login/DLogin';
 import DSignup from './components/doctor/signup/DSignup';
+import Verify from './components/doctor/login/Verify';
+import PVerify from './components/patient/login/PVerify'
 import AuthProvider from './components/AuthContext';
 import PatientProtected from './components/patient/PatientProtected';
 import DoctorProtected from './components/doctor/DoctorProtected';
@@ -29,14 +31,17 @@ function App() {
             <Route path='/' element={<Landing />} />
             <Route path='/patient/signup' element={<Signup />} />
             <Route path='/patient/login' element={<Login />} />
+            <Route path='/patient/Verify' element={<PVerify />} />
             <Route element={<PatientProtected />}>
               <Route path='/patient/dashboard' element={<Dashboard />} />
               <Route path='/patient/profile' element={<Pprofile />} />
+
               <Route path="/patient/appointment/:doctorId" element={<Appointment />}></Route>
             </Route>
             <Route path='/doctor/dlogin' element={<DLogin />} />
             <Route path='/doctor/DSignup' element={<DSignup />} />
             <Route element={<DoctorProtected />}>
+              <Route path='/doctor/Verify' element={<Verify />} />
               <Route path='/doctor/dashboard' element={<DDashboard />} />
             </Route>
             <Route path="/doctor/dashboard/patient/:patientId" element={<PatientDetails />} />

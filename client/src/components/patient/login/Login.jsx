@@ -29,8 +29,13 @@ const Login = () => {
       const result = await auth.patientLoginAction(formData);
 
       if (result.ok) {
-        setNotification({ type: 'success', message: '🎉 Login successful!' });
-        navigate('/patient/dashboard');
+        // setNotification({ type: 'success', message: '🎉 Login successful!' });
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        await sendOTP(formData.email, otp); // Function to send OTP via email
+        sessionStorage.setItem('otp', otp); // Save OTP temporarily
+        sessionStorage.setItem('email', formData.email);
+        console.log(otp)
+        navigate('/patient/Verify');
       } else {
         setNotification({ type: 'error', message: result.error });
       }
@@ -38,6 +43,21 @@ const Login = () => {
       setNotification({ type: 'error', message: 'An error occurred. Please try again.' });
     } finally {
       setLoading(false);
+    }
+  };
+  const sendOTP = async (email, otp) => {
+    try {
+      await window.Email.send({
+        Host: 'smtp.elasticemail.com',
+        Username: 'golisathu@gmail.com',
+        Password: 'BD3254FB9DB4883CB42ECB69B7C9642F4240',
+        To: email,
+        From: 'golisathu@gmail.com',
+        Subject: 'Your OTP for Login',
+        Body: `Your OTP is: ${otp}`,
+      });
+    } catch (error) {
+      console.error('Error sending OTP:', error);
     }
   };
 
