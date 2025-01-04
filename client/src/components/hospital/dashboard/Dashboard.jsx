@@ -33,7 +33,7 @@ const Dashboard = () => {
 
   const fetchRequests = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/hospitals/${userId}/requests`);
+      const response = await fetch(`https://mediconnect-but5.onrender.com/api/hospitals/${userId}/requests`);
       if (!response.ok) throw new Error('Failed to fetch requests');
       const data = await response.json();
       setRequests(data);
@@ -45,7 +45,7 @@ const Dashboard = () => {
   const handleRequest = async (request, status) => {
     // console.log(request)
     try {
-      const response = await fetch(`http://localhost:5000/api/doctor/profile/${request.doctorId}`, {
+      const response = await fetch(`https://mediconnect-but5.onrender.com/api/doctor/profile/${request.doctorId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ const Dashboard = () => {
       setLoading(true);
       setError(null);
 
-      const hospitalResponse = await fetch(`http://localhost:5000/api/hospitals/${userId}`);
+      const hospitalResponse = await fetch(`https://mediconnect-but5.onrender.com/api/hospitals/${userId}`);
       if (!hospitalResponse.ok) {
         throw new Error('Failed to fetch hospital details');
       }
@@ -104,7 +104,7 @@ const Dashboard = () => {
       // console.log(hospitalData.doctors)
 
       const doctorsPromises = hospitalData.doctors.map(async (doctorId) => {
-        const doctorResponse = await fetch(`http://localhost:5000/api/doctor/profile/${doctorId}`);
+        const doctorResponse = await fetch(`https://mediconnect-but5.onrender.com/api/doctor/profile/${doctorId}`);
         if (!doctorResponse.ok) {
           throw new Error(`Failed to fetch doctor with id ${doctorId}`);
         }

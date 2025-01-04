@@ -22,7 +22,7 @@ const AuthProvider = ({ children }) => {
 
     const patientLoginAction = async (data) => {
         try {
-            const response = await fetch('http://localhost:5000/api/patient/login', {
+            const response = await fetch('https://mediconnect-but5.onrender.com/api/patient/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ const AuthProvider = ({ children }) => {
 
     const doctorLoginAction = async (data) => {
         try {
-            const response = await fetch('http://localhost:5000/api/doctor/login', {
+            const response = await fetch('https://mediconnect-but5.onrender.com/api/doctor/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ const AuthProvider = ({ children }) => {
 
     const hospitalLoginAction = async (data) => {
         try {
-            const response = await fetch('http://localhost:5000/api/hospital/login', {
+            const response = await fetch('https://mediconnect-but5.onrender.com/api/hospital/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

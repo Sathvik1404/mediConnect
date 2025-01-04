@@ -28,8 +28,8 @@ function App() {
         const fetchData = async () => {
             try {
                 const [userResponse, doctorResponse] = await Promise.all([
-                    fetch(`http://localhost:5000/api/patient/profile/${userId}`),
-                    fetch(`http://localhost:5000/api/doctor/profile/${doctorId}`)
+                    fetch(`https://mediconnect-but5.onrender.com/api/patient/profile/${userId}`),
+                    fetch(`https://mediconnect-but5.onrender.com/api/doctor/profile/${doctorId}`)
                 ]);
 
                 const userData = await userResponse.json();
@@ -92,7 +92,7 @@ function App() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const [userResponse] = await Promise.all([
-            fetch(`http://localhost:5000/api/patient/profile/${userId}`)
+            fetch(`https://mediconnect-but5.onrender.com/api/patient/profile/${userId}`)
         ]);
 
         const userData = await userResponse.json();
@@ -134,7 +134,7 @@ function App() {
         };
 
         try {
-            const response = await fetch('http://localhost:5000/api/appointment', {
+            const response = await fetch('https://mediconnect-but5.onrender.com/api/appointment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(appointmentData),

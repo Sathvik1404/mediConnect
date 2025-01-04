@@ -10,7 +10,7 @@ const PatientDetails = () => {
     useEffect(() => {
         const fetchPatientDetails = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/patient/profile/${patientId}`);
+                const response = await fetch(`https://mediconnect-but5.onrender.com/api/patient/profile/${patientId}`);
                 if (response.ok) {
                     const data = await response.json();
                     setPatient(data);
@@ -27,7 +27,7 @@ const PatientDetails = () => {
 
     const handleDownloadRecord = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/patient/profile/downloadrecord/${patientId}`);
+            const response = await fetch(`https://mediconnect-but5.onrender.com/api/patient/profile/downloadrecord/${patientId}`);
             if (response.ok) {
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);

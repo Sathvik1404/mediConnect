@@ -37,7 +37,7 @@ const DProfile = ({ doctor, onUpdateProfile }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:5000/api/doctor/profile/${doctor._id}`, {
+      const response = await fetch(`https://mediconnect-but5.onrender.com/api/doctor/profile/${doctor._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

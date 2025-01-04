@@ -58,7 +58,7 @@ const Pprofile = () => {
     fileData.append('record', selectedFile);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/patient/profile/uploadrecord/${auth.user._id}`, {
+      const response = await fetch(`https://mediconnect-but5.onrender.com/api/patient/profile/uploadrecord/${auth.user._id}`, {
         method: 'PUT',
         body: fileData,
       });
@@ -78,14 +78,14 @@ const Pprofile = () => {
 
   const handleSaveChanges = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/patient/profile/${auth.user._id}`);
+      const response = await fetch(`https://mediconnect-but5.onrender.com/api/patient/profile/${auth.user._id}`);
       const patientData = await response.json();
 
       if (!selectedFile) {
         formData.record = patientData.record;
       }
 
-      await fetch(`http://localhost:5000/api/patient/profile/${auth.user._id}`, {
+      await fetch(`https://mediconnect-but5.onrender.com/api/patient/profile/${auth.user._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -99,7 +99,7 @@ const Pprofile = () => {
   };
 
   const viewMedicalRecord = () => {
-    window.open(`http://localhost:5000/api/patient/profile/downloadrecord/${auth.user._id}`, '_blank');
+    window.open(`https://mediconnect-but5.onrender.com/api/patient/profile/downloadrecord/${auth.user._id}`, '_blank');
   };
 
   if (loading) {

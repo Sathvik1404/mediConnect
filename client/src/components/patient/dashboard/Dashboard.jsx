@@ -33,7 +33,7 @@ const Dashboard = () => {
 
   const fetchHospitals = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true }));
-    const data = await fetchData('http://localhost:5000/api/hospitals', 'hospitals');
+    const data = await fetchData('https://mediconnect-but5.onrender.com/api/hospitals', 'hospitals');
     if (data) {
       setState(prev => ({
         ...prev,
@@ -48,14 +48,14 @@ const Dashboard = () => {
     setState(prev => ({ ...prev, loading: true }));
 
     const hospitalData = await fetchData(
-      `http://localhost:5000/api/hospitals/${hospitalId}`,
+      `https://mediconnect-but5.onrender.com/api/hospitals/${hospitalId}`,
       'hospital details'
     );
 
     if (!hospitalData) return;
 
     const doctorPromises = hospitalData.doctors.map(doctorId =>
-      fetchData(`http://localhost:5000/api/doctor/profile/${doctorId}`, `doctor ${doctorId}`)
+      fetchData(`https://mediconnect-but5.onrender.com/api/doctor/profile/${doctorId}`, `doctor ${doctorId}`)
     );
 
     const doctorsDetails = await Promise.all(doctorPromises);
@@ -72,7 +72,7 @@ const Dashboard = () => {
 
   const fetchAppointments = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true }));
-    const data = await fetchData('http://localhost:5000/api/appointment', 'appointments');
+    const data = await fetchData('https://mediconnect-but5.onrender.com/api/appointment', 'appointments');
 
     if (data) {
       const filteredAppointments = data.filter(appointment =>
@@ -91,7 +91,7 @@ const Dashboard = () => {
     try {
       setState(prev => ({ ...prev, loading: true }));
       const response = await fetch(
-        `http://localhost:5000/api/appointment/${appointmentId}`,
+        `https://mediconnect-but5.onrender.com/api/appointment/${appointmentId}`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },

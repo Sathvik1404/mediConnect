@@ -32,7 +32,7 @@ const Hsignup = () => {
         setLoading(true);
 
         try {
-            const response = await fetch('http://localhost:5000/api/hospital/signup', {
+            const response = await fetch('https://mediconnect-but5.onrender.com/api/hospital/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

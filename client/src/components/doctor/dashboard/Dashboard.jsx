@@ -25,7 +25,7 @@ const Dashboard = () => {
   const fetchHospitals = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/hospitals');
+      const response = await fetch('https://mediconnect-but5.onrender.com/api/hospitals');
       if (!response.ok) throw new Error('Failed to fetch hospitals');
       const data = await response.json();
 
@@ -49,7 +49,7 @@ const Dashboard = () => {
   const applyToHospital = async (hospitalId) => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5000/api/hospitals/${hospitalId}/apply`, {
+      const response = await fetch(`https://mediconnect-but5.onrender.com/api/hospitals/${hospitalId}/apply`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ const Dashboard = () => {
       try {
         const patientDetails = await Promise.all(
           doctor.patients.map(async (patientId) => {
-            const response = await fetch(`http://localhost:5000/api/patient/profile/${patientId}`);
+            const response = await fetch(`https://mediconnect-but5.onrender.com/api/patient/profile/${patientId}`);
             return response.ok ? response.json() : null;
           })
         );
@@ -99,7 +99,7 @@ const Dashboard = () => {
 
   const fetchAppointments = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/appointment');
+      const response = await fetch('https://mediconnect-but5.onrender.com/api/appointment');
       if (response.ok) {
         const allAppointments = await response.json();
         setAppointments(allAppointments.filter(apt => apt.doctorId === doctor._id));
@@ -111,7 +111,7 @@ const Dashboard = () => {
 
   const updateAppointmentStatus = async (appointmentId, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/appointment/${appointmentId}`, {
+      const response = await fetch(`https://mediconnect-but5.onrender.com/api/appointment/${appointmentId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
