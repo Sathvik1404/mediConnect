@@ -18,7 +18,7 @@ import PatientDetails from './components/doctor/dashboard/PatientDetails';
 import HospitalDetails from './components/hospital/register/Register';
 import Appointment from './components/patient/dashboard/appointment';
 import Hlogin from './components/hospital/login/Hlogin';
-import Hsignup from './components/hospital/Signup/Hsignup';
+// import Hsignup from './components/hospital/Signup/Hsignup';
 import HospitalProtected from './components/hospital/HospitalProtected';
 import HDashboard from './components/hospital/dashboard/Dashboard';
 
@@ -45,7 +45,7 @@ function App() {
               <Route path='/doctor/dashboard' element={<DDashboard />} />
             </Route>
             <Route path="/doctor/dashboard/patient/:patientId" element={<PatientDetails />} />
-            <Route path="/hospital/Hsignup" element={<Hsignup />} />
+            {/* <Route path="/hospital/Hsignup" element={<Hsignup />} /> */}
             <Route path='/hospital/Hlogin' element={<Hlogin />} />
             <Route element={<HospitalProtected />}>
               <Route path='/hospital/Dashboard' element={<HDashboard />} />
