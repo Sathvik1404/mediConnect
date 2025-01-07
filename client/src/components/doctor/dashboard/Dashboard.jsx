@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../AuthContext';
 import DProfile from '../dprofile/Dprofile';
 import { FaUserMd, FaCalendarCheck, FaSignOutAlt, FaUsers, FaHospital } from 'react-icons/fa';
+import { ToggleButton } from 'react-bootstrap';
 
 const Dashboard = () => {
   const [doctor, setDoctor] = useState(null);
@@ -193,6 +194,11 @@ const Dashboard = () => {
               >
                 <FaSignOutAlt className="w-4 h-4" />
                 <span>Logout</span>
+              </button>
+              <button
+                onClick={ToggleButton}
+                className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200"
+              >
               </button>
             </div>
           </div>
