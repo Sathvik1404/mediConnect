@@ -81,7 +81,7 @@ router.post('/login', async (req, res) => {
         const token = jwt.sign({ email: patient.email }, "jwt-secret-key", { expiresIn: '1h' });
 
         // Send the email
-        transporter.sendMail(mailOptions, (error, info) => {
+        await transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
                 return console.error('Error:', error);
             }
