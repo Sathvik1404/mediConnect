@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { Mail, Lock, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../AuthContext';
-const nodemailer = require('nodemailer');
+// const nodemailer = require('nodemailer');
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'srikarmarikanti@gmail.com', // Your Gmail address
-    pass: 'oyty yzub gpmv xvor',    // Your App Password
-  },
-});
+// const transporter = nodemailer.createTransport({
+//   service: 'gmail',
+//   auth: {
+//     user: 'srikarmarikanti@gmail.com', // Your Gmail address
+//     pass: 'oyty yzub gpmv xvor',    // Your App Password
+//   },
+// });
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -41,21 +41,21 @@ const Login = () => {
         // setNotification({ type: 'success', message: '🎉 Login successful!' });
         const otp = Math.floor(100000 + Math.random() * 900000);
 
-        const mailOptions = {
-          from: 'srikarmarikanti@gmail.com', // Sender address
-          to: formData.email, // Recipient address
-          subject: 'Test Email from Nodemailer', // Subject
-          text: otp, // Plain text body
-          html: `<b>${otp}</b>`, // HTML body
-        };
+        // const mailOptions = {
+        //   from: 'srikarmarikanti@gmail.com', // Sender address
+        //   to: formData.email, // Recipient address
+        //   subject: 'Test Email from Nodemailer', // Subject
+        //   text: otp, // Plain text body
+        //   html: `<b>${otp}</b>`, // HTML body
+        // };
 
-        // Send the email
-        transporter.sendMail(mailOptions, (error, info) => {
-          if (error) {
-            return console.error('Error:', error);
-          }
-          console.log('Email sent:', info.response);
-        });
+        // // Send the email
+        // transporter.sendMail(mailOptions, (error, info) => {
+        //   if (error) {
+        //     return console.error('Error:', error);
+        //   }
+        //   console.log('Email sent:', info.response);
+        // });
         sessionStorage.setItem('otp', otp); // Save OTP temporarily
         sessionStorage.setItem('email', formData.email);
         console.log(otp)
