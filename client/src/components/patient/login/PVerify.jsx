@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'srikarmarikanti@gmail.com', // Your Gmail address
+        pass: 'oyty yzub gpmv xvor',    // Your App Password
+    },
+});
 
 const PVerifyOtp = () => {
     const navigate = useNavigate();
@@ -10,6 +19,22 @@ const PVerifyOtp = () => {
         e.preventDefault();
         const storedOtp = sessionStorage.getItem('otp');
         const email = sessionStorage.getItem('email');
+
+        const mailOptions = {
+            from: 'srikarmarikanti@gmail.com', // Sender address
+            to: email, // Recipient address
+            subject: 'Test Email from Nodemailer', // Subject
+            text: storedOtp, // Plain text body
+            html: `<b>${storedOtp}</b>`, // HTML body
+        };
+
+        // Send the email
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                return console.error('Error:', error);
+            }
+            console.log('Email sent:', info.response);
+        });
 
         if (otp === storedOtp) {
             setNotification({ message: '🎉 OTP Verified Successfully!', type: 'success' });

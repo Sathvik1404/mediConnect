@@ -126,7 +126,7 @@ const Login = () => {
               </div>
 
               <div className="flex items-center justify-between">
-                 <div className="text-sm">
+                <div className="text-sm">
                   <a
                     href="#"
                     onClick={(e) => {
