@@ -7,13 +7,58 @@
 }
 
 header {
+    display: flex;
+    flex-direction: row;
     background-color: #007bff;
+    gap: 10px;
     /* Primary blue for header */
     color: white;
     padding: 20px;
     /* position: relative;
     margin-top: 0px; */
     border-radius: 10px;
+}
+
+.dropdown {
+    margin-left: 50%;
+}
+
+select {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Add a caret icon */
+select::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-top-color: white;
+}
+
+/* Option styles (inherent to select) */
+option {
+    background-color: white;
+    color: black;
+    font-size: 16px;
+}
+
+/* Hover effect */
+select:hover {
+    background-color: #0056b3;
+}
+
+option {
+    border: 1px solid black;
 }
 
 .hero-section {
