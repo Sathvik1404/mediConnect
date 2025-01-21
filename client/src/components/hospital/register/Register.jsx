@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -49,17 +50,9 @@ const Register = () => {
     setLoading(true); // Start loading
 
     try {
-      const response = await fetch('https://mediconnect-but5.onrender.com/api/hospital/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await axios.post('https://mediconnect-but5.onrender.com/api/hospital/signup', formData);
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (response.status === 200) {
         toast.success('🎉 Signup successful!', {
           position: 'top-center',
           className: 'custom-toast',
@@ -73,14 +66,9 @@ const Register = () => {
           password: '',
           confirmPassword: '',
         });
-      } else {
-        toast.error(data.error || '⚠️ Signup failed. Please try again.', {
-          position: 'top-center',
-          className: 'custom-toast',
-        });
       }
     } catch (error) {
-      toast.error(`Error: ${error.message}`, {
+      toast.error(error.response?.data?.error || '⚠️ Signup failed. Please try again.', {
         position: 'top-center',
         className: 'custom-toast',
       });

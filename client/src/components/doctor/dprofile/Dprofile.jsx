@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Form, Button, Container, Row, Col } from 'react-bootstrap';
+import axios from 'axios';
 
 const specializationsList = [
   'Cardiology',
@@ -37,17 +37,18 @@ const DProfile = ({ doctor, onUpdateProfile }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`https://mediconnect-but5.onrender.com/api/doctor/profile/${doctor._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedDoctor),
-      });
+      const response = await axios.put(
+        `https://mediconnect-but5.onrender.com/api/doctor/profile/${doctor._id}`,
+        updatedDoctor,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
-      if (response.ok) {
-        const updatedData = await response.json();
-        onUpdateProfile(updatedData);
+      if (response.status === 200) {
+        onUpdateProfile(response.data);
         alert('Profile updated successfully!');
       } else {
         alert('Failed to update profile.');

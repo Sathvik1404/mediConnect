@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, Mail, Lock, User, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -32,6 +33,8 @@ const Signup = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
     if (name === 'specialization' && value === 'Others') {
       setShowOtherSpec(true);
+    } else if (name === 'specialization') {
+      setShowOtherSpec(false);
     }
   };
 
@@ -44,7 +47,7 @@ const Signup = () => {
     }
 
     if (formData.mobile.length !== 10 || !/^[0-9]+$/.test(formData.mobile)) {
-      window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'cross check your mobile number!', type: 'error' } }));
+      window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'Cross-check your mobile number!', type: 'error' } }));
       return;
     }
 
@@ -55,38 +58,32 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('https://mediconnect-but5.onrender.com/api/doctor/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+      const response = await axios.post('https://mediconnect-but5.onrender.com/api/doctor/signup', formData, {
+        headers: { 'Content-Type': 'application/json' }
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (response.status === 201 || response.status === 200) {
         window.dispatchEvent(new CustomEvent('notify', { detail: { message: '🎉 Signup successful!', type: 'success' } }));
-
         setFormData({
           name: '',
-          age: '',
-          gender: '',
+          specialization: '',
+          otherSpec: '',
           mobile: '',
           email: '',
           password: '',
-          spec: '',
+          confirmPassword: ''
         });
+        navigate('/doctor/dlogin');
       } else {
-        window.dispatchEvent(new CustomEvent('notify', { detail: { message: data.error || '⚠️ Signup failed. Please try again.', type: 'error' } }));
+        window.dispatchEvent(new CustomEvent('notify', { detail: { message: response.data.error || '⚠️ Signup failed. Please try again.', type: 'error' } }));
       }
     } catch (error) {
-      window.dispatchEvent(new CustomEvent('notify', { detail: { message: `Error: ${error.message}`, type: 'error' } }));
+      console.error('Error during signup:', error);
+      window.dispatchEvent(new CustomEvent('notify', { detail: { message: `Error: ${error.response?.data?.message || error.message}`, type: 'error' } }));
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">

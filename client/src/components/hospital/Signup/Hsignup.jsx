@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, Mail, Lock, User, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Hsignup = () => {
     const navigate = useNavigate();
@@ -13,8 +14,6 @@ const Hsignup = () => {
         location: ''
     });
     const [loading, setLoading] = useState(false);
-    // const [showOtherSpec, setShowOtherSpec] = useState(false);
-
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -32,18 +31,13 @@ const Hsignup = () => {
         setLoading(true);
 
         try {
-            const response = await fetch('https://mediconnect-but5.onrender.com/api/hospital/signup', {
-                method: 'POST',
+            const response = await axios.post('https://mediconnect-but5.onrender.com/api/hospital/signup', formData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
             });
 
-            const data = await response.json();
-            console.log(data)
-
-            if (response.ok) {
+            if (response.status === 200) {
                 window.dispatchEvent(new CustomEvent('notify', { detail: { message: '🎉 Signup successful!', type: 'success' } }));
 
                 setFormData({
@@ -55,7 +49,7 @@ const Hsignup = () => {
                     location: ''
                 });
             } else {
-                window.dispatchEvent(new CustomEvent('notify', { detail: { message: data.error || '⚠️ Signup failed. Please try again.', type: 'error' } }));
+                window.dispatchEvent(new CustomEvent('notify', { detail: { message: response.data.error || '⚠️ Signup failed. Please try again.', type: 'error' } }));
             }
         } catch (error) {
             window.dispatchEvent(new CustomEvent('notify', { detail: { message: `Error: ${error.message}`, type: 'error' } }));
@@ -63,7 +57,6 @@ const Hsignup = () => {
             setLoading(false);
         }
     };
-
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
@@ -104,8 +97,6 @@ const Hsignup = () => {
                                     required
                                 />
                             </div>
-
-
 
                             <div className="relative flex items-center">
                                 <Phone className="absolute left-3 h-5 w-5 text-gray-400" />
@@ -159,7 +150,6 @@ const Hsignup = () => {
                                 />
                             </div>
                             <div className="relative flex items-center">
-                                {/* <Lock className="absolute left-3 h-5 w-5 text-gray-400" /> */}
                                 <input
                                     type="text"
                                     name="location"

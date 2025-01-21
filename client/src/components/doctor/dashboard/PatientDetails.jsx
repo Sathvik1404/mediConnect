@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 import { Container, Row, Col, Tab, Tabs, Button } from 'react-bootstrap';
 import './PatientDetails.css'; // Import the customized CSS
 
@@ -10,13 +11,8 @@ const PatientDetails = () => {
     useEffect(() => {
         const fetchPatientDetails = async () => {
             try {
-                const response = await fetch(`https://mediconnect-but5.onrender.com/api/patient/profile/${patientId}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setPatient(data);
-                } else {
-                    console.error('Failed to fetch patient details');
-                }
+                const response = await axios.get(`https://mediconnect-but5.onrender.com/api/patient/profile/${patientId}`);
+                setPatient(response.data);
             } catch (error) {
                 console.error('Error fetching patient details:', error);
             }
@@ -27,19 +23,18 @@ const PatientDetails = () => {
 
     const handleDownloadRecord = async () => {
         try {
-            const response = await fetch(`https://mediconnect-but5.onrender.com/api/patient/profile/downloadrecord/${patientId}`);
-            if (response.ok) {
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${patient.name}_medical_record.pdf`; // You can customize the file name here
-                a.click();
-            } else {
-                alert('No medical record');
-            }
+            const response = await axios.get(
+                `https://mediconnect-but5.onrender.com/api/patient/profile/downloadrecord/${patientId}`,
+                { responseType: 'blob' }
+            );
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${patient.name}_medical_record.pdf`; // Customize the file name here
+            a.click();
         } catch (error) {
             console.error('Error downloading medical record:', error);
+            alert('No medical record');
         }
     };
 
