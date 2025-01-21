@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../AuthContext';
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
+import axios from 'axios';
 
 function App() {
     const [doctor, setDoctor] = useState('');
@@ -28,26 +29,17 @@ function App() {
         const fetchData = async () => {
             try {
                 const [userResponse, doctorResponse] = await Promise.all([
-                    fetch(`https://mediconnect-but5.onrender.com/api/patient/profile/${userId}`),
-                    fetch(`https://mediconnect-but5.onrender.com/api/doctor/profile/${doctorId}`)
+                    axios.get(`https://mediconnect-but5.onrender.com/api/patient/profile/${userId}`),
+                    axios.get(`https://mediconnect-but5.onrender.com/api/doctor/profile/${doctorId}`)
                 ]);
 
-                const userData = await userResponse.json();
-                const doctorData = await doctorResponse.json();
+                const userData = userResponse.data;
+                const doctorData = doctorResponse.data;
 
-                if (userResponse.ok) {
-                    setUser(userData);
-                    setPatientName(userData.name);
-                    setEmail(userData.email);
-                } else {
-                    console.error('Error fetching user:', userData.message);
-                }
-
-                if (doctorResponse.ok) {
-                    setDoctor(doctorData.name);
-                } else {
-                    console.error('Error fetching doctor:', doctorData.message);
-                }
+                setUser(userData);
+                setPatientName(userData.name);
+                setEmail(userData.email);
+                setDoctor(doctorData.name);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -70,9 +62,6 @@ function App() {
         setMinTime(selectedDate === today ? new Date().toTimeString().slice(0, 5) : '00:00');
     };
 
-
-
-
     const amount = 300; // Example amount in paise (₹50.00)
     const loadRazorpay = () => {
         const script = document.createElement('script');
@@ -83,74 +72,63 @@ function App() {
     };
     loadRazorpay();
 
-
-
-
-
-
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const [userResponse] = await Promise.all([
-            fetch(`https://mediconnect-but5.onrender.com/api/patient/profile/${userId}`)
-        ]);
-
-        const userData = await userResponse.json();
-        const options = {
-            key: 'rzp_test_BxN4zyfawxKOr3', // Replace with your Razorpay Key ID
-            amount: amount * 100, // Amount in paise
-            currency: 'INR',
-            name: 'mediConnect',
-            image: 'https://s3.ap-south-1.amazonaws.com/rzp-prod-merchant-assets/payment-link/description/pdggkocyrqji6v.jpeg',
-            description: 'Consultation Fee',
-            handler: (response) => {
-                // Handle successful payment
-                console.log('Payment successful:', response);
-                toast.success('Appointment Booked Successfully 👩🏻‍⚕️Payment ID: ' + response.razorpay_payment_id);
-            },
-            prefill: {
-                name: userData.name,
-                email: userData.email,
-                contact: userData.mobile,
-            },
-            notes: {
-                address: userData.address,
-            },
-            theme: {
-                color: '#3399cc',
-            },
-        };
-
-        const paymentObject = new window.Razorpay(options);
-        paymentObject.open();
-        const appointmentData = {
-            doctorId: doctorId,
-            patientId: userId,
-            patientName: patientName,
-            patientEmail: email,
-            date: date,
-            time: appointmentTime,
-            doctorName: doctor,
-        };
 
         try {
-            const response = await fetch('https://mediconnect-but5.onrender.com/api/appointment', {
-                method: 'POST',
+            const userResponse = await axios.get(`https://mediconnect-but5.onrender.com/api/patient/profile/${userId}`);
+            const userData = userResponse.data;
+
+            const options = {
+                key: 'rzp_test_BxN4zyfawxKOr3', // Replace with your Razorpay Key ID
+                amount: amount * 100, // Amount in paise
+                currency: 'INR',
+                name: 'mediConnect',
+                image: 'https://s3.ap-south-1.amazonaws.com/rzp-prod-merchant-assets/payment-link/description/pdggkocyrqji6v.jpeg',
+                description: 'Consultation Fee',
+                handler: (response) => {
+                    console.log('Payment successful:', response);
+                    toast.success('Appointment Booked Successfully 👩🏻‍⚕️Payment ID: ' + response.razorpay_payment_id);
+                },
+                prefill: {
+                    name: userData.name,
+                    email: userData.email,
+                    contact: userData.mobile,
+                },
+                notes: {
+                    address: userData.address,
+                },
+                theme: {
+                    color: '#3399cc',
+                },
+            };
+
+            const paymentObject = new window.Razorpay(options);
+            paymentObject.open();
+
+            const appointmentData = {
+                doctorId: doctorId,
+                patientId: userId,
+                patientName: patientName,
+                patientEmail: email,
+                date: date,
+                time: appointmentTime,
+                doctorName: doctor,
+            };
+
+            const response = await axios.post('https://mediconnect-but5.onrender.com/api/appointment', appointmentData, {
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(appointmentData),
             });
 
-            if (response.ok) {
-                // Reset state
+            if (response.status === 200) {
                 setDoctor('');
                 setDate('');
                 setPatientName('');
                 setEmail('');
                 setAppointmentTime('');
             } else {
-                const data = await response.json();
-                console.error('Error booking appointment:', data.message);
-                alert(`Error: ${data.message}`);
+                console.error('Error booking appointment:', response.data.message);
+                toast.error(`Error: ${response.data.message}`);
             }
         } catch (error) {
             console.error('Error submitting form:', error);

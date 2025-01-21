@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useAuth } from '../../AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Upload, LogOut, Edit2, Save, X } from 'lucide-react';
@@ -58,48 +59,47 @@ const Pprofile = () => {
     fileData.append('record', selectedFile);
 
     try {
-      const response = await fetch(`https://mediconnect-but5.onrender.com/api/patient/profile/uploadrecord/${auth.user._id}`, {
-        method: 'PUT',
-        body: fileData,
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setPatient(prev => ({ ...prev, record: result.filePath }));
-        setFormData(prev => ({ ...prev, record: result.filePath }));
-        alert('File uploaded successfully');
-      } else {
-        alert('Failed to upload file');
-      }
+      const response = await axios.put(
+        `https://mediconnect-but5.onrender.com/api/patient/profile/uploadrecord/${auth.user._id}`,
+        fileData
+      );
+      setPatient(prev => ({ ...prev, record: response.data.filePath }));
+      setFormData(prev => ({ ...prev, record: response.data.filePath }));
+      alert('File uploaded successfully');
     } catch (error) {
       console.error('Error uploading file:', error);
+      alert('Failed to upload file');
     }
   };
 
   const handleSaveChanges = async () => {
     try {
-      const response = await fetch(`https://mediconnect-but5.onrender.com/api/patient/profile/${auth.user._id}`);
-      const patientData = await response.json();
+      const { data: patientData } = await axios.get(
+        `https://mediconnect-but5.onrender.com/api/patient/profile/${auth.user._id}`
+      );
 
       if (!selectedFile) {
         formData.record = patientData.record;
       }
 
-      await fetch(`https://mediconnect-but5.onrender.com/api/patient/profile/${auth.user._id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+      await axios.put(
+        `https://mediconnect-but5.onrender.com/api/patient/profile/${auth.user._id}`,
+        formData
+      );
 
       setPatient(prev => ({ ...prev, ...formData }));
       setIsEditing(false);
     } catch (error) {
+      console.error('Failed to update details:', error);
       setError('Failed to update details');
     }
   };
 
   const viewMedicalRecord = () => {
-    window.open(`https://mediconnect-but5.onrender.com/api/patient/profile/downloadrecord/${auth.user._id}`, '_blank');
+    window.open(
+      `https://mediconnect-but5.onrender.com/api/patient/profile/downloadrecord/${auth.user._id}`,
+      '_blank'
+    );
   };
 
   if (loading) {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, Phone, Mail, Lock, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const Signup = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     setError('');
   };
 
@@ -39,19 +40,17 @@ const Signup = () => {
       return;
     }
 
-
-
-
     setLoading(true);
     try {
-      const response = await fetch('https://mediconnect-but5.onrender.com/api/patient/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+      const response = await axios.post(
+        'https://mediconnect-but5.onrender.com/api/patient/signup',
+        formData,
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
 
-      const data = await response.json();
-      if (response.ok) {
+      if (response.status === 200 || response.status === 201) {
         setSuccess(true);
         setFormData({
           name: '',
@@ -61,15 +60,14 @@ const Signup = () => {
           password: '',
           confirmPassword: '',
         });
-        // Navigate to login page after successful signup
         setTimeout(() => {
           navigate('/patient/login');
         }, 2000);
       } else {
-        setError(data.error || 'Signup failed. Please try again.');
+        setError(response.data.error || 'Signup failed. Please try again.');
       }
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.error || err.message);
     } finally {
       setLoading(false);
     }
@@ -85,7 +83,9 @@ const Signup = () => {
               <span className="text-2xl font-bold text-indigo-600">mediConnect</span>
             </div>
             <button
-              onClick={() => { navigate('/patient/login') }}
+              onClick={() => {
+                navigate('/patient/login');
+              }}
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
             >
               Login <ChevronRight className="ml-2 h-4 w-4" />

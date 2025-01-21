@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../AuthContext';
+import axios from 'axios';
 
 const Dashboard = () => {
   const [state, setState] = useState({
@@ -22,9 +23,8 @@ const Dashboard = () => {
 
   const fetchData = useCallback(async (url, errorMessage) => {
     try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`Failed to fetch ${errorMessage}`);
-      return await response.json();
+      const response = await axios.get(url);
+      return response.data;
     } catch (error) {
       handleError(error, `Error fetching ${errorMessage}`);
       return null;
@@ -90,16 +90,10 @@ const Dashboard = () => {
   const cancelAppointment = async (appointmentId) => {
     try {
       setState(prev => ({ ...prev, loading: true }));
-      const response = await fetch(
+      await axios.put(
         `https://mediconnect-but5.onrender.com/api/appointment/${appointmentId}`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: "Cancelled" })
-        }
+        { status: "Cancelled" }
       );
-
-      if (!response.ok) throw new Error('Failed to cancel appointment');
 
       setState(prev => ({
         ...prev,

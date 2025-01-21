@@ -1,4 +1,5 @@
 import React, { useContext, createContext, useState, useEffect } from 'react';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
@@ -7,135 +8,86 @@ const AuthProvider = ({ children }) => {
     const [role, setRole] = useState("");
     const [user, setUser] = useState(null);
 
-    // useEffect(() => {
-    //     // Restore authentication state from localStorage
-    //     const storedToken = localStorage.getItem('token');
-    //     const storedRole = localStorage.getItem('role');
-    //     const storedUser = localStorage.getItem('user');
-
-    //     if (storedToken && storedRole && storedUser) {
-    //         setToken(storedToken);
-    //         setRole(storedRole);
-    //         setUser(JSON.parse(storedUser));
-    //     }
-    // }, []);
-
     const patientLoginAction = async (data) => {
         try {
-            const response = await fetch('https://mediconnect-but5.onrender.com/api/patient/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
+            const response = await axios.post(
+                'https://mediconnect-but5.onrender.com/api/patient/login',
+                data,
+                { headers: { 'Content-Type': 'application/json' } }
+            );
 
-            const responseData = await response.json();
+            const responseData = response.data;
 
-            if (response.ok) {
-                setToken(responseData.token);
-                setRole(responseData.role);
-                setUser(responseData.patient);
+            setToken(responseData.token);
+            setRole(responseData.role);
+            setUser(responseData.patient);
 
-                // Store auth state
-                localStorage.setItem('token', responseData.token);
-                localStorage.setItem('role', responseData.role);
-                localStorage.setItem('user', JSON.stringify(responseData.patient));
+            // Store auth state
+            localStorage.setItem('token', responseData.token);
+            localStorage.setItem('role', responseData.role);
+            localStorage.setItem('user', JSON.stringify(responseData.patient));
 
-                return {
-                    ok: true,
-                    data: responseData
-                };
-            }
-
-            return {
-                ok: false,
-                error: responseData.message || 'Invalid credentials'
-            };
+            return { ok: true, data: responseData };
         } catch (err) {
             return {
                 ok: false,
-                error: 'No record or Invalid credentials'
+                error: err.response?.data?.message || 'No record or Invalid credentials',
             };
         }
     };
 
     const doctorLoginAction = async (data) => {
         try {
-            const response = await fetch('https://mediconnect-but5.onrender.com/api/doctor/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
+            const response = await axios.post(
+                'https://mediconnect-but5.onrender.com/api/doctor/login',
+                data,
+                { headers: { 'Content-Type': 'application/json' } }
+            );
 
-            const responseData = await response.json();
+            const responseData = response.data;
 
-            if (response.ok) {
-                setToken(responseData.token);
-                setRole(responseData.role);
-                setUser(responseData.doctor);
+            setToken(responseData.token);
+            setRole(responseData.role);
+            setUser(responseData.doctor);
 
-                // Store auth state
-                localStorage.setItem('token', responseData.token);
-                localStorage.setItem('role', responseData.role);
-                localStorage.setItem('user', JSON.stringify(responseData.doctor));
+            // Store auth state
+            localStorage.setItem('token', responseData.token);
+            localStorage.setItem('role', responseData.role);
+            localStorage.setItem('user', JSON.stringify(responseData.doctor));
 
-                return {
-                    ok: true,
-                    data: responseData
-                };
-            }
-
-            return {
-                ok: false,
-                error: responseData.message || 'Invalid credentials'
-            };
+            return { ok: true, data: responseData };
         } catch (err) {
             return {
                 ok: false,
-                error: 'No record or Invalid credentials'
+                error: err.response?.data?.message || 'No record or Invalid credentials',
             };
         }
     };
 
     const hospitalLoginAction = async (data) => {
         try {
-            const response = await fetch('https://mediconnect-but5.onrender.com/api/hospital/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
+            const response = await axios.post(
+                'https://mediconnect-but5.onrender.com/api/hospital/login',
+                data,
+                { headers: { 'Content-Type': 'application/json' } }
+            );
 
-            const responseData = await response.json();
+            const responseData = response.data;
 
-            if (response.ok) {
-                setToken(responseData.token);
-                setRole(responseData.role);
-                setUser(responseData.hospital);
+            setToken(responseData.token);
+            setRole(responseData.role);
+            setUser(responseData.hospital);
 
-                // Store auth state
-                localStorage.setItem('token', responseData.token);
-                localStorage.setItem('role', responseData.role);
-                localStorage.setItem('user', JSON.stringify(responseData.hospital));
+            // Store auth state
+            localStorage.setItem('token', responseData.token);
+            localStorage.setItem('role', responseData.role);
+            localStorage.setItem('user', JSON.stringify(responseData.hospital));
 
-                return {
-                    ok: true,
-                    data: responseData
-                };
-            }
-
-            return {
-                ok: false,
-                error: responseData.message || 'Invalid credentials'
-            };
+            return { ok: true, data: responseData };
         } catch (err) {
             return {
                 ok: false,
-                error: 'No record or Invalid credentials'
+                error: err.response?.data?.message || 'No record or Invalid credentials',
             };
         }
     };
@@ -152,12 +104,11 @@ const AuthProvider = ({ children }) => {
         localStorage.removeItem('user');
     };
 
-    // Additional helper methods
     const isAuthenticated = () => !!token;
 
     const getAuthHeaders = () => ({
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
     });
 
     return (
@@ -171,7 +122,7 @@ const AuthProvider = ({ children }) => {
                 hospitalLoginAction,
                 logout,
                 isAuthenticated,
-                getAuthHeaders
+                getAuthHeaders,
             }}
         >
             {children}
