@@ -10,9 +10,10 @@ const db_url = process.env.MONGODB_URL;
 const app = express();
 
 app.use(cors({
-    origin: ["https://medi-connect-rho.vercel.app"],
+    origin: "https://medi-connect-rho.vercel.app"||"http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(session({
