@@ -179,7 +179,7 @@ const Pprofile = () => {
                 <div className="space-y-6">
                   {Object.entries(formData).map(([key, value]) => (
                     key !== 'record' && (
-                      <div key={key} className="space-y-1">
+                      <div key={key} className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700 capitalize">
                           {key}
                         </label>
