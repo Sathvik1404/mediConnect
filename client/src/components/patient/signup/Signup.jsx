@@ -117,13 +117,13 @@ const Signup = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <div className="relative flex items-center">
-                <User className="absolute left-3 h-5 w-5 text-gray-400" />
+                <User className="absolute ml-1 mb-2 h-5 w-5 text-gray-400" />
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Full Name"
+                  placeholder="  Full Name"
                   className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors duration-200"
                   required
                 />
@@ -143,52 +143,52 @@ const Signup = () => {
               </select>
 
               <div className="relative flex items-center">
-                <Phone className="absolute left-3 h-5 w-5 text-gray-400" />
+                <Phone className="absolute ml-1 mb-2 h-5 w-5 text-gray-400" />
                 <input
                   type="tel"
                   name="mobile"
                   value={formData.mobile}
                   onChange={handleChange}
-                  placeholder="Mobile Number"
+                  placeholder="  Mobile Number"
                   className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors duration-200"
                   required
                 />
               </div>
 
               <div className="relative flex items-center">
-                <Mail className="absolute left-3 h-5 w-5 text-gray-400" />
+                <Mail className="absolute ml-1 mb-2 h-5 w-5 text-gray-400" />
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Email Address"
+                  placeholder="  Email Address"
                   className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors duration-200"
                   required
                 />
               </div>
 
               <div className="relative flex items-center">
-                <Lock className="absolute left-3 h-5 w-5 text-gray-400" />
+                <Lock className="absolute ml-1 mb-2 h-5 w-5 text-gray-400" />
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="Password"
+                  placeholder="  Password"
                   className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors duration-200"
                   required
                 />
               </div>
 
               <div className="relative flex items-center">
-                <Lock className="absolute left-3 h-5 w-5 text-gray-400" />
+                <Lock className="absolute ml-1  mb-2 h-5 w-5 text-gray-400" />
                 <input
                   type="password"
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  placeholder="Confirm Password"
+                  placeholder="  Confirm Password"
                   className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors duration-200"
                   required
                 />
