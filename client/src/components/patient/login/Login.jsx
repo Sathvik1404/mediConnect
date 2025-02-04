@@ -98,7 +98,7 @@ const Login = () => {
               onClick={() => { navigate('/patient/signup') }} // Navigation logic would go here
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
             >
-              Signup <ChevronRight className="ml-2 h-4 w-4" />
+              Signup <ChevronRight className="ml-4 h-4 w-4" />
             </button>
           </div>
         </div>
@@ -124,26 +124,26 @@ const Login = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <div className="relative flex items-center">
-                <Mail className="absolute left-3 h-5 w-5 text-gray-400" />
+                <Mail className="absolute ml-1 mb-2 h-5 w-5 text-gray-400" />
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Email Address"
+                  placeholder="  Email Address"
                   className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors duration-200"
                   required
                 />
               </div>
 
               <div className="relative flex items-center">
-                <Lock className="absolute left-3 h-5 w-5 text-gray-400" />
+                <Lock className="absolute ml-1 mb-2 h-5 w-5 text-gray-400" />
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="Password"
+                  placeholder="  Password"
                   className="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-white px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors duration-200"
                   required
                 />
