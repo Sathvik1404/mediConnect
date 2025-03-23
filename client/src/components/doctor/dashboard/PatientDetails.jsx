@@ -11,7 +11,7 @@ const PatientDetails = () => {
     useEffect(() => {
         const fetchPatientDetails = async () => {
             try {
-                const response = await axios.get(`https://mediconnect-but5.onrender.com/api/patient/profile/${patientId}`);
+                const response = await axios.get(`http://localhost:5000/api/patient/profile/${patientId}`);
                 setPatient(response.data);
             } catch (error) {
                 console.error('Error fetching patient details:', error);
@@ -24,7 +24,7 @@ const PatientDetails = () => {
     const handleDownloadRecord = async () => {
         try {
             const response = await axios.get(
-                `https://mediconnect-but5.onrender.com/api/patient/profile/downloadrecord/${patientId}`,
+                `http://localhost:5000/api/patient/profile/downloadrecord/${patientId}`,
                 { responseType: 'blob' }
             );
             const url = window.URL.createObjectURL(new Blob([response.data]));

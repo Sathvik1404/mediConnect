@@ -11,7 +11,7 @@ const AuthProvider = ({ children }) => {
     const patientLoginAction = async (data) => {
         try {
             const response = await axios.post(
-                'https://mediconnect-but5.onrender.com/api/patient/login',
+                'http://localhost:5000/api/patient/login',
                 data,
                 { headers: { 'Content-Type': 'application/json' } }
             );
@@ -39,7 +39,7 @@ const AuthProvider = ({ children }) => {
     const doctorLoginAction = async (data) => {
         try {
             const response = await axios.post(
-                'https://mediconnect-but5.onrender.com/api/doctor/login',
+                'http://localhost:5000/api/doctor/login',
                 data,
                 { headers: { 'Content-Type': 'application/json' } }
             );
@@ -67,7 +67,7 @@ const AuthProvider = ({ children }) => {
     const hospitalLoginAction = async (data) => {
         try {
             const response = await axios.post(
-                'https://mediconnect-but5.onrender.com/api/hospital/login',
+                'http://localhost:5000/api/hospital/login',
                 data,
                 { headers: { 'Content-Type': 'application/json' } }
             );

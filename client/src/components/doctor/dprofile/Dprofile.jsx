@@ -38,7 +38,7 @@ const DProfile = ({ doctor, onUpdateProfile }) => {
     e.preventDefault();
     try {
       const response = await axios.put(
-        `https://mediconnect-but5.onrender.com/api/doctor/profile/${doctor._id}`,
+        `http://localhost:5000/api/doctor/profile/${doctor._id}`,
         updatedDoctor,
         {
           headers: {

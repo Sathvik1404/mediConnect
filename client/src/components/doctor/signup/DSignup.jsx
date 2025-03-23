@@ -58,7 +58,7 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('https://mediconnect-but5.onrender.com/api/doctor/signup', formData, {
+      const response = await axios.post('http://localhost:5000/api/doctor/signup', formData, {
         headers: { 'Content-Type': 'application/json' }
       });
 

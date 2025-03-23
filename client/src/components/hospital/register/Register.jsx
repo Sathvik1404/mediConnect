@@ -50,7 +50,7 @@ const Register = () => {
     setLoading(true); // Start loading
 
     try {
-      const response = await axios.post('https://mediconnect-but5.onrender.com/api/hospital/signup', formData);
+      const response = await axios.post('http://localhost:5000/api/hospital/signup', formData);
 
       if (response.status === 200) {
         toast.success('🎉 Signup successful!', {

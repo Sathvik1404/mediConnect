@@ -21,6 +21,7 @@ import Hlogin from './components/hospital/login/Hlogin';
 // import Hsignup from './components/hospital/Signup/Hsignup';
 import HospitalProtected from './components/hospital/HospitalProtected';
 import HDashboard from './components/hospital/dashboard/Dashboard';
+import AuthPage from './components/AuthPage';
 
 function App() {
   return (
@@ -29,7 +30,8 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path='/' element={<Landing />} />
-            <Route path='/patient/signup' element={<Signup />} />
+            <Route path='/authpage' element={<AuthPage />} />
+            <Route path='/patient/signup' element={<AuthPage />} />
             <Route path='/patient/login' element={<Login />} />
             <Route path='/patient/Verify' element={<PVerify />} />
             <Route element={<PatientProtected />}>

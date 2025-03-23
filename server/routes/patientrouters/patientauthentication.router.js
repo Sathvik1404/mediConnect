@@ -50,24 +50,24 @@ router.post('/signup', async (req, res) => {
 
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
-    const otp = sessionStorage.getItem('otp')
-    // Create a transporter using Gmail
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: 'srikarmarikanti@gmail.com', // Your Gmail address
-            pass: 'oyty yzub gpmv xvor',    // Your App Password
-        },
-    });
+    // const otp = sessionStorage.getItem('otp')
+    // // Create a transporter using Gmail
+    // const transporter = nodemailer.createTransport({
+    //     service: 'gmail',
+    //     auth: {
+    //         user: 'srikarmarikanti@gmail.com', // Your Gmail address
+    //         pass: 'oyty yzub gpmv xvor',    // Your App Password
+    //     },
+    // });
 
-    // Set up email options
-    const mailOptions = {
-        from: 'srikarmarikanti@gmail.com', // Sender address
-        to: email, // Recipient address
-        subject: 'Test Email from Nodemailer', // Subject
-        text: 'Hello, this is a test email sent using Nodemailer with Gmail!', // Plain text body
-        html: `<b>${otp}</b>`, // HTML body
-    };
+    // // Set up email options
+    // const mailOptions = {
+    //     from: 'srikarmarikanti@gmail.com', // Sender address
+    //     to: email, // Recipient address
+    //     subject: 'Test Email from Nodemailer', // Subject
+    //     text: 'Hello, this is a test email sent using Nodemailer with Gmail!', // Plain text body
+    //     html: `<b>${otp}</b>`, // HTML body
+    // };
 
     try {
         const patient = await patientModel.findOne({ email });
@@ -81,12 +81,12 @@ router.post('/login', async (req, res) => {
         const token = jwt.sign({ email: patient.email }, "jwt-secret-key", { expiresIn: '1h' });
 
         // Send the email
-        await transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                return console.error('Error:', error);
-            }
-            console.log('Email sent:', info.response);
-        });
+        // await transporter.sendMail(mailOptions, (error, info) => {
+        //     if (error) {
+        //         return console.error('Error:', error);
+        //     }
+        //     console.log('Email sent:', info.response);
+        // });
 
         return res.status(200).json({ status: 'Success', token, patient });
     } catch (err) {

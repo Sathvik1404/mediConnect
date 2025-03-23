@@ -60,7 +60,7 @@ const Pprofile = () => {
 
     try {
       const response = await axios.put(
-        `https://mediconnect-but5.onrender.com/api/patient/profile/uploadrecord/${auth.user._id}`,
+        `http://localhost:5000/api/patient/profile/uploadrecord/${auth.user._id}`,
         fileData
       );
       setPatient(prev => ({ ...prev, record: response.data.filePath }));
@@ -75,7 +75,7 @@ const Pprofile = () => {
   const handleSaveChanges = async () => {
     try {
       const { data: patientData } = await axios.get(
-        `https://mediconnect-but5.onrender.com/api/patient/profile/${auth.user._id}`
+        `http://localhost:5000/api/patient/profile/${auth.user._id}`
       );
 
       if (!selectedFile) {
@@ -83,7 +83,7 @@ const Pprofile = () => {
       }
 
       await axios.put(
-        `https://mediconnect-but5.onrender.com/api/patient/profile/${auth.user._id}`,
+        `http://localhost:5000/api/patient/profile/${auth.user._id}`,
         formData
       );
 
@@ -97,7 +97,7 @@ const Pprofile = () => {
 
   const viewMedicalRecord = () => {
     window.open(
-      `https://mediconnect-but5.onrender.com/api/patient/profile/downloadrecord/${auth.user._id}`,
+      `http://localhost:5000/api/patient/profile/downloadrecord/${auth.user._id}`,
       '_blank'
     );
   };

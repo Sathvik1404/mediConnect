@@ -34,7 +34,7 @@ const Dashboard = () => {
 
   const fetchRequests = async () => {
     try {
-      const response = await axios.get(`https://mediconnect-but5.onrender.com/api/hospitals/${userId}/requests`);
+      const response = await axios.get(`http://localhost:5000/api/hospitals/${userId}/requests`);
       setRequests(response.data);
     } catch (err) {
       console.error('Error fetching requests:', err);
@@ -43,7 +43,7 @@ const Dashboard = () => {
 
   const handleRequest = async (request, status) => {
     try {
-      const response = await axios.put(`https://mediconnect-but5.onrender.com/api/doctor/profile/${request.doctorId}`, {
+      const response = await axios.put(`http://localhost:5000/api/doctor/profile/${request.doctorId}`, {
         status,
         hospitals: [userId],
       });
@@ -75,14 +75,14 @@ const Dashboard = () => {
       type === 'success'
         ? 'bg-green-100'
         : type === 'error'
-        ? 'bg-red-100'
-        : 'bg-blue-100';
+          ? 'bg-red-100'
+          : 'bg-blue-100';
     const textColor =
       type === 'success'
         ? 'text-green-800'
         : type === 'error'
-        ? 'text-red-800'
-        : 'text-blue-800';
+          ? 'text-red-800'
+          : 'text-blue-800';
 
     return (
       <div className={`fixed top-4 right-4 ${bgColor} ${textColor} px-4 py-2 rounded-lg shadow-md z-50`}>
@@ -96,11 +96,11 @@ const Dashboard = () => {
       setLoading(true);
       setError(null);
 
-      const hospitalResponse = await axios.get(`https://mediconnect-but5.onrender.com/api/hospitals/${userId}`);
+      const hospitalResponse = await axios.get(`http://localhost:5000/api/hospitals/${userId}`);
       const hospitalData = hospitalResponse.data;
 
       const doctorsPromises = hospitalData.doctors.map(async (doctorId) => {
-        const doctorResponse = await axios.get(`https://mediconnect-but5.onrender.com/api/doctor/profile/${doctorId}`);
+        const doctorResponse = await axios.get(`http://localhost:5000/api/doctor/profile/${doctorId}`);
         return doctorResponse.data;
       });
 
@@ -262,11 +262,10 @@ const Dashboard = () => {
                     <p className="text-sm text-gray-500">{member.specialization || member.role}</p>
                   </div>
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      member.status === 'Active'
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${member.status === 'Active'
                         ? 'bg-green-100 text-green-800'
                         : 'bg-yellow-100 text-yellow-800'
-                    }`}
+                      }`}
                   >
                     {member.status || 'On Leave'}
                   </span>
