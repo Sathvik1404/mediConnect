@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const session = require('express-session');
 const nodemailer = require('nodemailer');
+const Razorpay = require('razorpay');
 
 const router = express.Router();
 
@@ -94,5 +95,29 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+router.get('/getKey', async (req, res) => {
+    res.status(200).json({ key: process.env.RAZORPAY_KEY_ID })
+})
+router.post('/create-order', async (req, res) => {
+    const razorpay = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_SECRET_ID,
+    });
+    try {
+        const options = {
+            amount: req.body.amount * 100,
+            currency: "INR",
+            receipt: `receipt_${Date.now()}`,
+            payment_capture: 1,
+        };
+
+        const order = await razorpay.orders.create(options);
+        res.json({ success: true, order });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+})
+
 
 module.exports = router;

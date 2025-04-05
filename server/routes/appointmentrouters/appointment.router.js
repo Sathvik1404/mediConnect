@@ -29,6 +29,18 @@ router.get('/', async (req, res) => {
         res.status(200).json(response)
     }
 });
+router.get('/:name', async (req, res) => {
+    const name = req.params;
+    try {
+        const data = await AppointmentModel.find({ patientName: name })
+        if (data) {
+            res.status(200).json({ message: "Data retrived", data })
+        }
+    }
+    catch (err) {
+        res.status(400).json({ message: "Error in receiving in appointments" })
+    }
+})
 
 router.put('/:id', async (req, res) => {
     const { id } = req.params;

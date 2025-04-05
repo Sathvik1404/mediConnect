@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { User, Phone, Mail, Lock, ChevronRight } from 'lucide-react';
+import { User, Phone, Mail, Lock, Pointer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Heart, ArrowRight } from 'lucide-react';
 
 const Signup = () => {
+  const isScrolled = true
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -76,19 +78,19 @@ const Signup = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
       {/* Navbar */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center">
-              <span className="text-2xl font-bold text-indigo-600">mediConnect</span>
-            </div>
+      <nav className={`fixed w-full z-10 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'}`}>
+        <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
+          <div className="flex items-center">
+            <Heart className="h-8 w-8 text-blue-600" />
+            <span className="ml-2 text-xl font-bold text-blue-900" onClick={() => navigate('/authpage')} style={{ cursor: 'pointer' }}>MediConnect</span>
+          </div>
+          <div className="hidden md:flex items-center space-x-8">
             <button
-              onClick={() => {
-                navigate('/patient/login');
-              }}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+              onClick={() => navigate('/patient/login')}
+              className="w-full flex items-center justify-center py-2 px-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
             >
-              Login <ChevronRight className="ml-2 h-4 w-4" />
+              SignIn
+              <ArrowRight className="ml-2 h-5 w-6" />
             </button>
           </div>
         </div>
@@ -201,6 +203,7 @@ const Signup = () => {
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             >
               {loading ? 'Creating Account...' : 'Create Account'}
+              <ArrowRight className="ml-2 h-5 w-5" />
             </button>
           </form>
         </div>

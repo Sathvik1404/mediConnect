@@ -56,9 +56,9 @@ const LandingPage = () => {
                             <button onClick={handleButton} className="py-4 px-6 bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium rounded-xl transition-colors">
                                 Get Started
                             </button>
-                            <button className="py-4 px-6 border border-blue-600 text-blue-600 text-lg font-medium rounded-xl hover:bg-blue-50 transition-colors">
+                            <a href='#testimonials'><button className="py-4 px-6 border border-blue-600 text-blue-600 text-lg font-medium rounded-xl hover:bg-blue-50 transition-colors">
                                 Learn More
-                            </button>
+                            </button></a>
                         </div>
                         <div className="mt-8 flex items-center space-x-2">
                             <div className="flex -space-x-2">

@@ -109,8 +109,10 @@ const PatientDashboard = () => {
   const fetchAppointments = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true }));
     const data = await fetchData('http://localhost:5000/api/appointment', 'appointments');
+    console.log(data)
 
     if (data) {
+      console.log("Current User ID:", user?._id);
       const filteredAppointments = data.filter(appointment =>
         appointment.patientId === user?._id
       );
@@ -281,8 +283,8 @@ const PatientDashboard = () => {
                   <div className="flex justify-between mb-2">
                     <h3 className="font-medium">{appointment.doctor}</h3>
                     <span className={`text-sm px-2 py-1 rounded-full ${appointment.status === 'Confirmed'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-yellow-100 text-yellow-800'
                       }`}>
                       {appointment.status}
                     </span>
@@ -390,8 +392,8 @@ const PatientDashboard = () => {
                     <div className="flex justify-between mb-2">
                       <h3 className="font-medium">{appointment.doctor}</h3>
                       <span className={`text-sm px-2 py-1 rounded-full ${appointment.status === 'Confirmed'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
                         }`}>
                         {appointment.status}
                       </span>
@@ -583,8 +585,8 @@ const PatientDashboard = () => {
                     <button
                       onClick={() => setActiveTab(item.id)}
                       className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors ${activeTab === item.id
-                          ? 'bg-blue-50 text-blue-600'
-                          : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-blue-50 text-blue-600'
+                        : 'text-gray-600 hover:bg-gray-100'
                         }`}
                     >
                       {item.icon}

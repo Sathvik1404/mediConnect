@@ -22,6 +22,8 @@ import Hlogin from './components/hospital/login/Hlogin';
 import HospitalProtected from './components/hospital/HospitalProtected';
 import HDashboard from './components/hospital/dashboard/Dashboard';
 import AuthPage from './components/AuthPage';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
@@ -31,7 +33,7 @@ function App() {
           <Routes>
             <Route path='/' element={<Landing />} />
             <Route path='/authpage' element={<AuthPage />} />
-            <Route path='/patient/signup' element={<AuthPage />} />
+            <Route path='/patient/signup' element={<Signup />} />
             <Route path='/patient/login' element={<Login />} />
             <Route path='/patient/Verify' element={<PVerify />} />
             <Route element={<PatientProtected />}>
@@ -53,7 +55,7 @@ function App() {
               <Route path='/hospital/Dashboard' element={<HDashboard />} />
             </Route>
           </Routes>
-
+          <ToastContainer position="top-right" autoClose={3000} />
         </BrowserRouter>
       </AuthProvider>
     </div>

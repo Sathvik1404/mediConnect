@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { Heart, Mail, Lock, User, Hospital, UserPlus, ChevronRight, CheckCircle, ArrowRight } from 'lucide-react';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AuthPage = () => {
   const [activeTab, setActiveTab] = useState('login');
@@ -11,7 +14,7 @@ const AuthPage = () => {
   const [name, setName] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
-
+  const navigate = useNavigate()
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -34,55 +37,159 @@ const AuthPage = () => {
   const handleUserTypeChange = (type) => {
     setUserType(type);
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission - would connect to backend in real implementation
-    console.log({ userType, email, password, name });
-    if (userType === 'patient') {
-      const formData = { name, email, password }
-      // if (formData.password !== formData.confirmPassword) {
-      //   setError('Passwords do not match');
-      //   return;
-      // }
-      // if (formData.mobile.length !== 10 || !/^[0-9]+$/.test(formData.mobile)) {
-      //   setError('Invalid mobile number');
+
+    const formData = { name, email, password };
+    const loginData = { email, password };
+
+    const baseURL = "http://localhost:5000/api";
+    let endpoint = "";
+    let redirectPath = "";
+
+    if (activeTab === "signup") {
+      // if (!name) {
+      //   toast.warning("Please enter your full name.");
       //   return;
       // }
 
-      if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+]).{8,}$/.test(formData.password)) {
-        // setError('Password must contain at least one number, one lowercase letter, one uppercase letter, and one special character');
-        return;
+      // if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+]).{8,}$/.test(password)) {
+      //   toast.warning("Password must contain at least one number, one lowercase letter, one uppercase letter, and one special character");
+      //   return;
+      // }
+
+      if (userType === "patient") {
+        // endpoint = `${baseURL}/patient/signup`;
+        redirectPath = "/patient/signup";
+      } else if (userType === "doctor") {
+        // endpoint = `${baseURL}/doctor/signup`;
+        redirectPath = "/doctor/DSignup";
+      } else if (userType === "hospital") {
+        // endpoint = `${baseURL}/hospital/signup`;
+        redirectPath = "/hospital/signup";
       }
 
-      // setLoading(true);
       try {
-        const response = await axios.post(
-          'http://localhost:5000/api/patient/signup',
-          formData,
-          {
-            headers: { 'Content-Type': 'application/json' },
-          }
-        );
+        // const response = await axios.post(endpoint, formData, {
+        //   headers: { "Content-Type": "application/json" },
+        // });
 
-        if (response.status === 200 || response.status === 201) {
-          // setSuccess(true);
-          setName('')
-          setEmail('')
-          setPassword('')
+        // if (response.status === 200 || response.status === 201) {
+        if (true) {
+          setName("");
+          setEmail("");
+          setPassword("");
+          // toast.success("SignUp Successful");
+          console.log(redirectPath)
+          navigate(redirectPath);
           // setTimeout(() => {
-          //   navigate('/patient/login');
-          // }, 2000);
+          // }, 1000);
         } else {
-          // setError(response.data.error || 'Signup failed. Please try again.');
+          // toast.warning(response.data.error || "Signup failed. Please try again.");
         }
       } catch (err) {
-        // setError(err.response?.data?.error || err.message);
-      } finally {
-        // setLoading(false);
+        // toast.warning(err.response?.data?.error || err.message);
+      }
+    }
+
+    // ✅ LOGIN logic is now outside the signup block
+    else if (activeTab === "login") {
+      if (userType === "patient") {
+        // endpoint = `${baseURL}/patient/login`;
+        redirectPath = "/patient/login";
+      } else if (userType === "doctor") {
+        // endpoint = `${baseURL}/doctor/login`;
+        redirectPath = "/doctor/dlogin";
+      } else if (userType === "hospital") {
+        // endpoint = `${baseURL}/hospital/login`;
+        redirectPath = "/hospital/dashboard";
+      }
+
+      try {
+        // const response = await axios.post(endpoint, loginData, {
+        //   headers: { "Content-Type": "application/json" },
+        // });
+
+        // if (response.status === 200) {
+        if (true) {
+          setEmail("");
+          setPassword("");
+          // toast.success("Login Successful");
+          console.log(redirectPath)
+          navigate(redirectPath);
+          // setTimeout(() => {
+          // }, 2000);
+        } else {
+          // toast.warning(response.data.error || "Login failed. Please try again.");
+        }
+      } catch (err) {
+        // toast.warning(err.response?.data?.error || err.message);
       }
     }
   };
+
+
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   // Handle form submission - would connect to backend in real implementation
+  //   console.log({ userType, email, password, name });
+  //   if (userType === 'patient' && activeTab === 'signup') {
+  //     const formData = { name, email, password }
+  //     // if (formData.password !== formData.confirmPassword) {
+  //     //   setError('Passwords do not match');
+  //     //   return;
+  //     // }
+  //     // if (formData.mobile.length !== 10 || !/^[0-9]+$/.test(formData.mobile)) {
+  //     //   setError('Invalid mobile number');
+  //     //   return;
+  //     // }
+
+  //     if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+]).{8,}$/.test(formData.password)) {
+  //       // setError('Password must contain at least one number, one lowercase letter, one uppercase letter, and one special character');
+  //       return;
+  //     }
+
+  //     // setLoading(true);
+  //     try {
+  //       const response = await axios.post(
+  //         'http://localhost:5000/api/patient/signup',
+  //         formData,
+  //         {
+  //           headers: { 'Content-Type': 'application/json' },
+  //         }
+  //       );
+
+  //       if (response.status === 200 || response.status === 201) {
+  //         // setSuccess(true);
+  //         setName('')
+  //         setEmail('')
+  //         setPassword('')
+  //         setTimeout(() => {
+  //           navigate('/patient/dashboard');
+  //         }, 2000);
+  //       } else {
+  //         // setError(response.data.error || 'Signup failed. Please try again.');
+  //       }
+  //     } catch (err) {
+  //       // setError(err.response?.data?.error || err.message);
+  //     } finally {
+  //       // setLoading(false);
+  //     }
+  //   } else if (userType === 'doctor' && activeTab === 'signup') {
+
+  //   } else if (userType === 'hospital' && activeTab === 'signup') {
+
+  //   } else if (userType === 'patient' && activeTab === 'login') {
+
+  //   }
+  //   else if (userType === 'doctor' && activeTab === 'login') {
+
+  //   }
+  //   else if (userType === 'hospital' && activeTab === 'login') {
+
+  //   }
+  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col">
@@ -190,12 +297,12 @@ const AuthPage = () => {
             <form onSubmit={handleSubmit} className={`space-y-6 transition-all duration-300 ${showAnimation ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-95'}`}>
               {activeTab === 'signup' && (
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  {/* <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label> */}
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <User className="h-5 w-5 text-gray-400" />
+                      {/* <User className="h-5 w-5 text-gray-400" /> */}
                     </div>
-                    <input
+                    {/* <input
                       id="name"
                       name="name"
                       type="text"
@@ -204,18 +311,18 @@ const AuthPage = () => {
                       required
                       className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Enter your full name"
-                    />
+                    /> */}
                   </div>
                 </div>
               )}
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                {/* <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label> */}
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
+                    {/* <Mail className="h-5 w-5 text-gray-400" /> */}
                   </div>
-                  <input
+                  {/* <input
                     id="email"
                     name="email"
                     type="email"
@@ -224,17 +331,17 @@ const AuthPage = () => {
                     required
                     className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter your email"
-                  />
+                  /> */}
                 </div>
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                {/* <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label> */}
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
+                    {/* <Lock className="h-5 w-5 text-gray-400" /> */}
                   </div>
-                  <input
+                  {/* <input
                     id="password"
                     name="password"
                     type="password"
@@ -243,30 +350,30 @@ const AuthPage = () => {
                     required
                     className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                     placeholder={activeTab === 'login' ? "Enter your password" : "Create a password"}
-                  />
+                  /> */}
                 </div>
               </div>
 
               {activeTab === 'login' && (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <input
+                    {/* <input
                       id="remember_me"
                       name="remember_me"
                       type="checkbox"
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="remember_me" className="ml-2 block text-sm text-gray-700">
+                    /> */}
+                    {/* <label htmlFor="remember_me" className="ml-2 block text-sm text-gray-700">
                       Remember me
-                    </label>
+                    </label> */}
                   </div>
-                  <div className="text-sm">
+                  {/* <div className="text-sm">
                     <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
                       Forgot password?
                     </a>
-                  </div>
+                  </div> */}
                 </div>
               )}
 
@@ -300,12 +407,12 @@ const AuthPage = () => {
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300"></div>
                 </div>
-                <div className="relative flex justify-center text-sm">
+                {/* <div className="relative flex justify-center text-sm">
                   <span className="px-2 bg-white text-gray-500">Or continue with</span>
-                </div>
+                </div> */}
               </div>
 
-              <div className="mt-6 grid grid-cols-3 gap-3">
+              {/* <div className="mt-6 grid grid-cols-3 gap-3">
                 {['Google', 'Apple', 'Facebook'].map((provider) => (
                   <button
                     key={provider}
@@ -314,7 +421,7 @@ const AuthPage = () => {
                     {provider}
                   </button>
                 ))}
-              </div>
+              </div> */}
             </div>
 
             <div className="mt-8 text-center text-sm text-gray-600">
