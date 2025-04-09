@@ -60,6 +60,7 @@ const PatientDashboard = () => {
   const fetchData = useCallback(async (url, errorMessage) => {
     try {
       const response = await axios.get(url);
+      console.log(response)
       return response.data;
     } catch (error) {
       handleError(error, `Error fetching ${errorMessage}`);
@@ -108,11 +109,11 @@ const PatientDashboard = () => {
 
   const fetchAppointments = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true }));
-    const data = await fetchData('http://localhost:5000/api/appointment', 'appointments');
+    const data = await axios.get('http://localhost:5000/api/appointment')
     console.log(data)
 
     if (data) {
-      console.log("Current User ID:", user?._id);
+      // console.log("Current User ID:", user?._id);
       const filteredAppointments = data.filter(appointment =>
         appointment.patientId === user?._id
       );
