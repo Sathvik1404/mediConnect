@@ -59,10 +59,10 @@ const AppointmentBooking = () => {
     maxDate.setDate(today.getDate() + 30); // Allow booking up to 30 days in advance
 
     useEffect(() => {
-        if (!userId) {
-            navigate('/login');
-            return;
-        }
+        // if (!userId) {
+        //     navigate('/login');
+        //     return;
+        // }
 
         const fetchData = async () => {
             setLoading(true);
@@ -154,20 +154,20 @@ const AppointmentBooking = () => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault()
         const res = await fetch('http://localhost:5000/api/appointment', {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: formData,
         })
-        const response = await fetch("http://localhost:3000/api/patient/getKey");
-        console.log("Received the Keys")
-        if (!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
+        // const response = await fetch("http://localhost:3000/api/patient/getKey");
+        // console.log("Received the Keys")
+        // if (!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
 
-        const data = await response.json();
+        // const data = await response.json();
 
         var options = {
-            "key": data.key, // Enter the Key ID generated from the Dashboard
+            "key": "rzp_test_BxN4zyfawxKOr3", // Enter the Key ID generated from the Dashboard
             "amount": 300 * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
             "currency": "INR",
             "name": "MediConnect", //your business name
