@@ -110,11 +110,11 @@ const PatientDashboard = () => {
   const fetchAppointments = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true }));
     const data = await axios.get('http://localhost:5000/api/appointment')
-    console.log(data)
+    console.log(data.data)
 
-    if (data) {
+    if (data.data) {
       // console.log("Current User ID:", user?._id);
-      const filteredAppointments = data.filter(appointment =>
+      const filteredAppointments = data.data.filter(appointment =>
         appointment.patientId === user?._id
       );
 
