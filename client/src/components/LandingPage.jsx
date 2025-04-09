@@ -75,7 +75,7 @@ const LandingPage = () => {
                         <div className="relative z-0 rounded-xl overflow-hidden shadow-2xl">
                             <div className="bg-gradient-to-r from-blue-400 to-indigo-500 aspect-video rounded-xl"></div>
                             <img
-                                src="/api/placeholder/600/400"
+                                src="/dashboard.png"
                                 alt="Hospital management dashboard preview"
                                 className="absolute inset-0 w-full h-full object-cover rounded-xl"
                             />
@@ -161,7 +161,7 @@ const LandingPage = () => {
                             <div className="relative">
                                 <div className="rounded-xl overflow-hidden shadow-xl">
                                     <img
-                                        src="/api/placeholder/500/400"
+                                        src="/booking.png"
                                         alt="Patient using app"
                                         className="w-full object-cover rounded-xl"
                                     />
@@ -216,7 +216,7 @@ const LandingPage = () => {
                             <div className="relative">
                                 <div className="rounded-xl overflow-hidden shadow-xl">
                                     <img
-                                        src="/api/placeholder/500/400"
+                                        src="/doctor"
                                         alt="Doctor using app"
                                         className="w-full object-cover rounded-xl"
                                     />
