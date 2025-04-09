@@ -27,7 +27,7 @@ const AuthProvider = ({ children }) => {
             localStorage.setItem('role', responseData.role);
             localStorage.setItem('user', JSON.stringify(responseData.patient));
 
-            return { ok: true, data: responseData };
+            return { ok: true, data: responseData, otp: responseData.otp };
         } catch (err) {
             return {
                 ok: false,
@@ -55,7 +55,7 @@ const AuthProvider = ({ children }) => {
             localStorage.setItem('role', responseData.role);
             localStorage.setItem('user', JSON.stringify(responseData.doctor));
 
-            return { ok: true, data: responseData };
+            return { ok: true, data: responseData, otp: responseData.otp };
         } catch (err) {
             return {
                 ok: false,

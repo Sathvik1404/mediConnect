@@ -153,11 +153,12 @@ const AppointmentBooking = () => {
         });
     };
 
-    const handleSubmit = async () => {
-        const res = await fetch('http://localhost:5000/api/patient/create-order', {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const res = await fetch('http://localhost:5000/api/appointment', {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: "300",
+            body: formData,
         })
         const response = await fetch("http://localhost:3000/api/patient/getKey");
         console.log("Received the Keys")

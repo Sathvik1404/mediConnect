@@ -1,20 +1,16 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const VerifyOtp = () => {
     const navigate = useNavigate();
     const [otp, setOtp] = useState('');
     const [notification, setNotification] = useState({ message: '', type: '' });
-
+    const location = useLocation();
+    const otpSent = location.state?.otp;
     const handleSubmit = (e) => {
         e.preventDefault();
-        const storedOtp = sessionStorage.getItem('otp');
-        const email = sessionStorage.getItem('email');
-
-        if (otp === storedOtp) {
+        if (otp == otpSent) {
             setNotification({ message: '🎉 OTP Verified Successfully!', type: 'success' });
-            sessionStorage.removeItem('otp');
-            sessionStorage.removeItem('email');
             navigate('/doctor/Dashboard');
         } else {
             setNotification({ message: '⚠️ Invalid OTP. Please try again.', type: 'error' });

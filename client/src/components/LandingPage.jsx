@@ -328,7 +328,7 @@ const LandingPage = () => {
                         <button className="py-4 px-6 bg-white text-blue-600 hover:bg-blue-50 font-medium text-lg rounded-xl transition-colors">
                             Sign Up Now
                         </button>
-                        <button className="py-4 px-6 border border-white text-white hover:bg-blue-700 font-medium text-lg rounded-xl transition-colors">
+                        <button onClick={navigate('/authpage')} className="py-4 px-6 border border-white text-white hover:bg-blue-700 font-medium text-lg rounded-xl transition-colors">
                             Schedule a Demo
                         </button>
                     </div>
