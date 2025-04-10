@@ -59,10 +59,10 @@ const AppointmentBooking = () => {
     maxDate.setDate(today.getDate() + 30); // Allow booking up to 30 days in advance
 
     useEffect(() => {
-        // if (!userId) {
-        //     navigate('/login');
-        //     return;
-        // }
+        if (!userId) {
+            navigate('patient/login');
+            return;
+        }
 
         const fetchData = async () => {
             setLoading(true);
@@ -155,10 +155,10 @@ const AppointmentBooking = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        const res = await fetch('http://localhost:5000/api/appointment', {
+        const res = await fetch('http://localhost:5000/api/patient/create-order', {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: formData,
+            body: "300",
         })
         // const response = await fetch("http://localhost:3000/api/patient/getKey");
         // console.log("Received the Keys")
@@ -174,7 +174,13 @@ const AppointmentBooking = () => {
             "description": "Test Transaction",
             "image": "https://example.com/your_logo",
             "order_id": res, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-            "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+            "handler": async function () {
+                await axios.post(
+                    'http://localhost:5000/api/appointment',
+                    formData,
+                    { headers: { 'Content-Type': 'application/json' } }
+                );
+            },
             "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
                 "name": "Sathvik", //your customer's name
                 "email": "golisathvik04@gmail.com",
@@ -191,6 +197,20 @@ const AppointmentBooking = () => {
 
         const rzp1 = new window.Razorpay(options);
         rzp1.open();
+
+        rzp1.on('payment.success', function (response) {
+            // Process successful payment
+            // You can set booking complete here
+            setBookingComplete(true);
+            setAppointmentDetails({
+                confirmationCode: "APT" + Math.random().toString(36).substr(2, 9).toUpperCase(),
+                patientName: formData.patientName,
+                doctorName: doctor.name,
+                date: formData.date,
+                time: selectedTimeSlot?.display || formData.time,
+                paymentId: response.razorpay_payment_id
+            });
+        });
     }
 
 
