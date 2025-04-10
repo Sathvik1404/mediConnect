@@ -51,7 +51,12 @@ const PatientDashboard = () => {
     loading: false,
     error: null
   });
-
+  try {
+    const noti = fetch('http://localhost:5000/api/appointment');
+    console.log(noti);
+  } catch (err) {
+    console.log(err)
+  }
   const handleError = useCallback((error, errorMessage) => {
     console.error(error);
     setState(prev => ({ ...prev, error: errorMessage, loading: false }));

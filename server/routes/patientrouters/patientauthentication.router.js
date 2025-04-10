@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const session = require('express-session');
 const nodemailer = require('nodemailer');
 const Razorpay = require('razorpay');
+const { sendMail } = require('../../controllers/sendMail');
 
 const router = express.Router();
 
@@ -51,6 +52,7 @@ router.post('/signup', async (req, res) => {
 
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
+    const otp = Math.floor(100000 + Math.random() * 900000);
     // const otp = sessionStorage.getItem('otp')
     // // Create a transporter using Gmail
     // const transporter = nodemailer.createTransport({
@@ -71,6 +73,7 @@ router.post('/login', async (req, res) => {
     // };
 
     try {
+        const otp = Math.floor(100000 + Math.random() * 900000);
         const patient = await patientModel.findOne({ email });
         if (!patient) {
             return res.status(404).json({ error: 'No record exists' });
@@ -80,7 +83,7 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'The password is incorrect' });
         }
         const token = jwt.sign({ email: patient.email }, "jwt-secret-key", { expiresIn: '1h' });
-
+        sendMail(email, "Welcome to mediConnect", `This is your otp for login ${otp}`)
         // Send the email
         // await transporter.sendMail(mailOptions, (error, info) => {
         //     if (error) {
@@ -89,7 +92,7 @@ router.post('/login', async (req, res) => {
         //     console.log('Email sent:', info.response);
         // });
 
-        return res.status(200).json({ status: 'Success', token, patient });
+        return res.status(200).json({ status: 'Success', token, patient, otp });
     } catch (err) {
         console.log('Login error:', err);
         res.status(500).json({ error: 'Internal Server Error' });

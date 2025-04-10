@@ -4,6 +4,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const session = require('express-session');
+const { sendMail } = require('../../controllers/sendMail');
 
 const router = express.Router();
 
@@ -48,6 +49,7 @@ router.post('/signup', async (req, res) => {
 
 
 router.post('/login', async (req, res) => {
+    const otp = Math.floor(100000 + Math.random() * 900000);
     const { email, password } = req.body;
     try {
         const doctor = await doctorModel.findOne({ email });
@@ -59,7 +61,9 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'The password is incorrect' });
         }
         const token = jwt.sign({ email: doctor.email }, "jwt-secret-key", { expiresIn: '1h' });
-        return res.status(200).json({ status: 'Success', token, doctor });
+        sendMail(email, "Hello Welcome to MediConnect", `This is your otp for login ${otp}`)
+        console.log("OTP SENT TO MAIL")
+        return res.status(200).json({ status: 'Success', token, doctor, otp });
     } catch (err) {
         console.log('Login error:', err);
         res.status(500).json({ error: 'Internal Server Error' });

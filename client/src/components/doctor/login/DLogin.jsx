@@ -26,17 +26,12 @@ const Login = () => {
     setNotification({ message: '', type: '' }); // Reset notification
 
     try {
-      const user = await auth.doctorLoginAction(formData);
-
-      if (user.ok) {
-        const otp = Math.floor(100000 + Math.random() * 900000);
-        await sendOTP(formData.email, otp); // Function to send OTP via email
-        sessionStorage.setItem('otp', otp); // Save OTP temporarily
-        sessionStorage.setItem('email', formData.email);
-        console.log(otp)
-        navigate('/doctor/Verify');
+      const result = await auth.doctorLoginAction(formData);
+      console.log(result)
+      if (result.ok) {
+        navigate('/doctor/Verify', { state: { otp: result.otp } });
       } else {
-        setNotification({ message: user.error || '⚠️ Login failed. Please try again.', type: 'error' });
+        setNotification({ type: 'error', message: result.error });
       }
     } catch (error) {
       setNotification({ message: `Error: ${error.message}`, type: 'error' });
