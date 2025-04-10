@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
 const PVerifyOtp = () => {
     const navigate = useNavigate();
     const [otp, setOtp] = useState('');
-    const [notification, setNotification] = useState({ message: '', type: '' });
     const location = useLocation();
     const otpSent = location.state?.otp;
     const handleSubmit = (e) => {
         e.preventDefault();
         if (otp == otpSent) {
-            setNotification({ message: '🎉 OTP Verified Successfully!', type: 'success' });
-            navigate('/patient/Dashboard');
+            toast.success("🎉 OTP Verified Successfully!")
+            setTimeout(() => {
+                navigate('/patient/Dashboard');
+            }, 2000)
         } else {
-            setNotification({ message: '⚠️ Invalid OTP. Please try again.', type: 'error' });
+            toast.warning('⚠️ Invalid OTP. Please try again.')
         }
     };
 
@@ -26,11 +28,11 @@ const PVerifyOtp = () => {
                         <p className="mt-2 text-gray-600">Enter the OTP sent to your email</p>
                     </div>
 
-                    {notification.message && (
+                    {/* {notification.message && (
                         <div className={`mb-4 p-4 rounded-lg ${notification.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                             {notification.message}
                         </div>
-                    )}
+                    )} */}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <input

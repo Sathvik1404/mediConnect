@@ -3,7 +3,7 @@ import { Mail, Lock, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../AuthContext';
 import { Heart, ArrowRight } from 'lucide-react';
-
+import { toast } from 'react-toastify';
 const Login = () => {
   const isScrolled = true;
   const auth = useAuth();
@@ -13,7 +13,7 @@ const Login = () => {
     password: ''
   });
   const [loading, setLoading] = useState(false);
-  const [notification, setNotification] = useState({ message: '', type: '' });
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,35 +23,23 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setNotification({ message: '', type: '' }); // Reset notification
+
 
     try {
       const result = await auth.doctorLoginAction(formData);
       console.log(result)
       if (result.ok) {
-        navigate('/doctor/Verify', { state: { otp: result.otp } });
+        setTimeout(() => {
+          toast.success("Otp sent to your Email");
+          navigate('/doctor/Verify', { state: { otp: result.otp, email: formData.email } });
+        }, 2000);
       } else {
-        setNotification({ type: 'error', message: result.error });
+        toast.warning("Invalid login details");
       }
     } catch (error) {
-      setNotification({ message: `Error: ${error.message}`, type: 'error' });
+      toast.warning(error);
     } finally {
       setLoading(false);
-    }
-  };
-  const sendOTP = async (email, otp) => {
-    try {
-      await window.Email.send({
-        Host: 'smtp.elasticemail.com',
-        Username: 'golisathu@gmail.com',
-        Password: 'BD3254FB9DB4883CB42ECB69B7C9642F4240',
-        To: email,
-        From: 'golisathu@gmail.com',
-        Subject: 'Your OTP for Login',
-        Body: `Your OTP is: ${otp}`,
-      });
-    } catch (error) {
-      console.error('Error sending OTP:', error);
     }
   };
 
@@ -83,11 +71,11 @@ const Login = () => {
           </div>
 
           {/* Notification Section */}
-          {notification.message && (
+          {/* {notification.message && (
             <div className={`mb-4 p-4 rounded-lg ${notification.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
               {notification.message}
             </div>
-          )}
+          )} */}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
