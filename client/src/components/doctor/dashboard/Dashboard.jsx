@@ -1,18 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, FileText, Activity, User, Users, Bell, Settings, Clock, CheckCircle, X, ArrowRight, MessageSquare, Clipboard, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Mail, Phone, PlusCircle, Search, MoreVertical, FileText as FileTextIcon } from 'lucide-react';
+import axios from 'axios';
+import { useAuth } from '../../AuthContext';
 
 const DoctorDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [upcomingAppointments, setAppointments] = useState([]);
+  const [patients, setPatients] = useState([]);
+  const { user, logout } = useAuth();
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/patient/profile`);
+        // Filter based on currentDoctorId
+        const filtered = response.data.filter(patient => patient === user._id);
+        console.log(response)
+        setPatients(filtered);
+      } catch (error) {
+        console.error('Error fetching patients:', error);
+      } finally {
+        // setLoading(false);
+      }
+    };
 
-  // Mock data for dashboard
-  const upcomingAppointments = [
-    { id: 1, patient: 'Sarah Johnson', time: '09:00 AM', type: 'Follow-up', status: 'confirmed', avatar: 'SJ', age: 34, gender: 'Female' },
-    { id: 2, patient: 'Michael Chen', time: '10:30 AM', type: 'Consultation', status: 'confirmed', avatar: 'MC', age: 45, gender: 'Male' },
-    { id: 3, patient: 'Emily Rodriguez', time: '01:15 PM', type: 'Check-up', status: 'pending', avatar: 'ER', age: 28, gender: 'Female' },
-    { id: 4, patient: 'James Wilson', time: '03:00 PM', type: 'New Patient', status: 'confirmed', avatar: 'JW', age: 52, gender: 'Male' },
-  ];
+    const fetchAppointments = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/appointment');
+        // console.log(response.data)
+        // console.log(user)
+        const filteredAppointments = response.data.filter(
+          appointment => appointment.doctorId === user._id || null
+        );
+        setAppointments(filteredAppointments);
+      } catch (error) {
+        console.error('Failed to fetch appointments:', error);
+      } finally {
+        // setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+    fetchPatients();
+  }, []);
 
   const recentPatients = [
     { id: 1, name: 'Sarah Johnson', lastVisit: '2 days ago', condition: 'Hypertension', avatar: 'SJ' },
@@ -195,7 +226,7 @@ const DoctorDashboard = () => {
                           {appointment.avatar}
                         </div>
                         <div className="ml-4">
-                          <h3 className="font-medium text-gray-800">{appointment.patient}</h3>
+                          <h3 className="font-medium text-gray-800">{appointment.patientName}</h3>
                           <div className="flex items-center text-sm text-gray-500">
                             <Clock className="h-4 w-4 mr-1" />
                             {appointment.time} • {appointment.type}
