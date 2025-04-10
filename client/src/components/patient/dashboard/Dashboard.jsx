@@ -53,7 +53,7 @@ const PatientDashboard = () => {
   });
   try {
     const noti = fetch('http://localhost:5000/api/appointment');
-    console.log(noti);
+    // console.log(noti);
   } catch (err) {
     console.log(err)
   }
@@ -65,7 +65,7 @@ const PatientDashboard = () => {
   const fetchData = useCallback(async (url, errorMessage) => {
     try {
       const response = await axios.get(url);
-      console.log(response)
+      // console.log(response)
       return response.data;
     } catch (error) {
       handleError(error, `Error fetching ${errorMessage}`);
@@ -115,13 +115,15 @@ const PatientDashboard = () => {
   const fetchAppointments = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true }));
     const data = await axios.get('http://localhost:5000/api/appointment')
-    console.log(data.data)
+    // console.log(data.data)
 
     if (data.data) {
       // console.log("Current User ID:", user?._id);
       const filteredAppointments = data.data.filter(appointment =>
         appointment.patientId === user?._id
       );
+
+      // console.log(filteredAppointments)
 
       // Format appointments for UI presentation
       const formattedAppointments = filteredAppointments.map(appointment => ({
@@ -585,7 +587,7 @@ const PatientDashboard = () => {
                   { id: 'hospitals', label: 'Hospitals', icon: <FileText className="h-5 w-5" /> },
                   { id: 'medications', label: 'Medications', icon: <Pill className="h-5 w-5" /> },
                   { id: 'messages', label: 'Messages', icon: <MessageSquare className="h-5 w-5" /> },
-                  { id: 'profile', label: 'My Profile', icon: <User className="h-5 w-5" /> }
+                  // { id: 'profile', label: 'My Profile', icon: <User className="h-5 w-5" /> }
                 ].map(item => (
                   <li key={item.id}>
                     <button

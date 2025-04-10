@@ -24,6 +24,11 @@ router.use(session({
     saveUninitialized: true
 }));
 
+router.get('/', async (req, res) => {
+    const patiets = await patientModel.find({})
+    res.json(patiets)
+})
+
 router.get('/:id', async (req, res) => {
     const { id } = req.params
     const patient = await patientModel.findOne({ _id: id })

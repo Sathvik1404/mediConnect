@@ -37,8 +37,13 @@ const AppointmentBooking = () => {
         date: new Date().toISOString().split('T')[0],
         time: '',
         patientName: '',
+        patientId: '',
+        status: '',
         email: '',
         phone: '',
+        doctorId: '',
+        doctorName: '',
+        hospitalName: '',
         reasonForVisit: '',
         isNewPatient: false,
         insuranceProvider: '',
@@ -80,9 +85,12 @@ const AppointmentBooking = () => {
                 // Pre-populate form with user data
                 setFormData(prev => ({
                     ...prev,
+                    patientId: userData._id,
                     patientName: userData.name || '',
                     email: userData.email || '',
-                    phone: userData.mobile || ''
+                    phone: userData.mobile || '',
+                    doctorId: doctorData._id,
+                    doctorName: doctorData.name,
                 }));
 
                 // Generate sample time slots for the selected date
@@ -180,6 +188,11 @@ const AppointmentBooking = () => {
                     formData,
                     { headers: { 'Content-Type': 'application/json' } }
                 );
+                await axios.put(
+                    `http://localhost:5000/api/patient/profile/${user._id}`,
+                    { doctors: [doctorId] },
+                    { headers: { 'Content-Type:': 'application/json' } }
+                )
             },
             "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
                 "name": "Sathvik", //your customer's name
