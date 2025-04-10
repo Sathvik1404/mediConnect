@@ -255,7 +255,7 @@ const LandingPage = () => {
                                     </div>
                                 ))}
                             </div>
-                            <button className="mt-8 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
+                            <button onClick={handleButton} className="mt-8 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
                                 Join as Healthcare Provider
                             </button>
                         </div>
@@ -325,10 +325,10 @@ const LandingPage = () => {
                         Join our growing community of patients, doctors, and hospitals. Experience healthcare management like never before.
                     </p>
                     <div className="mt-10 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-                        <button className="py-4 px-6 bg-white text-blue-600 hover:bg-blue-50 font-medium text-lg rounded-xl transition-colors">
+                        <button onClick={handleButton} className="py-4 px-6 bg-white text-blue-600 hover:bg-blue-50 font-medium text-lg rounded-xl transition-colors">
                             Sign Up Now
                         </button>
-                        <button onClick={navigate('/authpage')} className="py-4 px-6 border border-white text-white hover:bg-blue-700 font-medium text-lg rounded-xl transition-colors">
+                        <button onClick={handleButton} className="py-4 px-6 border border-white text-white hover:bg-blue-700 font-medium text-lg rounded-xl transition-colors">
                             Schedule a Demo
                         </button>
                     </div>
