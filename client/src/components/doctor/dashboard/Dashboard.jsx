@@ -25,6 +25,7 @@ const DoctorDashboard = () => {
       }
     };
 
+
     const fetchAppointments = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/appointment');
@@ -95,6 +96,16 @@ const DoctorDashboard = () => {
 
     return days;
   };
+  const handleCalenderLeft = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setMonth(newDate.getMonth() - 1);
+    setSelectedDate(newDate);
+  }
+  const handleCalenderRight = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setMonth(newDate.getMonth() + 1);
+    setSelectedDate(newDate);
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -192,7 +203,7 @@ const DoctorDashboard = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {[
-                    { label: 'Appointments', value: '8', icon: <Calendar className="h-6 w-6 text-blue-600" />, color: 'bg-blue-50' },
+                    { label: 'Appointments', value: upcomingAppointments.length, icon: <Calendar className="h-6 w-6 text-blue-600" />, color: 'bg-blue-50' },
                     { label: 'Pending Reports', value: '3', icon: <FileText className="h-6 w-6 text-amber-600" />, color: 'bg-amber-50' },
                     { label: 'Messages', value: '12', icon: <MessageSquare className="h-6 w-6 text-green-600" />, color: 'bg-green-50' }
                   ].map((item, index) => (
@@ -347,10 +358,10 @@ const DoctorDashboard = () => {
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold text-blue-900">Calendar</h2>
                   <div className="flex space-x-2">
-                    <button className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
+                    <button onClick={handleCalenderLeft} className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
                       <ChevronLeft className="h-4 w-4" />
                     </button>
-                    <button className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
+                    <button onClick={handleCalenderRight} className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
                       <ChevronRight className="h-4 w-4" />
                     </button>
                   </div>
