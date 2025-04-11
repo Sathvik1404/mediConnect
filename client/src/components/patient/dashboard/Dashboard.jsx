@@ -12,15 +12,27 @@ import {
   Heart,
   Search,
   ChevronRight,
-  BarChart
+  BarChart,
+  MessageCircle,
+  MessageCircleDashed,
+  LucideMessageSquareReply,
+  LucideMessageSquareQuote
 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../../AuthContext';
+import { toast } from 'react-toastify';
 
 const PatientDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [reviewForm, setReviewForm] = useState({
+    name: '',
+    role: '',
+    quote: ''
+  });
+
+  const [submitting, setSubmitting] = useState(false);
 
   const [state, setState] = useState({
     hospitals: [],
@@ -194,6 +206,8 @@ const PatientDashboard = () => {
       return renderAppointmentsContent();
     } else if (activeTab === 'hospitals') {
       return renderHospitalsContent();
+    } else if (activeTab === 'review') {
+      return renderReview();
     } else {
       return (
         <div className="bg-white rounded-lg shadow p-6">
@@ -202,6 +216,109 @@ const PatientDashboard = () => {
         </div>
       );
     }
+  };
+  const renderReview = () => {
+    const handleReviewChange = (e) => {
+      const { name, value } = e.target;
+      setReviewForm(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleReviewSubmit = async (e) => {
+      e.preventDefault();
+      setSubmitting(true);
+      try {
+        const res = await axios.post("http://localhost:5000/api/patient/review", reviewForm);
+        if (res.status === 200 || res.status === 201) {
+          setReviewForm({ name: '', role: '', quote: '' });
+          setState(prev => ({
+            ...prev,
+            testimonials: [...(prev.testimonials || []), reviewForm]
+          }));
+          toast.success("Review Submitted Successfully");
+        }
+      } catch (error) {
+        toast.warning("Error submitting review:", error);
+      } finally {
+        setSubmitting(false);
+      }
+    };
+
+    return (
+      <div className="bg-white rounded-lg shadow p-6 space-y-8">
+        <h2 className="text-xl font-bold text-blue-900">Share Your Experience</h2>
+        <form onSubmit={handleReviewSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+            <input
+              type="text"
+              name="name"
+              value={reviewForm.name}
+              onChange={handleReviewChange}
+              required
+              placeholder="Enter your name"
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Your Role</label>
+            <input
+              type="text"
+              name="role"
+              value={reviewForm.role}
+              onChange={handleReviewChange}
+              required
+              placeholder="Patient / Doctor / Administrator"
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Your Review</label>
+            <textarea
+              name="quote"
+              value={reviewForm.quote}
+              onChange={handleReviewChange}
+              required
+              rows="4"
+              placeholder="Share your experience..."
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+          >
+            {submitting ? 'Submitting...' : 'Submit Review'}
+          </button>
+        </form>
+
+        {/* Testimonials Display */}
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">What others say</h3>
+          {state.testimonials && state.testimonials.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {state.testimonials.map((testimonial, index) => (
+                <div
+                  key={testimonial._id || index}
+                  className="border rounded-lg p-4 hover:shadow-md bg-gray-50 transition duration-300"
+                >
+                  <p className="text-gray-700 italic mb-4">"{testimonial.quote}"</p>
+                  <div className="text-right">
+                    <h4 className="font-semibold text-blue-700">{testimonial.name}</h4>
+                    <p className="text-sm text-gray-600">{testimonial.role}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-600">No reviews available yet. Be the first to share!</p>
+          )}
+        </div>
+      </div>
+    );
   };
 
   const renderHospitalsContent = () => {
@@ -587,6 +704,7 @@ const PatientDashboard = () => {
                   { id: 'hospitals', label: 'Hospitals', icon: <FileText className="h-5 w-5" /> },
                   { id: 'medications', label: 'Medications', icon: <Pill className="h-5 w-5" /> },
                   { id: 'messages', label: 'Messages', icon: <MessageSquare className="h-5 w-5" /> },
+                  { id: 'review', label: 'Review', icon: <LucideMessageSquareQuote className='h-5 w-5' /> },
                   // { id: 'profile', label: 'My Profile', icon: <User className="h-5 w-5" /> }
                 ].map(item => (
                   <li key={item.id}>
