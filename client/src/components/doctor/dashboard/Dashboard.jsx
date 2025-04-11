@@ -4,7 +4,16 @@ import axios from 'axios';
 import { useAuth } from '../../AuthContext';
 
 const DoctorDashboard = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [state, setState] = useState({
+    patients: [],
+    appointments: [],
+    recentActivities: [],
+    notifications: [],
+    loading: false,
+    error: null
+    // Add other properties you need for your doctor dashboard
+  });
+  const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [upcomingAppointments, setAppointments] = useState([]);
@@ -57,6 +66,56 @@ const DoctorDashboard = () => {
     { id: 2, type: 'message', message: 'Sarah Johnson sent you a message', time: '1 hour ago' },
     { id: 3, type: 'lab', message: 'Lab results for Michael Chen are ready', time: '3 hours ago' },
   ];
+
+  const renderTabContent = () => {
+    if (activeTab === 'overview') {
+      return renderOverviewContent();
+    } else if (activeTab === 'appointments') {
+      return renderAppointmentsContent();
+    } else if (activeTab === 'patients') {
+      return renderPatientsContent();
+    } else if (activeTab === 'schedule') {
+      return renderScheduleContent();
+    } else if (activeTab === 'messages') {
+      return renderMessagesContent();
+    } else {
+      // Default fallback for sections under development
+      return (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-bold mb-4">{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h2>
+          <p>This section is under development.</p>
+        </div>
+      );
+    }
+  };
+
+  const renderOverviewContent = () => {
+    return (<>Overview</>
+      // Your overview content here
+      // Copy structure from patient dashboard and modify as needed
+    )
+  };
+
+  const renderAppointmentsContent = () => {
+    return (<>Appointments</>
+      // Your appointments content here
+    );
+  };
+  const renderPatientsContent = () => {
+    return (<>Patients</>
+      // Your appointments content here
+    );
+  };
+  const renderScheduleContent = () => {
+    return (<>Schedules</>
+      // Your appointments content here
+    );
+  };
+  const renderMessagesContent = () => {
+    return (<>Messages</>
+      // Your appointments content here
+    );
+  };
 
   // Helper function to generate calendar days
   const generateCalendarDays = () => {
@@ -121,25 +180,25 @@ const DoctorDashboard = () => {
         </div>
 
         <div className="flex-grow py-8">
-          <nav>
-            <ul className="space-y-2">
+          <nav className="p-2">
+            <ul className="space-y-1">
               {[
-                { id: 'dashboard', icon: <Activity />, label: 'Dashboard' },
-                { id: 'appointments', icon: <Calendar />, label: 'Appointments' },
-                { id: 'patients', icon: <Users />, label: 'Patients' },
-                { id: 'records', icon: <FileText />, label: 'Medical Records' },
-                { id: 'messages', icon: <MessageSquare />, label: 'Messages' },
-                { id: 'prescriptions', icon: <Clipboard />, label: 'Prescriptions' }
+                { id: 'overview', label: 'Overview', icon: <Activity className="h-5 w-5" /> },
+                { id: 'appointments', label: 'Appointments', icon: <Calendar className="h-5 w-5" /> },
+                { id: 'patients', label: 'Patients', icon: <User className="h-5 w-5" /> },
+                { id: 'schedule', label: 'Schedule', icon: <Clock className="h-5 w-5" /> },
+                { id: 'messages', label: 'Messages', icon: <MessageSquare className="h-5 w-5" /> },
               ].map(item => (
                 <li key={item.id}>
                   <button
                     onClick={() => setActiveTab(item.id)}
-                    className={`flex items-center w-full p-3 ${sidebarOpen ? 'px-6' : 'justify-center'} 
-                      ${activeTab === item.id ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'}
-                      transition-colors rounded-lg`}
+                    className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors ${activeTab === item.id
+                      ? 'bg-blue-50 text-blue-600'
+                      : 'text-gray-600 hover:bg-gray-100'
+                      }`}
                   >
-                    <span className="h-5 w-5">{item.icon}</span>
-                    {sidebarOpen && <span className="ml-3">{item.label}</span>}
+                    {item.icon}
+                    <span className="ml-3">{item.label}</span>
                   </button>
                 </li>
               ))}
@@ -190,11 +249,9 @@ const DoctorDashboard = () => {
         </header>
 
         {/* Main Dashboard Content */}
-        <main className="p-6">
+        {/* <main className="p-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Today's Summary */}
               <div className="bg-white rounded-xl shadow p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold text-blue-900">Today's Summary</h2>
@@ -220,7 +277,6 @@ const DoctorDashboard = () => {
                 </div>
               </div>
 
-              {/* Upcoming Appointments */}
               <div className="bg-white rounded-xl shadow p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold text-blue-900">Upcoming Appointments</h2>
@@ -265,7 +321,6 @@ const DoctorDashboard = () => {
                 </div>
               </div>
 
-              {/* Patient Details Preview */}
               <div className="bg-white rounded-xl shadow p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold text-blue-900">Patient Details</h2>
@@ -351,9 +406,7 @@ const DoctorDashboard = () => {
               </div>
             </div>
 
-            {/* Right Column */}
             <div className="space-y-6">
-              {/* Mini Calendar */}
               <div className="bg-white rounded-xl shadow p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold text-blue-900">Calendar</h2>
@@ -391,7 +444,6 @@ const DoctorDashboard = () => {
                 </div>
               </div>
 
-              {/* Recent Patients */}
               <div className="bg-white rounded-xl shadow p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold text-blue-900">Recent Patients</h2>
@@ -425,7 +477,6 @@ const DoctorDashboard = () => {
                 </div>
               </div>
 
-              {/* Notifications */}
               <div className="bg-white rounded-xl shadow p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold text-blue-900">Notifications</h2>
@@ -448,6 +499,15 @@ const DoctorDashboard = () => {
               </div>
             </div>
           </div>
+        </main> */}
+        <main className="flex-1 md:ml-8">
+          {state.error && (
+            <div className="bg-red-50 text-red-800 p-4 rounded-md mb-4">
+              {state.error}
+            </div>
+          )}
+
+          {renderTabContent()}
         </main>
       </div>
     </div>
