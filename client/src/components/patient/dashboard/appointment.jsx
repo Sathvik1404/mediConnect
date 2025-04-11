@@ -17,6 +17,7 @@ import {
     MapPin,
     Stethoscope
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const AppointmentBooking = () => {
     const { doctorId } = useParams();
@@ -191,8 +192,12 @@ const AppointmentBooking = () => {
                 await axios.put(
                     `http://localhost:5000/api/patient/profile/${user._id}`,
                     { doctors: [doctorId] },
-                    { headers: { 'Content-Type:': 'application/json' } }
+                    { headers: { 'Content-Type': 'application/json' } }
                 )
+                setTimeout(() => {
+                    toast.success("Payment Successfull !")
+                }, 1000)
+                navigate('/patient/Dashboard');
             },
             "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
                 "name": "Sathvik", //your customer's name

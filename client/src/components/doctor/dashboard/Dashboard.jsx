@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, FileText, Activity, User, Users, Bell, Settings, Clock, CheckCircle, X, ArrowRight, MessageSquare, Clipboard, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Mail, Phone, PlusCircle, Search, MoreVertical, FileText as FileTextIcon } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../../AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const DoctorDashboard = () => {
   const [state, setState] = useState({
@@ -13,20 +15,23 @@ const DoctorDashboard = () => {
     error: null
     // Add other properties you need for your doctor dashboard
   });
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [upcomingAppointments, setAppointments] = useState([]);
-  const [patients, setPatients] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [patientsdata, setPatients] = useState([]);
   const { user, logout } = useAuth();
   useEffect(() => {
     const fetchPatients = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/patient/profile`);
         // Filter based on currentDoctorId
-        const filtered = response.data.filter(patient => patient === user._id);
-        console.log(response)
-        setPatients(filtered);
+        // console.log(response.data)
+        // const filteredPatients = response.data.filter(
+        //   patient => patient.doctorId === user?._id
+        // );
+        setPatients(response.data);
       } catch (error) {
         console.error('Error fetching patients:', error);
       } finally {
@@ -34,16 +39,13 @@ const DoctorDashboard = () => {
       }
     };
 
-
     const fetchAppointments = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/appointment');
-        // console.log(response.data)
-        // console.log(user)
-        const filteredAppointments = response.data.filter(
-          appointment => appointment.doctorId === user._id || null
-        );
-        setAppointments(filteredAppointments);
+        // const filteredAppointments = response.data.filter(
+        //   appointment => appointment.doctorId === user._id || null
+        // );
+        setAppointments(response.data);
       } catch (error) {
         console.error('Failed to fetch appointments:', error);
       } finally {
@@ -54,6 +56,7 @@ const DoctorDashboard = () => {
     fetchAppointments();
     fetchPatients();
   }, []);
+
 
   const recentPatients = [
     { id: 1, name: 'Sarah Johnson', lastVisit: '2 days ago', condition: 'Hypertension', avatar: 'SJ' },
@@ -66,7 +69,17 @@ const DoctorDashboard = () => {
     { id: 2, type: 'message', message: 'Sarah Johnson sent you a message', time: '1 hour ago' },
     { id: 3, type: 'lab', message: 'Lab results for Michael Chen are ready', time: '3 hours ago' },
   ];
-
+  const handleViewProfile = async (patientid) => {
+    try {
+      console.log(patientid)
+      const response = await axios.get(`http://localhost:5000/api/patient/profile/downloadrecord/${patientid}`);
+      const fileUrl = response.data.fileUrl;
+      window.open(fileUrl, '_blank');
+    } catch (err) {
+      console.error('Failed to fetch record:', err);
+      toast.warning('Unable to open medical record.');
+    }
+  }
   const renderTabContent = () => {
     if (activeTab === 'overview') {
       return renderOverviewContent();
@@ -90,29 +103,381 @@ const DoctorDashboard = () => {
   };
 
   const renderOverviewContent = () => {
-    return (<>Overview</>
+    return (
+      //<>Overview</>
+      <main className="p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white rounded-xl shadow p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-blue-900">Today's Summary</h2>
+                <p className="text-gray-500">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { label: 'Appointments', value: appointments.length, icon: <Calendar className="h-6 w-6 text-blue-600" />, color: 'bg-blue-50' },
+                  { label: 'Pending Reports', value: '3', icon: <FileText className="h-6 w-6 text-amber-600" />, color: 'bg-amber-50' },
+                  { label: 'Messages', value: '12', icon: <MessageSquare className="h-6 w-6 text-green-600" />, color: 'bg-green-50' }
+                ].map((item, index) => (
+                  <div key={index} className="flex items-center p-4 rounded-lg border">
+                    <div className={`h-12 w-12 rounded-full ${item.color} flex items-center justify-center mr-4`}>
+                      {item.icon}
+                    </div>
+                    <div>
+                      <p className="text-gray-500">{item.label}</p>
+                      <p className="text-2xl font-bold text-gray-800">{item.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-blue-900">Upcoming Appointments</h2>
+                <button className="text-blue-600 font-medium flex items-center">
+                  View All <ArrowRight className="h-4 w-4 ml-1" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {appointments.map(appointment => (
+                  <div key={appointment.id} className="p-4 border rounded-lg flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                        {appointment.avatar}
+                      </div>
+                      <div className="ml-4">
+                        <h3 className="font-medium text-gray-800">{appointment.patientName}</h3>
+                        <div className="flex items-center text-sm text-gray-500">
+                          <Clock className="h-4 w-4 mr-1" />
+                          {appointment.time} • {appointment.type}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${appointment.status === 'confirmed' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'
+                        }`}>
+                        {appointment.status === 'confirmed' ? 'Confirmed' : 'Pending'}
+                      </span>
+
+                      <div className="flex ml-4">
+                        <button className="h-8 w-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100">
+                          <FileTextIcon className="h-4 w-4" />
+                        </button>
+                        <button className="h-8 w-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 ml-2">
+                          <MessageSquare className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-blue-900">Patient Details</h2>
+                <div className="flex space-x-2">
+                  <button className="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50">Edit</button>
+                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">View Full Record</button>
+                </div>
+              </div>
+
+              <div className="flex flex-col md:flex-row">
+                <div className="md:w-1/3 mb-6 md:mb-0 flex flex-col items-center">
+                  <div className="h-24 w-24 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-2xl mb-4">
+                    SJ
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-800">Sarah Johnson</h3>
+                  <p className="text-gray-500">34 years, Female</p>
+
+                  <div className="mt-4 space-y-2 w-full max-w-xs">
+                    <div className="flex items-center text-gray-600">
+                      <Mail className="h-4 w-4 mr-2" />
+                      <span>sarah.j@example.com</span>
+                    </div>
+                    <div className="flex items-center text-gray-600">
+                      <Phone className="h-4 w-4 mr-2" />
+                      <span>+1 (555) 123-4567</span>
+                    </div>
+                  </div>
+
+                  <button className="mt-6 w-full max-w-xs px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50">
+                    Send Message
+                  </button>
+                </div>
+
+                <div className="md:w-2/3 md:pl-6 md:border-l">
+                  <div className="space-y-6">
+                    <div>
+                      <h4 className="font-medium text-gray-700 mb-2">Medical History</h4>
+                      <div className="space-y-2">
+                        {[
+                          { condition: 'Hypertension', since: '2018', status: 'Ongoing' },
+                          { condition: 'Migraine', since: '2015', status: 'Managed' }
+                        ].map((item, index) => (
+                          <div key={index} className="flex justify-between p-2 bg-gray-50 rounded">
+                            <span>{item.condition}</span>
+                            <span className="text-gray-500">Since {item.since} • {item.status}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-medium text-gray-700 mb-2">Current Medications</h4>
+                      <div className="space-y-2">
+                        {[
+                          { name: 'Lisinopril', dosage: '10mg', frequency: 'Once daily' },
+                          { name: 'Sumatriptan', dosage: '50mg', frequency: 'As needed' }
+                        ].map((item, index) => (
+                          <div key={index} className="flex justify-between p-2 bg-gray-50 rounded">
+                            <span>{item.name} {item.dosage}</span>
+                            <span className="text-gray-500">{item.frequency}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-medium text-gray-700 mb-2">Recent Visits</h4>
+                      <div className="space-y-2">
+                        {[
+                          { date: 'Mar 15, 2025', reason: 'Blood pressure check', doctor: 'Dr. Smith' },
+                          { date: 'Feb 02, 2025', reason: 'Migraine follow-up', doctor: 'Dr. Smith' }
+                        ].map((item, index) => (
+                          <div key={index} className="flex justify-between p-2 bg-gray-50 rounded">
+                            <span>{item.date}</span>
+                            <span className="text-gray-500">{item.reason}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl shadow p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-blue-900">Calendar</h2>
+                <div className="flex space-x-2">
+                  <button onClick={handleCalenderLeft} className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button onClick={handleCalenderRight} className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-center mb-4">
+                <h3 className="font-medium text-gray-800">
+                  {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-7 gap-1 mb-2 text-sm text-gray-500">
+                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
+                  <div key={index} className="text-center font-medium">{day}</div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7 gap-1">
+                {generateCalendarDays()}
+              </div>
+
+              <div className="mt-6">
+                <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center">
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  New Appointment
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-blue-900">Recent Patients</h2>
+                <button className="text-blue-600 font-medium flex items-center">
+                  View All <ArrowRight className="h-4 w-4 ml-1" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {recentPatients.map(patient => (
+                  <div key={patient.id} className="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold mr-3">
+                      {patient.avatar}
+                    </div>
+                    <div className="flex-grow">
+                      <h3 className="font-medium text-gray-800">{patient.name}</h3>
+                      <p className="text-sm text-gray-500">{patient.condition}</p>
+                    </div>
+                    <div className="text-sm text-gray-500">{patient.lastVisit}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4 relative">
+                <input
+                  type="text"
+                  placeholder="Search patients..."
+                  className="w-full p-2 pl-10 border rounded-lg text-sm"
+                />
+                <Search className="h-4 w-4 text-gray-400 absolute left-3 top-3" />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-blue-900">Notifications</h2>
+                <button className="text-blue-600 font-medium text-sm">Mark all as read</button>
+              </div>
+
+              <div className="space-y-4">
+                {notifications.map(notification => (
+                  <div key={notification.id} className="p-3 border-l-4 border-blue-600 bg-blue-50 rounded-r-lg">
+                    <div className="flex justify-between items-start">
+                      <p className="text-gray-800">{notification.message}</p>
+                      <button className="text-gray-400 hover:text-gray-600">
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">{notification.time}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
       // Your overview content here
       // Copy structure from patient dashboard and modify as needed
     )
   };
 
   const renderAppointmentsContent = () => {
-    return (<>Appointments</>
-      // Your appointments content here
+    return (
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-blue-900">My Appointments</h2>
+          {/* Optional button */}
+          <button
+            onClick={() => setActiveTab('patients')}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            View Patients
+          </button>
+        </div>
+
+        {state.loading ? (
+          <p>Loading appointments...</p>
+        ) : (
+          <div className="divide-y">
+            {appointments.length > 0 ? (
+              appointments.map(appointment => (
+                <div key={appointment.id} className="py-4">
+                  <div className="flex justify-between mb-2">
+                    <h3 className="font-medium">{appointment.patientName || 'Unknown Patient'}</h3>
+                    <span className={`text-sm px-2 py-1 rounded-full ${appointment.status === 'Confirmed'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                      {appointment.status}
+                    </span>
+                  </div>
+
+                  <p className="text-gray-600 text-sm">
+                    Reason: {appointment.reasonForVisit || 'N/A'}
+                  </p>
+
+                  <div className="flex items-center mt-2 text-sm text-gray-500">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    {appointment.date}
+                    <Clock className="h-4 w-4 ml-3 mr-1" />
+                    {appointment.time}
+                  </div>
+
+                  <div className="mt-2 text-sm text-gray-600">
+                    Email: {appointment.patientEmail}
+                  </div>
+
+                  {/* Optional feature: reschedule/cancel */}
+                  {/* <button className="mt-2 text-blue-600 hover:underline text-sm">Reschedule</button> */}
+                </div>
+              ))
+            ) : (
+              <p className="py-4 text-gray-600">No appointments scheduled yet.</p>
+            )}
+          </div>
+        )}
+      </div>
     );
   };
+  console.log(patientsdata)
   const renderPatientsContent = () => {
-    return (<>Patients</>
-      // Your appointments content here
+    return (
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold text-blue-900 mb-4">Patients</h2>
+
+        {state.loading ? (
+          <p className="text-gray-600">Loading patient information...</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {patientsdata && patientsdata.length > 0 ? (
+              patientsdata.map((patient, index) => (
+                <div
+                  key={patient._id || index}
+                  className="border rounded-lg p-4 hover:shadow-md bg-gray-50 transition duration-300"
+                >
+                  <div className="flex items-center mb-3">
+                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold mr-3">
+                      {patient.name?.[0] || 'P'}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800">{patient.name || "Unknown"}</h3>
+                      <p className="text-sm text-gray-600">{patient.email || "No email"}</p>
+                    </div>
+                  </div>
+
+                  <div className="text-sm text-gray-600 space-y-1">
+                    <p><strong>Age:</strong> {patient.age || "N/A"}</p>
+                    <p><strong>Gender:</strong> {patient.gender || "N/A"}</p>
+                    <p><strong>Phone:</strong> {patient.phone || "N/A"}</p>
+                  </div>
+
+                  <button onClick={() => handleViewProfile(patient._id)} className="mt-4 w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">
+                    View Profile
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-600 col-span-full">No patients found.</p>
+            )}
+          </div>
+        )}
+      </div>
     );
   };
+
   const renderScheduleContent = () => {
     return (<>Schedules</>
       // Your appointments content here
     );
   };
   const renderMessagesContent = () => {
-    return (<>Messages</>
+    return (<div className="bg-white rounded-lg shadow p-6 mb-6">
+      <h2 className="text-xl font-bold text-blue-900 mb-2">Patient Messages</h2>
+      <p className="text-gray-600 text-sm">
+        This section previews messages sent by patients to the doctor. You can view and respond to their queries.
+      </p>
+    </div>
+
       // Your appointments content here
     );
   };
@@ -137,7 +502,7 @@ const DoctorDashboard = () => {
     // Generate calendar days
     for (let i = 1; i <= lastDay; i++) {
       const isToday = i === new Date().getDate() && date.getMonth() === new Date().getMonth();
-      const hasAppointment = [4, 10, 15, 22].includes(i); // Mock data for days with appointments
+      const hasAppointment = [4, 10, 15, 22].includes(i);
 
       days.push(
         <div

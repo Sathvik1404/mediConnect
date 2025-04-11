@@ -61,7 +61,7 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'The password is incorrect' });
         }
         const token = jwt.sign({ email: doctor.email }, "jwt-secret-key", { expiresIn: '1h' });
-        sendMail(email, "Hello Welcome to MediConnect", `This is your otp for login ${otp}`)
+        sendMail(email, "Welcome to MediConnect", `This is your OTP for login ${otp}.It will expire in 1 Hour\nThank You.\n\n\nTeam MediConnect`)
         console.log("OTP SENT TO MAIL")
         return res.status(200).json({ status: 'Success', token, doctor, otp });
     } catch (err) {

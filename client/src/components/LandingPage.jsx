@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const LandingPage = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const navigate = useNavigate()
+    const [reviews, setReviews] = useState([]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -19,7 +20,18 @@ const LandingPage = () => {
         e.preventDefault()
         navigate('/authpage')
     }
-
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                const respo = await fetch('http://localhost:5000/api/patient/review');
+                const tem = await respo.json();
+                setReviews([...tem]);
+            } catch (error) {
+                console.error("Failed to fetch reviews:", error);
+            }
+        };
+        fetchReviews();
+    }, []);
     return (
         <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
             {/* Navigation */}
@@ -276,41 +288,42 @@ const LandingPage = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {[
-                            {
-                                quote: "The appointment system is so intuitive. I've never missed a doctor's appointment since I started using this platform.",
-                                name: "Sarah Johnson",
-                                role: "Patient"
-                            },
-                            {
-                                quote: "As a doctor, this system has revolutionized how I manage my practice. Less paperwork means more time with patients.",
-                                name: "Dr. Michael Chen",
-                                role: "Cardiologist"
-                            },
-                            {
-                                quote: "Our hospital has seen a 40% reduction in administrative costs since implementing this system. It's been transformative.",
-                                name: "Emily Rodriguez",
-                                role: "Hospital Administrator"
-                            }
-                        ].map((testimonial, index) => (
-                            <div key={index} className="bg-white rounded-xl shadow-lg p-6">
-                                <div className="mb-4">
-                                    {[...Array(5)].map((_, i) => (
-                                        <span key={i} className="text-yellow-400">★</span>
-                                    ))}
-                                </div>
-                                <p className="text-gray-600 italic mb-6">"{testimonial.quote}"</p>
-                                <div className="flex items-center">
-                                    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl">
-                                        {testimonial.name.charAt(0)}
+                        {
+                            // {
+                            //     quote: "The appointment system is so intuitive. I've never missed a doctor's appointment since I started using this platform.",
+                            //     name: "Sarah Johnson",
+                            //     role: "Patient"
+                            // },
+                            // {
+                            //     quote: "As a doctor, this system has revolutionized how I manage my practice. Less paperwork means more time with patients.",
+                            //     name: "Dr. Michael Chen",
+                            //     role: "Cardiologist"
+                            // },
+                            // {
+                            //     quote: "Our hospital has seen a 40% reduction in administrative costs since implementing this system. It's been transformative.",
+                            //     name: "Emily Rodriguez",
+                            //     role: "Hospital Administrator"
+                            // }
+
+                            reviews.slice(1, 4).map((testimonial, index) => (
+                                <div key={index} className="bg-white rounded-xl shadow-lg p-6">
+                                    <div className="mb-4">
+                                        {[...Array(5)].map((_, i) => (
+                                            <span key={i} className="text-yellow-400">★</span>
+                                        ))}
                                     </div>
-                                    <div className="ml-4">
-                                        <p className="font-medium text-blue-900">{testimonial.name}</p>
-                                        <p className="text-sm text-gray-500">{testimonial.role}</p>
+                                    <p className="text-gray-600 italic mb-6">"{testimonial.quote}"</p>
+                                    <div className="flex items-center">
+                                        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl">
+                                            {testimonial.name.charAt(0)}
+                                        </div>
+                                        <div className="ml-4">
+                                            <p className="font-medium text-blue-900">{testimonial.name}</p>
+                                            <p className="text-sm text-gray-500">{testimonial.role}</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
                     </div>
                 </div>
             </section>

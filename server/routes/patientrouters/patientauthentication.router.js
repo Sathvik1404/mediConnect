@@ -83,7 +83,7 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'The password is incorrect' });
         }
         const token = jwt.sign({ email: patient.email }, "jwt-secret-key", { expiresIn: '1h' });
-        sendMail(email, "Welcome to mediConnect", `This is your otp for login ${otp}`)
+        sendMail(email, "Welcome to MediConnect", `This is your OTP for login ${otp}.It will expire in 1 Hour\nThank You.\n\n\nTeam MediConnect`)
         // Send the email
         // await transporter.sendMail(mailOptions, (error, info) => {
         //     if (error) {
