@@ -36,7 +36,7 @@ const hospitalAuthenticationRouter = require('./routes/hospitalrouters/hospitala
 const hospitalsRouter = require('./routes/hospitalrouters/hospitalprofile.router');
 
 const appointmentRouter = require('./routes/appointmentrouters/appointment.router');
-
+const review = require('./controllers/reviews')
 mongoose.connect(db_url, {
     tls: true,
 })
@@ -61,6 +61,7 @@ app.use('/api/hospital', hospitalAuthenticationRouter);
 app.use('/api/hospitals', hospitalsRouter);
 
 //Appointment End Ponints
+app.use('/api/patient', review)
 app.use('/api/appointment', appointmentRouter);
 
 app.listen(port, () => console.log(`Server is running on ${port}`));
