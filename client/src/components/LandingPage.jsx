@@ -305,7 +305,7 @@ const LandingPage = () => {
                             //     role: "Hospital Administrator"
                             // }
 
-                            reviews.slice(1, 4).map((testimonial, index) => (
+                            [...reviews].reverse().slice(1, 4).map((testimonial, index) => (
                                 <div key={index} className="bg-white rounded-xl shadow-lg p-6">
                                     <div className="mb-4">
                                         {[...Array(5)].map((_, i) => (

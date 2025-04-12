@@ -588,7 +588,7 @@ const DoctorDashboard = () => {
           <div className="flex justify-between items-center px-6 py-4">
             <div>
               <h1 className="text-2xl font-bold text-blue-900">Doctor Dashboard</h1>
-              <p className="text-gray-500">Welcome back, Dr. Smith</p>
+              <p className="text-gray-500">Welcome back , Dr.{user.name}</p>
             </div>
 
             <div className="flex items-center space-x-4">
@@ -603,7 +603,7 @@ const DoctorDashboard = () => {
                 <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold mr-2">
                   DS
                 </div>
-                <span className="font-medium text-gray-700">Dr. Smith</span>
+                <span className="font-medium text-gray-700">Dr.{user.name}</span>
               </div>
 
               <button className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
