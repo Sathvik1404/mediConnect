@@ -42,10 +42,10 @@ const DoctorDashboard = () => {
     const fetchAppointments = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/appointment');
-        // const filteredAppointments = response.data.filter(
-        //   appointment => appointment.doctorId === user._id || null
-        // );
-        setAppointments(response.data);
+        const filteredAppointments = response.data.filter(
+          appointment => appointment.doctorId === user._id || null
+        );
+        setAppointments(filteredAppointments);
       } catch (error) {
         console.error('Failed to fetch appointments:', error);
       } finally {

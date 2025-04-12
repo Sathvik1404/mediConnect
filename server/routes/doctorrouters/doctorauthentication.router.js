@@ -23,6 +23,7 @@ router.use(session({
 }));
 
 router.post('/signup', async (req, res) => {
+    console.log(req.body)
     const { name, email, password, age, mobile, gender, spec } = req.body;
 
     try {
@@ -37,9 +38,9 @@ router.post('/signup', async (req, res) => {
         const hash = await bcrypt.hash(password, 12);
 
         // Create the new user
-        await doctorModel.create({ name, email, password: hash, age, gender, mobile, specialization: spec })
+        await doctorModel.create({ name, email, password: hash, mobile, specialization: spec })
             .then(user => res.json({ success: true }))
-            .catch(err => res.status(500).json({ error: 'Failed to create user' }));
+            .catch(err => res.status(500).json({ error: err + '  Failed to create user' }));
 
     } catch (err) {
         console.error('Signup error: ', err);

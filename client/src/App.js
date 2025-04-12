@@ -36,24 +36,24 @@ function App() {
             <Route path='/patient/signup' element={<Signup />} />
             <Route path='/patient/login' element={<Login />} />
             <Route path='/patient/Verify' element={<PVerify />} />
-            {/* <Route element={<PatientProtected />}> */}
-            <Route path='/patient/dashboard' element={<Dashboard />} />
-            <Route path='/patient/profile' element={<Pprofile />} />
+            <Route element={<PatientProtected />}>
+              <Route path='/patient/dashboard' element={<Dashboard />} />
+              <Route path='/patient/profile' element={<Pprofile />} />
 
-            <Route path="/patient/appointment/:doctorId" element={<Appointment />}></Route>
-            {/* </Route> */}
+              <Route path="/patient/appointment/:doctorId" element={<Appointment />}></Route>
+            </Route>
             <Route path='/doctor/dlogin' element={<DLogin />} />
             <Route path='/doctor/DSignup' element={<DSignup />} />
-            {/* <Route element={<DoctorProtected />}> */}
-            <Route path='/doctor/Verify' element={<Verify />} />
-            <Route path='/doctor/dashboard' element={<DDashboard />} />
-            {/* </Route> */}
+            <Route element={<DoctorProtected />}>
+              <Route path='/doctor/Verify' element={<Verify />} />
+              <Route path='/doctor/dashboard' element={<DDashboard />} />
+            </Route>
             <Route path="/doctor/dashboard/patient/:patientId" element={<PatientDetails />} />
             {/* <Route path="/hospital/Hsignup" element={<Hsignup />} /> */}
             <Route path='/hospital/Hlogin' element={<Hlogin />} />
-            {/* <Route element={<HospitalProtected />}> */}
-            <Route path='/hospital/Dashboard' element={<HDashboard />} />
-            {/* </Route> */}
+            <Route element={<HospitalProtected />}>
+              <Route path='/hospital/Dashboard' element={<HDashboard />} />
+            </Route>
           </Routes>
           <ToastContainer position="top-right" autoClose={3000} />
         </BrowserRouter>

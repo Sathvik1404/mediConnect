@@ -31,7 +31,7 @@ const PatientDashboard = () => {
     role: '',
     quote: ''
   });
-
+  const [searchTerm, setSearchTerm] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const [state, setState] = useState({
@@ -123,6 +123,40 @@ const PatientDashboard = () => {
       error: null
     }));
   }, [fetchData]);
+
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const getFilteredHospitals = useCallback(() => {
+    if (!searchTerm.trim()) return state.hospitals;
+
+    return state.hospitals.filter(hospital =>
+      // console.log(hospital)
+      hospital.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      hospital.location.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [state.hospitals, searchTerm]);
+
+  const getFilteredDoctors = useCallback(() => {
+    if (!searchTerm.trim()) return state.doctors;
+
+    return state.doctors.filter(doctor =>
+      doctor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doctor.specialization?.join(', ').toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [state.doctors, searchTerm]);
+
+  const getFilteredAppointments = useCallback(() => {
+    if (!searchTerm.trim()) return state.appointments;
+
+    return state.appointments.filter(appointment =>
+      appointment.doctor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.specialty.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.date.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [state.appointments, searchTerm]);
 
   const fetchAppointments = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true }));
@@ -325,6 +359,7 @@ const PatientDashboard = () => {
     return (
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-bold mb-4">Hospitals</h2>
+        {renderSearchIndicator()}
 
         {state.selectedHospital ? (
           <div>
@@ -343,8 +378,8 @@ const PatientDashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {state.doctors.length > 0 ? (
-                state.doctors.map((doctor, index) => (
+              {getFilteredDoctors().length > 0 ? (
+                getFilteredDoctors().map((doctor, index) => (
                   <div key={doctor._id || index} className="bg-white border rounded-lg p-4 hover:shadow-md">
                     <h4 className="font-bold">{doctor.name || 'Unknown Doctor'}</h4>
                     <p className="text-gray-600">Specialization: {doctor.specialization?.join(', ') || 'N/A'}</p>
@@ -358,14 +393,14 @@ const PatientDashboard = () => {
                   </div>
                 ))
               ) : (
-                <p>No doctors available at this hospital.</p>
+                <p>No doctors found matching "{searchTerm}".</p>
               )}
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {state.hospitals.length > 0 ? (
-              state.hospitals.map((hospital, index) => (
+            {getFilteredHospitals().length > 0 ? (
+              getFilteredHospitals().map((hospital, index) => (
                 <div
                   key={hospital._id || index}
                   className="bg-white border rounded-lg p-4 cursor-pointer hover:shadow-md"
@@ -377,7 +412,7 @@ const PatientDashboard = () => {
                 </div>
               ))
             ) : (
-              <p>No hospitals found.</p>
+              <p>No hospitals found matching "{searchTerm}".</p>
             )}
           </div>
         )}
@@ -398,12 +433,14 @@ const PatientDashboard = () => {
           </button>
         </div>
 
+        {renderSearchIndicator()}
+
         {state.loading ? (
           <p>Loading appointments...</p>
         ) : (
           <div className="divide-y">
-            {state.appointments.length > 0 ? (
-              state.appointments.map(appointment => (
+            {getFilteredAppointments().length > 0 ? (
+              getFilteredAppointments().map(appointment => (
                 <div key={appointment.id} className="py-4">
                   <div className="flex justify-between mb-2">
                     <h3 className="font-medium">{appointment.doctor}</h3>
@@ -431,7 +468,9 @@ const PatientDashboard = () => {
                 </div>
               ))
             ) : (
-              <p className="py-4 text-gray-600">No appointments scheduled. Book your first appointment now!</p>
+              <p className="py-4 text-gray-600">
+                {searchTerm ? `No appointments found matching "${searchTerm}".` : 'No appointments scheduled. Book your first appointment now!'}
+              </p>
             )}
           </div>
         )}
@@ -465,6 +504,8 @@ const PatientDashboard = () => {
             )}
           </div>
         </div>
+
+        {renderSearchIndicator()}
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -511,8 +552,8 @@ const PatientDashboard = () => {
             <div className="divide-y">
               {state.loading ? (
                 <div className="p-4">Loading appointments...</div>
-              ) : state.appointments.length > 0 ? (
-                state.appointments.slice(0, 2).map(appointment => (
+              ) : getFilteredAppointments().length > 0 ? (
+                getFilteredAppointments().slice(0, 2).map(appointment => (
                   <div key={appointment.id} className="p-4 hover:bg-gray-50">
                     <div className="flex justify-between mb-2">
                       <h3 className="font-medium">{appointment.doctor}</h3>
@@ -534,13 +575,19 @@ const PatientDashboard = () => {
                 ))
               ) : (
                 <div className="p-4">
-                  <p>No upcoming appointments.</p>
-                  <button
-                    onClick={() => setActiveTab('hospitals')}
-                    className="mt-2 text-blue-600 text-sm hover:underline"
-                  >
-                    Book your first appointment
-                  </button>
+                  {searchTerm ? (
+                    <p>No appointments found matching "{searchTerm}".</p>
+                  ) : (
+                    <>
+                      <p>No upcoming appointments.</p>
+                      <button
+                        onClick={() => setActiveTab('hospitals')}
+                        className="mt-2 text-blue-600 text-sm hover:underline"
+                      >
+                        Book your first appointment
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -650,6 +697,24 @@ const PatientDashboard = () => {
     );
   };
 
+  const renderSearchIndicator = () => {
+    if (!searchTerm) return null;
+
+    return (
+      <div className="bg-blue-50 rounded-lg p-2 mb-4 flex items-center justify-between">
+        <span className="text-blue-700">
+          Showing results for: <strong>{searchTerm}</strong>
+        </span>
+        <button
+          onClick={() => setSearchTerm('')}
+          className="text-blue-600 hover:text-blue-800"
+        >
+          Clear
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Navigation */}
@@ -660,14 +725,25 @@ const PatientDashboard = () => {
             <span className="ml-2 text-xl font-bold text-blue-900">MediConnect</span>
           </div>
 
+          {/* Replace the existing search input with this */}
           <div className="hidden md:flex items-center flex-1 max-w-lg mx-8">
             <div className="relative w-full">
               <input
                 type="text"
                 className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Search..."
+                placeholder="Search doctors, hospitals, locations..."
+                value={searchTerm}
+                onChange={handleSearch}
               />
               <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              )}
             </div>
           </div>
 
