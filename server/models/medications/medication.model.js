@@ -17,5 +17,5 @@ const medicationSchema = mongoose.Schema({
         required: true,
     },
 });
-const medicaion = mongoose.model("medication", medicationSchema);
-module.exports = medicaion
+const medication = mongoose.model("medication", medicationSchema);
+module.exports = medication

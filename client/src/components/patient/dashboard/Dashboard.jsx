@@ -33,6 +33,13 @@ const PatientDashboard = () => {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [showMessageBox, setShowMessageBox] = useState(false);
+  const [messageDoctorId, setMessageDoctorId] = useState(null);
+  const [messageText, setMessageText] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [loadingMessages, setLoadingMessages] = useState(true);
+
+
 
   const [state, setState] = useState({
     hospitals: [],
@@ -217,6 +224,12 @@ const PatientDashboard = () => {
   const handleBookAppointment = (doctorId) => {
     navigate(`/patient/appointment/${doctorId}`);
   };
+  const handleMessageDoctor = (doctorId) => {
+    setMessageDoctorId(doctorId);
+    setShowMessageBox(true);
+  };
+
+
 
   useEffect(() => {
     if (user) {
@@ -242,6 +255,8 @@ const PatientDashboard = () => {
       return renderHospitalsContent();
     } else if (activeTab === 'review') {
       return renderReview();
+    } else if (activeTab === 'messages') {
+      return renderMessages();
     } else {
       return (
         <div className="bg-white rounded-lg shadow p-6">
@@ -251,6 +266,59 @@ const PatientDashboard = () => {
       );
     }
   };
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/messages/`);
+
+        setMessages(res.data);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      } finally {
+        setLoadingMessages(false);
+      }
+    };
+
+    if (user?._id) fetchMessages();
+  }, [user?._id]);
+
+  const renderMessages = () => {
+    return (
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold mb-4 text-blue-900">Your Messages</h2>
+
+        {loadingMessages ? (
+          <p>Loading messages...</p>
+        ) : messages.length === 0 ? (
+          <p className="text-gray-600">
+            No messages yet. You can message your doctor from the hospitals tab.
+          </p>
+        ) : (
+          <div className="space-y-4 max-h-[500px] overflow-y-auto">
+            {messages.map((msg, index) => (
+              <div
+                key={msg._id || index}
+                className={`p-4 border rounded-md ${msg.from === 'patient' ? 'bg-blue-50' : 'bg-green-50'}`}
+              >
+                <div className="flex justify-between items-center mb-1">
+                  <h4 className="font-semibold text-gray-800">
+                    {msg.from === 'patient' ? 'You' : `Dr. ${msg.doctorName || 'Doctor'}`}
+                  </h4>
+                  <span className="text-sm text-gray-500">
+                    {new Date(msg.timestamp).toLocaleString()}
+                  </span>
+                </div>
+                <p className="text-gray-700">{msg.message}</p>
+                <p className="text-gray-700">Reply : {msg.reply}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderReview = () => {
     const handleReviewChange = (e) => {
       const { name, value } = e.target;
@@ -384,12 +452,70 @@ const PatientDashboard = () => {
                     <h4 className="font-bold">{doctor.name || 'Unknown Doctor'}</h4>
                     <p className="text-gray-600">Specialization: {doctor.specialization?.join(', ') || 'N/A'}</p>
                     <p className="text-gray-600">Experience: {doctor.experience || 'N/A'} years</p>
-                    <button
-                      onClick={() => handleBookAppointment(doctor._id)}
-                      className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                    >
-                      Book Appointment
-                    </button>
+                    <div className="flex" style={{ display: 'flex', flexDirection: 'row', gap: '5%' }}>
+                      <button
+                        onClick={() => handleBookAppointment(doctor._id)}
+                        className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      >
+                        Book Appointment
+                      </button>
+                      <button
+                        onClick={() => setShowMessageBox(true)}
+                        className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      >
+                        Send Message
+                      </button>
+                    </div>
+                    {showMessageBox && (
+                      <div className="mt-6 p-4 border rounded-lg bg-gray-50">
+                        <h3 className="text-lg font-semibold text-blue-900 mb-2">Message Dr.{doctor.name}</h3>
+                        <textarea
+                          value={messageText}
+                          onChange={(e) => setMessageText(e.target.value)}
+                          placeholder="Write your questions here...."
+                          className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 resize-none"
+                          rows={4}
+                        />
+                        <div className="mt-2 flex gap-2">
+                          <button
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            onClick={async () => {
+                              try {
+                                await axios.post("http://localhost:5000/api/messages", {
+                                  doctorId: doctor._id,
+                                  patientId: user._id,
+                                  message: messageText,
+                                  doctorName: doctor.name,
+                                  patientName: user.name
+                                }, {
+                                  headers: {
+                                    'Content-Type': 'application/json'
+                                  }
+                                });
+
+
+                                toast.success("Message sent successfully!");
+                                setShowMessageBox(false);
+                                setMessageText('');
+                              } catch (error) {
+                                toast.error(`${error}`);
+                              }
+                            }}
+                          >
+                            Send Message
+                          </button>
+                          <button
+                            className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+                            onClick={() => {
+                              setShowMessageBox(false);
+                              setMessageText('');
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))
               ) : (
@@ -520,7 +646,9 @@ const PatientDashboard = () => {
             <ChevronRight className="h-5 w-5 text-gray-400" />
           </button>
 
-          <button className="flex items-center justify-between p-4 rounded-lg shadow-sm bg-green-50 hover:shadow-md transition-shadow">
+          <button
+            onClick={() => setActiveTab('messages')}
+            className="flex items-center justify-between p-4 rounded-lg shadow-sm bg-green-50 hover:shadow-md transition-shadow">
             <div className="flex items-center">
               <MessageSquare className="h-5 w-5 text-green-600" />
               <span className="ml-3 font-medium">Message Doctor</span>
