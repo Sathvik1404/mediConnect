@@ -13,7 +13,7 @@ router.post('/messages', async (req, res) => {
 });
 router.get('/messages', async (req, res) => {
     try {
-        const data = await Message.find({}, { _id: 0, __v: 0 });
+        const data = await Message.find({}, { __v: 0 });
         if (data) {
             res.status(200).json(data)
         } else {
@@ -24,13 +24,12 @@ router.get('/messages', async (req, res) => {
     }
 })
 
-router.put('/messages/:patientId', async (req, res) => {
+router.put('/messages/:id', async (req, res) => {
     try {
-        const { patientId } = req.params;
-        const { reply } = req.body
-        console.log(patientId);
-        const updated = await Message.findOneAndUpdate(
-            { patientId: patientId },
+        const { id } = req.params;
+        const { reply } = req.body;
+        const updated = await Message.findByIdAndUpdate(
+            id,
             { $set: { reply: reply || "You need to eat properly and take water" } },
             { new: true }
         );

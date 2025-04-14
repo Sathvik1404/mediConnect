@@ -21,6 +21,9 @@ const DoctorDashboard = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [appointments, setAppointments] = useState([]);
   const [patientsdata, setPatients] = useState([]);
+  const [doctorMessages, setDoctorMessages] = useState([]);
+  const [replyBoxVisible, setReplyBoxVisible] = useState(null);
+  const [replyText, setReplyText] = useState('');
   const { user, logout } = useAuth();
   useEffect(() => {
     const fetchPatients = async () => {
@@ -56,6 +59,18 @@ const DoctorDashboard = () => {
     fetchAppointments();
     fetchPatients();
   }, []);
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/messages`);
+        setDoctorMessages(res.data);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
+
+    fetchMessages();
+  }, [user._id]);
 
 
   const recentPatients = [
@@ -419,7 +434,6 @@ const DoctorDashboard = () => {
       </div>
     );
   };
-  console.log(patientsdata)
   const renderPatientsContent = () => {
     return (
       <div className="bg-white rounded-lg shadow p-6">
@@ -471,16 +485,89 @@ const DoctorDashboard = () => {
     );
   };
   const renderMessagesContent = () => {
-    return (<div className="bg-white rounded-lg shadow p-6 mb-6">
-      <h2 className="text-xl font-bold text-blue-900 mb-2">Patient Messages</h2>
-      <p className="text-gray-600 text-sm">
-        This section previews messages sent by patients to the doctor. You can view and respond to their queries.
-      </p>
-    </div>
+    const handleReplySubmit = async (messageId) => {
+      try {
+        await axios.put(`http://localhost:5000/api/messages/${messageId}`, {
+          reply: replyText
+        });
+        const res = await axios.get(`http://localhost:5000/api/messages`);
+        // const filteredMessages = res.filter(message => message.doctorId === user._id)
+        setDoctorMessages(res.data);
+        setReplyBoxVisible(null);
+        setReplyText('');
+      } catch (error) {
+        console.error("Error sending reply:", error);
+      }
+    };
 
-      // Your appointments content here
+    return (
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 className="text-xl font-bold text-blue-900 mb-4">Patient Messages</h2>
+        <p className="text-gray-600 text-sm mb-4">
+          This section previews messages sent by patients to the doctor. You can view and respond to their queries.
+        </p>
+
+        {doctorMessages.length === 0 ? (
+          <p className="text-gray-600">No messages received yet.</p>
+        ) : (
+          doctorMessages.map((msg, index) => (
+            <div key={msg._id || index} className="border p-4 mb-4 rounded-md bg-blue-50">
+              <div className="flex justify-between mb-2">
+                <h4 className="font-semibold text-blue-800">From: Patient {msg.patientName}</h4>
+                <span className="text-sm text-gray-500">{new Date(msg.timestamp).toLocaleString()}</span>
+              </div>
+              <p className="text-gray-700 mb-2">Message: {msg.message}</p>
+
+              {msg.reply ? (
+                <div className="mt-2 text-green-700 bg-green-50 border-l-4 border-green-500 p-2 rounded">
+                  <strong>Replied:</strong> {msg.reply}
+                </div>
+              ) : (
+                <>
+                  {replyBoxVisible === msg._id ? (
+                    <div className="mt-3">
+                      <textarea
+                        className="w-full p-2 border rounded-md mb-2"
+                        rows="3"
+                        placeholder="Type your reply..."
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleReplySubmit(msg._id)}
+                          className="bg-blue-600 text-white px-4 py-1 rounded-md hover:bg-blue-700"
+                        >
+                          Send Reply
+                        </button>
+                        <button
+                          onClick={() => {
+                            setReplyBoxVisible(null);
+                            setReplyText('');
+                          }}
+                          className="bg-gray-200 text-gray-700 px-4 py-1 rounded-md hover:bg-gray-300"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setReplyBoxVisible(msg._id)}
+                      className="mt-2 text-sm text-blue-600 hover:underline"
+                    >
+                      Reply
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          ))
+        )}
+      </div>
     );
   };
+
 
   // Helper function to generate calendar days
   const generateCalendarDays = () => {
