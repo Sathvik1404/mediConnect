@@ -38,6 +38,7 @@ const PatientDashboard = () => {
   const [messageText, setMessageText] = useState('');
   const [messages, setMessages] = useState([]);
   const [loadingMessages, setLoadingMessages] = useState(true);
+  const [isListening, setIsListening] = useState(false);
 
 
 
@@ -104,6 +105,32 @@ const PatientDashboard = () => {
       }));
     }
   }, [fetchData]);
+  const startListening = () => {
+    if (!('webkitSpeechRecognition' in window)) {
+      alert('Your browser does not support speech recognition.');
+      return;
+    }
+
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.continuous = false;
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+
+    recognition.onstart = () => setIsListening(true);
+
+    recognition.onresult = (event) => {
+      const speechResult = event.results[0][0].transcript;
+      setMessageText(speechResult)
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+    };
+
+    recognition.onend = () => setIsListening(false);
+
+    recognition.start();
+  };
 
   const fetchDoctors = useCallback(async (hospitalId) => {
     setState(prev => ({ ...prev, loading: true }));
@@ -472,11 +499,16 @@ const PatientDashboard = () => {
                         <textarea
                           value={messageText}
                           onChange={(e) => setMessageText(e.target.value)}
-                          placeholder="Write your questions here...."
+                          placeholder={isListening ? "Listening....." : "Write your questions here...."}
                           className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 resize-none"
                           rows={4}
                         />
                         <div className="mt-2 flex gap-2">
+                          <button
+                            onClick={startListening}
+                            className='px-3 py-1 bg-white-600 text-white rounded-md hover:bg-blue-600'>
+                            🎙️
+                          </button>
                           <button
                             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                             onClick={async () => {
