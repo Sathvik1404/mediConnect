@@ -15,6 +15,14 @@ const DoctorDashboard = () => {
     error: null
     // Add other properties you need for your doctor dashboard
   });
+  const [showMedicationModal, setShowMedicationModal] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [medicationDetails, setMedicationDetails] = useState({
+    name: '',
+    dosage: '',
+    frequency: '',
+    instructions: ''
+  });
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -31,10 +39,10 @@ const DoctorDashboard = () => {
         const response = await axios.get(`http://localhost:5000/api/patient/profile`);
         // Filter based on currentDoctorId
         // console.log(response.data)
-        // const filteredPatients = response.data.filter(
-        //   patient => patient.doctorId === user?._id
-        // );
-        setPatients(response.data);
+        const filteredPatients = response.data.filter(
+          patient => patient.doctors.includes(user?._id)
+        );
+        setPatients(filteredPatients);
       } catch (error) {
         console.error('Error fetching patients:', error);
       } finally {
@@ -95,6 +103,41 @@ const DoctorDashboard = () => {
       toast.warning('Unable to open medical record.');
     }
   }
+
+  const handlePrescribeMedication = (patientId, patientName) => {
+    // Set the selected patient and show the modal
+    setSelectedPatient({
+      id: patientId,
+      name: patientName
+    });
+    setShowMedicationModal(true);
+  };
+
+  const handleMedicationSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:5000/api/prescriptions', {
+        patientId: selectedPatient.id,
+        doctorId: user._id,
+        medication: medicationDetails.name,
+        dosage: medicationDetails.dosage,
+        frequency: medicationDetails.frequency,
+        instructions: medicationDetails.instructions,
+        datePrescribed: new Date()
+      });
+
+      // Close modal and reset form
+      setShowMedicationModal(false);
+      setSelectedPatient(null);
+      setMedicationDetails({ name: '', dosage: '', frequency: '', instructions: '' });
+
+      toast.success(`Medication prescribed to ${selectedPatient.name} successfully!`);
+    } catch (error) {
+      console.error('Failed to prescribe medication:', error);
+      toast.error('Failed to prescribe medication. Please try again.');
+    }
+  };
+
   const renderTabContent = () => {
     if (activeTab === 'overview') {
       return renderOverviewContent();
@@ -465,9 +508,20 @@ const DoctorDashboard = () => {
                     <p><strong>Phone:</strong> {patient.phone || "N/A"}</p>
                   </div>
 
-                  <button onClick={() => handleViewProfile(patient._id)} className="mt-4 w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">
-                    View Profile
-                  </button>
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => handleViewProfile(patient._id)}
+                      className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm flex items-center justify-center"
+                    >
+                      <FileText className="h-4 w-4 mr-1" /> View Profile
+                    </button>
+                    <button
+                      onClick={() => handlePrescribeMedication(patient._id, patient.name)}
+                      className="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm flex items-center justify-center"
+                    >
+                      <Clipboard className="h-4 w-4 mr-1" /> Prescribe
+                    </button>
+                  </div>
                 </div>
               ))
             ) : (
@@ -617,6 +671,127 @@ const DoctorDashboard = () => {
     newDate.setMonth(newDate.getMonth() + 1);
     setSelectedDate(newDate);
   }
+
+  // Add the medication modal
+  // Modify the MedicationModal function
+  const MedicationModal = () => {
+    if (!showMedicationModal) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold text-blue-900">
+              Prescribe Medication for {selectedPatient?.name}
+            </h3>
+            <button
+              onClick={() => setShowMedicationModal(false)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <form onSubmit={handleMedicationSubmit}>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Medication Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  className="w-full p-2 border rounded-md"
+                  value={medicationDetails.name}
+                  onChange={(e) => setMedicationDetails({
+                    ...medicationDetails,
+                    name: e.target.value
+                  })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Dosage
+                </label>
+                <input
+                  type="text"
+                  required
+                  className="w-full p-2 border rounded-md"
+                  placeholder="e.g., 10mg"
+                  value={medicationDetails.dosage}
+                  onChange={(e) => setMedicationDetails({
+                    ...medicationDetails,
+                    dosage: e.target.value
+                  })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Frequency
+                </label>
+                <select
+                  className="w-full p-2 border rounded-md"
+                  value={medicationDetails.frequency}
+                  onChange={(e) => setMedicationDetails({
+                    ...medicationDetails,
+                    frequency: e.target.value
+                  })}
+                  required
+                >
+                  <option value="">Select frequency</option>
+                  <option value="Once daily">Once daily</option>
+                  <option value="Twice daily">Twice daily</option>
+                  <option value="Three times daily">Three times daily</option>
+                  <option value="Four times daily">Four times daily</option>
+                  <option value="Every morning">Every morning</option>
+                  <option value="Every night">Every night</option>
+                  <option value="As needed">As needed</option>
+                  <option value="Weekly">Weekly</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Special Instructions
+                </label>
+                <textarea
+                  className="w-full p-2 border rounded-md"
+                  rows="3"
+                  placeholder="Any special instructions for the patient"
+                  value={medicationDetails.instructions}
+                  onChange={(e) => setMedicationDetails({
+                    ...medicationDetails,
+                    instructions: e.target.value
+                  })}
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMedicationModal(false);
+                  setMedicationDetails({ name: '', dosage: '', frequency: '', instructions: '' });
+                }}
+                className="px-4 py-2 border text-gray-700 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Prescribe Medication
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -958,10 +1133,11 @@ const DoctorDashboard = () => {
               {state.error}
             </div>
           )}
-
+          {/* Render the medication modal */}
           {renderTabContent()}
         </main>
       </div>
+      <MedicationModal />
     </div>
   );
 };
