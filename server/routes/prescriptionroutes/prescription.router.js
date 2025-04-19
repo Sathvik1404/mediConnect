@@ -18,8 +18,9 @@ router.post('/', async (req, res) => {
 })
 
 router.get('/patient/:id', async (req, res) => {
-    const { id } = req.params.id
-    const prescriptions = await prescriptionModel.find({ _id: id })
+    const { id } = req.params
+    // console.log(id)
+    const prescriptions = await prescriptionModel.find({ patientId: id })
     if (!prescriptions) {
         return res.status(404).json({ message: "Not found" })
     }

@@ -31,6 +31,7 @@ const PatientDashboard = () => {
     role: '',
     quote: ''
   });
+  const [prescriptions, setPrescriptions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [showMessageBox, setShowMessageBox] = useState(false);
@@ -93,6 +94,21 @@ const PatientDashboard = () => {
     }
   }, [handleError]);
 
+  const fetchPrescriptions = useCallback(async () => {
+    try {
+      setState(prev => ({ ...prev, loading: true }));
+      console.log(typeof user?._id)
+      const response = await axios.get(`http://localhost:5000/api/prescriptions/patient/${user?._id}`);
+
+      if (response.data) {
+        setPrescriptions(response.data);
+      }
+      setState(prev => ({ ...prev, loading: false }));
+    } catch (error) {
+      handleError(error, 'Error fetching prescriptions');
+    }
+  }, [user, handleError]);
+
   const fetchHospitals = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true }));
     const data = await fetchData('http://localhost:5000/api/hospitals', 'hospitals');
@@ -105,6 +121,7 @@ const PatientDashboard = () => {
       }));
     }
   }, [fetchData]);
+
   const startListening = () => {
     if (!('webkitSpeechRecognition' in window)) {
       alert('Your browser does not support speech recognition.');
@@ -192,6 +209,16 @@ const PatientDashboard = () => {
     );
   }, [state.appointments, searchTerm]);
 
+  const getFilteredPrescriptions = useCallback(() => {
+    if (!searchTerm.trim()) return prescriptions;
+
+    return prescriptions.filter(prescription =>
+      prescription.medicationName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prescription.doctorName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prescription.status.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [prescriptions, searchTerm]);
+
   const fetchAppointments = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true }));
     const data = await axios.get('http://localhost:5000/api/appointment')
@@ -256,14 +283,31 @@ const PatientDashboard = () => {
     setShowMessageBox(true);
   };
 
+  const requestRefill = async (prescriptionId) => {
+    try {
+      setState(prev => ({ ...prev, loading: true }));
+      await axios.post(`http://localhost:5000/api/prescriptions/refill-request`, {
+        prescriptionId,
+        patientId: user._id
+      });
 
+      toast.success("Refill request sent successfully!");
+      setState(prev => ({ ...prev, loading: false }));
+      // Refresh prescriptions to update UI
+      fetchPrescriptions();
+    } catch (error) {
+      toast.error("Failed to request refill");
+      handleError(error, 'Error requesting refill');
+    }
+  };
 
   useEffect(() => {
     if (user) {
       fetchHospitals();
       fetchAppointments();
+      fetchPrescriptions();
     }
-  }, [fetchHospitals, fetchAppointments, user]);
+  }, [fetchHospitals, fetchAppointments, fetchPrescriptions, user]);
 
   // Helper function to render trend icon
   const renderTrendIcon = (trend) => {
@@ -280,6 +324,8 @@ const PatientDashboard = () => {
       return renderAppointmentsContent();
     } else if (activeTab === 'hospitals') {
       return renderHospitalsContent();
+    } else if (activeTab === 'medications') {
+      return renderMedicationsContent();
     } else if (activeTab === 'review') {
       return renderReview();
     } else if (activeTab === 'messages') {
@@ -309,6 +355,69 @@ const PatientDashboard = () => {
 
     if (user?._id) fetchMessages();
   }, [user?._id]);
+
+  const renderMedicationsContent = () => {
+    return (
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold mb-4 text-blue-900">Your Prescriptions</h2>
+
+        {renderSearchIndicator()}
+
+        {state.loading ? (
+          <p>Loading prescriptions...</p>
+        ) : (
+          <div className="divide-y">
+            {prescriptions.length > 0 ? (
+              prescriptions.map(prescription => (
+                <div key={prescription._id} className="py-4">
+                  <div className="flex justify-between mb-2">
+                    <h3 className="font-medium">{prescription.medication}</h3>
+                    <span className={`text-sm px-2 py-1 rounded-full ${prescription.status === 'Active'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                      {prescription.status}
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm">Doctor: {prescription.doctorName}</p>
+                  <p className="text-gray-600 text-sm">Dosage: {prescription.dosage} - {prescription.frequency}</p>
+                  <p className="text-gray-600 text-sm">Instructions: {prescription.instructions}</p>
+                  <div className="flex items-center mt-2 text-sm text-gray-500">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    Prescribed: {new Date(prescription.prescribedDate).toLocaleDateString()}
+                    <Clock className="h-4 w-4 ml-3 mr-1" />
+                    Expires: {new Date(prescription.expiryDate).toLocaleDateString()}
+                  </div>
+                  <div className="mt-2 flex gap-2">
+                    {prescription.status === 'Active' && (
+                      <button
+                        onClick={() => requestRefill(prescription._id)}
+                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+                        disabled={prescription.refillRequestPending}
+                      >
+                        {prescription.refillRequestPending ? 'Refill Pending' : 'Request Refill'}
+                      </button>
+                    )}
+                    <button
+                      className="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded-md hover:bg-gray-300"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="py-4 text-gray-600">
+                {searchTerm
+                  ? `No prescriptions found matching "${searchTerm}".`
+                  : 'No active prescriptions found.'}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const renderMessages = () => {
     return (
@@ -791,22 +900,28 @@ const PatientDashboard = () => {
               </button>
             </div>
             <div className="divide-y">
-              {state.medications.map(medication => (
-                <div key={medication.id} className="p-4 hover:bg-gray-50">
-                  <div className="flex justify-between">
-                    <h3 className="font-medium">{medication.name}</h3>
-                    <span className={`text-sm ${medication.remaining < 10 ? 'text-red-600' : 'text-gray-500'
-                      }`}>
-                      {medication.remaining} days left
-                    </span>
+              {prescriptions.length > 0 ? (
+                prescriptions.slice(0, 3).map(prescription => (
+                  <div key={prescription._id} className="p-4 hover:bg-gray-50">
+                    <div className="flex justify-between">
+                      <h3 className="font-medium">{prescription.medication}</h3>
+                      <span className={`text-sm ${prescription.refillsRemaining < 2 ? 'text-red-600' : 'text-gray-500'}`}>
+                        {prescription.refillsRemaining} refills left
+                      </span>
+                    </div>
+                    <p className="text-gray-600 text-sm">{prescription.dosage} - {prescription.frequency}</p>
+                    <div className="mt-2 flex justify-between">
+                      <button className="text-sm text-blue-600 hover:underline">Instructions</button>
+                      <button className="text-sm text-blue-600 hover:underline"
+                        onClick={() => requestRefill(prescription._id)}>Request Refill</button>
+                    </div>
                   </div>
-                  <p className="text-gray-600 text-sm">{medication.dosage} - {medication.frequency}</p>
-                  <div className="mt-2 flex justify-between">
-                    <button className="text-sm text-blue-600 hover:underline">Instructions</button>
-                    <button className="text-sm text-blue-600 hover:underline">Request Refill</button>
-                  </div>
+                ))
+              ) : (
+                <div className="p-4 text-center text-gray-500">
+                  {state.loading ? "Loading prescriptions..." : "No active prescriptions found."}
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
