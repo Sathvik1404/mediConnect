@@ -36,8 +36,8 @@ router.get('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { name, mobile, email, address, patients } = req.body;
-    await hospitalModel.findOneAndUpdate({ _id: id }, { name, mobile, email, address, patients })
+    const { name, mobile, email, address, patients, doctors } = req.body;
+    await hospitalModel.findOneAndUpdate({ _id: id }, { name, mobile, email, address, patients, doctors })
         .then(hos => res.status(200).json({ message: "Success" }))
         .catch(err => res.status(500).json({ message: "Internal Server Error or No data" }))
 });
@@ -71,6 +71,13 @@ router.put('/:id/requests/:reqId', async (req, res) => {
     await requestModel.findOneAndUpdate({ _id: reqId }, { status })
         .then(hos => res.status(200).json({ message: "Success" }))
         .catch(err => res.status(500).json({ message: "Internal Server Error or No data" }))
+})
+
+router.delete('/requests/:reqId', async (req, res) => {
+    const { reqId } = req.params
+    await requestModel.findOneAndDelete({ _id: reqId })
+        .then(req => res.status(200).json({ message: "Success" }))
+        .catch(err => res.status(500).json({ message: "Couldn't delete the request" }))
 })
 
 module.exports = router;

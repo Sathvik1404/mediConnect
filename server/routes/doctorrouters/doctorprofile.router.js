@@ -42,20 +42,31 @@ router.get('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-    const { id } = req.params;
-    const { name, email, mobile, age, record, specialization, hospitals, patients, status } = req.body;
-    // console.log(hospitals)
-    // console.log(id);
+    try {
+        const { id } = req.params;
+        const { name, email, mobile, age, record, specialization, hospitals, patients, status } = req.body;
 
-    let iterator = hospitals.values();
+        // Update the doctor document
+        await doctorModel.findOneAndUpdate(
+            { _id: id },
+            { name, email, mobile, age, record, specialization, hospitals, patients, status }
+        );
 
-    await doctorModel.findOneAndUpdate({ _id: id }, { name, email, mobile, age, record, specialization, hospitals, patients, status })
-        .then(doc => res.status(200).json({ message: "Success" }))
-        .catch(err => res.status(500).json({ message: "Internal Server Error" }))
+        // Update each hospital by adding this doctor to their doctors array
+        if (hospitals && hospitals.length) {
+            for (let hospitalId of hospitals) {
+                await hospitalModel.findOneAndUpdate(
+                    { _id: hospitalId },
+                    { $addToSet: { doctors: id } } // Add the doctor ID without duplicating
+                );
+            }
+        }
 
-    for (let hospital of iterator) {
-        await hospitalModel.findOneAndUpdate({ _id: hospital }, { doctors: id });
+        res.status(200).json({ message: "Success" });
+    } catch (err) {
+        console.error("Error updating doctor:", err);
+        res.status(500).json({ message: "Internal Server Error" });
     }
-})
+});
 
 module.exports = router;
