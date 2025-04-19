@@ -15,14 +15,25 @@ const DoctorDashboard = () => {
     error: null
     // Add other properties you need for your doctor dashboard
   });
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [showMedicationModal, setShowMedicationModal] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
-  const [medicationDetails, setMedicationDetails] = useState({
+  const [medicationForm, setMedicationForm] = useState({
     name: '',
     dosage: '',
     frequency: '',
-    instructions: ''
+    instructions: '',
+    duration: '',  // Adding duration field
+    isLoading: false,
+    error: null
   });
+  const [medicationSuggestions, setMedicationSuggestions] = useState([
+    { name: 'Amoxicillin', dosage: '500mg', frequency: 'Three times daily', duration: '7 days' },
+    { name: 'Lisinopril', dosage: '10mg', frequency: 'Once daily', duration: '30 days' },
+    { name: 'Atorvastatin', dosage: '20mg', frequency: 'Every night', duration: '30 days' },
+    { name: 'Metformin', dosage: '500mg', frequency: 'Twice daily', duration: '30 days' },
+    { name: 'Ibuprofen', dosage: '400mg', frequency: 'Three times daily', duration: '5 days' }
+  ]);
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -92,17 +103,59 @@ const DoctorDashboard = () => {
     { id: 2, type: 'message', message: 'Sarah Johnson sent you a message', time: '1 hour ago' },
     { id: 3, type: 'lab', message: 'Lab results for Michael Chen are ready', time: '3 hours ago' },
   ];
-  const handleViewProfile = async (patientid) => {
+
+  const selectMedicationSuggestion = (suggestion) => {
+    setMedicationForm(prev => ({
+      ...prev,
+      name: suggestion.name,
+      dosage: suggestion.dosage,
+      frequency: suggestion.frequency,
+      duration: suggestion.duration,
+    }));
+  };
+
+  const fetchPatientPrescriptions = async (patientId) => {
     try {
-      console.log(patientid)
-      const response = await axios.get(`http://localhost:5000/api/patient/profile/downloadrecord/${patientid}`);
-      const fileUrl = response.data.fileUrl;
+      const response = await axios.get(`http://localhost:5000/api/prescriptions/patient/${patientId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching patient prescriptions:', error);
+      return [];
+    }
+  };
+
+  const handleViewProfile = async (patientId) => {
+    try {
+      // First get medical record
+      const recordResponse = await axios.get(`http://localhost:5000/api/patient/profile/downloadrecord/${patientId}`);
+      const fileUrl = recordResponse.data.fileUrl;
+
+      // Also fetch prescriptions for this patient
+      const prescriptions = await fetchPatientPrescriptions(patientId);
+
+      // Set selected patient with prescriptions
+      const patient = patientsdata.find(p => p._id === patientId);
+      setSelectedPatient({
+        id: patientId,
+        name: patient?.name || 'Patient',
+        prescriptions: prescriptions
+      });
+
+      // Open medical record in new tab
       window.open(fileUrl, '_blank');
     } catch (err) {
       console.error('Failed to fetch record:', err);
       toast.warning('Unable to open medical record.');
     }
-  }
+  };
+
+  const handleMedicationChange = (e) => {
+    const { name, value } = e.target;
+    setMedicationForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handlePrescribeMedication = (patientId, patientName) => {
     // Set the selected patient and show the modal
@@ -115,25 +168,47 @@ const DoctorDashboard = () => {
 
   const handleMedicationSubmit = async (e) => {
     e.preventDefault();
+    setShowConfirmation(true);
+  };
+
+  const confirmAndSubmitPrescription = async () => {
+    setMedicationForm(prev => ({ ...prev, isLoading: true, error: null }));
+
     try {
       await axios.post('http://localhost:5000/api/prescriptions', {
         patientId: selectedPatient.id,
         doctorId: user._id,
-        medication: medicationDetails.name,
-        dosage: medicationDetails.dosage,
-        frequency: medicationDetails.frequency,
-        instructions: medicationDetails.instructions,
+        medication: medicationForm.name,
+        dosage: medicationForm.dosage,
+        frequency: medicationForm.frequency,
+        duration: medicationForm.duration,
+        instructions: medicationForm.instructions,
         datePrescribed: new Date()
       });
 
-      // Close modal and reset form
+      // Reset all states
+      setMedicationForm({
+        name: '',
+        dosage: '',
+        frequency: '',
+        instructions: '',
+        duration: '',
+        isLoading: false,
+        error: null
+      });
+      setShowConfirmation(false);
       setShowMedicationModal(false);
       setSelectedPatient(null);
-      setMedicationDetails({ name: '', dosage: '', frequency: '', instructions: '' });
 
+      // Show success message
       toast.success(`Medication prescribed to ${selectedPatient.name} successfully!`);
     } catch (error) {
       console.error('Failed to prescribe medication:', error);
+      setMedicationForm(prev => ({
+        ...prev,
+        isLoading: false,
+        error: error.response?.data?.message || 'Failed to prescribe medication'
+      }));
       toast.error('Failed to prescribe medication. Please try again.');
     }
   };
@@ -692,6 +767,30 @@ const DoctorDashboard = () => {
             </button>
           </div>
 
+          {medicationForm.error && (
+            <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md">
+              {medicationForm.error}
+            </div>
+          )}
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Quick Select:
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {medicationSuggestions.map((suggestion, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => selectMedicationSuggestion(suggestion)}
+                  className="px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100"
+                >
+                  {suggestion.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <form onSubmit={handleMedicationSubmit}>
             <div className="space-y-4">
               <div>
@@ -700,31 +799,43 @@ const DoctorDashboard = () => {
                 </label>
                 <input
                   type="text"
+                  name="name"
                   required
                   className="w-full p-2 border rounded-md"
-                  value={medicationDetails.name}
-                  onChange={(e) => setMedicationDetails({
-                    ...medicationDetails,
-                    name: e.target.value
-                  })}
+                  value={medicationForm.name}
+                  onChange={handleMedicationChange}
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Dosage
-                </label>
-                <input
-                  type="text"
-                  required
-                  className="w-full p-2 border rounded-md"
-                  placeholder="e.g., 10mg"
-                  value={medicationDetails.dosage}
-                  onChange={(e) => setMedicationDetails({
-                    ...medicationDetails,
-                    dosage: e.target.value
-                  })}
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Dosage
+                  </label>
+                  <input
+                    type="text"
+                    name="dosage"
+                    required
+                    className="w-full p-2 border rounded-md"
+                    placeholder="e.g., 10mg"
+                    value={medicationForm.dosage}
+                    onChange={handleMedicationChange}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Duration
+                  </label>
+                  <input
+                    type="text"
+                    name="duration"
+                    className="w-full p-2 border rounded-md"
+                    placeholder="e.g., 7 days"
+                    value={medicationForm.duration}
+                    onChange={handleMedicationChange}
+                  />
+                </div>
               </div>
 
               <div>
@@ -732,12 +843,10 @@ const DoctorDashboard = () => {
                   Frequency
                 </label>
                 <select
+                  name="frequency"
                   className="w-full p-2 border rounded-md"
-                  value={medicationDetails.frequency}
-                  onChange={(e) => setMedicationDetails({
-                    ...medicationDetails,
-                    frequency: e.target.value
-                  })}
+                  value={medicationForm.frequency}
+                  onChange={handleMedicationChange}
                   required
                 >
                   <option value="">Select frequency</option>
@@ -757,14 +866,12 @@ const DoctorDashboard = () => {
                   Special Instructions
                 </label>
                 <textarea
+                  name="instructions"
                   className="w-full p-2 border rounded-md"
                   rows="3"
                   placeholder="Any special instructions for the patient"
-                  value={medicationDetails.instructions}
-                  onChange={(e) => setMedicationDetails({
-                    ...medicationDetails,
-                    instructions: e.target.value
-                  })}
+                  value={medicationForm.instructions}
+                  onChange={handleMedicationChange}
                 />
               </div>
             </div>
@@ -774,20 +881,77 @@ const DoctorDashboard = () => {
                 type="button"
                 onClick={() => {
                   setShowMedicationModal(false);
-                  setMedicationDetails({ name: '', dosage: '', frequency: '', instructions: '' });
+                  setMedicationForm({
+                    name: '',
+                    dosage: '',
+                    frequency: '',
+                    instructions: '',
+                    duration: '',
+                    isLoading: false,
+                    error: null
+                  });
                 }}
                 className="px-4 py-2 border text-gray-700 rounded-md hover:bg-gray-50"
+                disabled={medicationForm.isLoading}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center ${medicationForm.isLoading ? 'opacity-75 cursor-not-allowed' : ''
+                  }`}
+                disabled={medicationForm.isLoading}
               >
-                Prescribe Medication
+                {medicationForm.isLoading ? (
+                  <>
+                    <span className="mr-2">Processing...</span>
+                    {/* Add a spinner icon here if desired */}
+                  </>
+                ) : (
+                  'Prescribe Medication'
+                )}
               </button>
             </div>
           </form>
+          {showConfirmation && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60">
+              <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">
+                  Confirm Prescription
+                </h3>
+
+                <div className="bg-blue-50 p-4 rounded-md mb-4">
+                  <p><strong>Patient:</strong> {selectedPatient?.name}</p>
+                  <p><strong>Medication:</strong> {medicationForm.name} {medicationForm.dosage}</p>
+                  <p><strong>Frequency:</strong> {medicationForm.frequency}</p>
+                  {medicationForm.duration && <p><strong>Duration:</strong> {medicationForm.duration}</p>}
+                  {medicationForm.instructions && <p><strong>Instructions:</strong> {medicationForm.instructions}</p>}
+                </div>
+
+                <p className="text-gray-600 mb-4">
+                  Please confirm you want to prescribe this medication to the patient.
+                </p>
+
+                <div className="flex justify-end space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmation(false)}
+                    className="px-4 py-2 border text-gray-700 rounded-md hover:bg-gray-50"
+                  >
+                    Back to Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={confirmAndSubmitPrescription}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                    disabled={medicationForm.isLoading}
+                  >
+                    {medicationForm.isLoading ? 'Processing...' : 'Confirm & Submit'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
