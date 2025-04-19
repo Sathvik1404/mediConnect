@@ -42,11 +42,10 @@ router.put('/:id', async (req, res) => {
         .catch(err => res.status(500).json({ message: "Internal Server Error or No data" }))
 });
 
-router.post('/:id/apply', async (req, res) => {
-    const { id } = req.params;
-    const { doctorId, doctorName, specialization, experience } = req.body;
+router.post('/apply', async (req, res) => {
+    const { doctorId, hospitalId, coverLetter, availability, startDate, status, appliedAt } = req.body;
     try {
-        await requestModel.create({ hospitalId: id, doctorId, doctorName, specialization, experience })
+        await requestModel.create({ doctorId, hospitalId, coverLetter, availability, startDate, status, appliedAt })
             .then(user => res.json({ success: true }))
             .catch(err => res.json(err))
     } catch (err) {
@@ -57,6 +56,7 @@ router.post('/:id/apply', async (req, res) => {
 
 router.get('/:id/requests', async (req, res) => {
     const { id } = req.params;
+    console.log(id)
     const requests = await requestModel.find({ hospitalId: id });
     if (requests) {
         res.status(200).json(requests)

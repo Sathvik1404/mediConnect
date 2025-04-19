@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, FileText, Activity, User, Users, Bell, Settings, Clock, CheckCircle, X, ArrowRight, MessageSquare, Clipboard, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Mail, Phone, PlusCircle, Search, MoreVertical, FileText as FileTextIcon } from 'lucide-react';
+import { Calendar, FileText, Activity, User, Users, Bell, Settings, Clock, CheckCircle, X, ArrowRight, MessageSquare, Clipboard, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Mail, Phone, PlusCircle, Search, MoreVertical, FileText as FileTextIcon, Building, MapPin } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../../AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +14,16 @@ const DoctorDashboard = () => {
     loading: false,
     error: null
     // Add other properties you need for your doctor dashboard
+  });
+  const [hospitals, setHospitals] = useState([]);
+  const [showApplicationModal, setShowApplicationModal] = useState(false);
+  const [selectedHospital, setSelectedHospital] = useState(null);
+  const [applicationForm, setApplicationForm] = useState({
+    coverLetter: '',
+    availability: 'full-time',
+    startDate: '',
+    isLoading: false,
+    error: null
   });
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showMedicationModal, setShowMedicationModal] = useState(false);
@@ -91,6 +101,23 @@ const DoctorDashboard = () => {
     fetchMessages();
   }, [user._id]);
 
+  // Add this to your useEffect blocks or create a new one
+  useEffect(() => {
+    const fetchHospitals = async () => {
+      try {
+        // Replace with your actual API endpoint
+        const response = await axios.get('http://localhost:5000/api/hospitals');
+        setHospitals(response.data);
+      } catch (error) {
+        console.error('Error fetching hospitals:', error);
+      }
+    };
+
+    if (activeTab === 'hospitals') {
+      fetchHospitals();
+    }
+  }, [activeTab]);
+
 
   const recentPatients = [
     { id: 1, name: 'Sarah Johnson', lastVisit: '2 days ago', condition: 'Hypertension', avatar: 'SJ' },
@@ -122,6 +149,11 @@ const DoctorDashboard = () => {
       console.error('Error fetching patient prescriptions:', error);
       return [];
     }
+  };
+
+  const handleApplyToHospital = (hospital) => {
+    setSelectedHospital(hospital);
+    setShowApplicationModal(true);
   };
 
   const handleViewProfile = async (patientId) => {
@@ -171,6 +203,156 @@ const DoctorDashboard = () => {
     setShowConfirmation(true);
   };
 
+  const HospitalApplicationModal = () => {
+    if (!showApplicationModal) return null;
+
+    const handleApplicationChange = (e) => {
+      const { name, value } = e.target;
+      setApplicationForm(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    };
+
+    const handleApplicationSubmit = async (e) => {
+      e.preventDefault();
+      setApplicationForm(prev => ({ ...prev, isLoading: true, error: null }));
+
+      try {
+        await axios.post(`http://localhost:5000/api/hospitals/apply`, {
+          doctorId: user._id,
+          hospitalId: selectedHospital._id,
+          coverLetter: applicationForm.coverLetter,
+          availability: applicationForm.availability,
+          startDate: applicationForm.startDate,
+          status: 'pending', // Initial status
+          appliedAt: new Date()
+        });
+
+        // Reset form and close modal
+        setApplicationForm({
+          coverLetter: '',
+          availability: 'full-time',
+          startDate: '',
+          isLoading: false,
+          error: null
+        });
+        setShowApplicationModal(false);
+        setSelectedHospital(null);
+
+        // Show success message
+        toast.success(`Application submitted to ${selectedHospital.name} successfully!`);
+      } catch (error) {
+        console.error('Failed to submit application:', error);
+        setApplicationForm(prev => ({
+          ...prev,
+          isLoading: false,
+          error: error.response?.data?.message || 'Failed to submit application'
+        }));
+      }
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold text-blue-900">
+              Apply to {selectedHospital?.name}
+            </h3>
+            <button
+              onClick={() => setShowApplicationModal(false)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          {applicationForm.error && (
+            <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md">
+              {applicationForm.error}
+            </div>
+          )}
+
+          <form onSubmit={handleApplicationSubmit}>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Cover Letter/Introduction
+                </label>
+                <textarea
+                  name="coverLetter"
+                  required
+                  className="w-full p-2 border rounded-md"
+                  rows="5"
+                  placeholder="Briefly introduce yourself and explain why you'd like to join this hospital..."
+                  value={applicationForm.coverLetter}
+                  onChange={handleApplicationChange}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Availability
+                </label>
+                <select
+                  name="availability"
+                  className="w-full p-2 border rounded-md"
+                  value={applicationForm.availability}
+                  onChange={handleApplicationChange}
+                  required
+                >
+                  <option value="full-time">Full-time</option>
+                  <option value="part-time">Part-time</option>
+                  <option value="weekends-only">Weekends Only</option>
+                  <option value="evenings">Evenings</option>
+                  <option value="on-call">On-call</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Preferred Start Date
+                </label>
+                <input
+                  type="date"
+                  name="startDate"
+                  className="w-full p-2 border rounded-md"
+                  value={applicationForm.startDate}
+                  onChange={handleApplicationChange}
+                  required
+                />
+              </div>
+
+              <div className="bg-blue-50 p-3 rounded-md">
+                <p className="text-sm text-blue-700">
+                  Your professional information and credentials will be automatically shared with this hospital.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={() => setShowApplicationModal(false)}
+                className="px-4 py-2 border text-gray-700 rounded-md hover:bg-gray-50"
+                disabled={applicationForm.isLoading}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center ${applicationForm.isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
+                disabled={applicationForm.isLoading}
+              >
+                {applicationForm.isLoading ? 'Submitting...' : 'Submit Application'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
   const confirmAndSubmitPrescription = async () => {
     setMedicationForm(prev => ({ ...prev, isLoading: true, error: null }));
 
@@ -213,6 +395,73 @@ const DoctorDashboard = () => {
     }
   };
 
+  const renderHospitalsContent = () => {
+    return (
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-blue-900">Available Hospitals</h2>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search hospitals..."
+              className="pl-10 pr-4 py-2 border rounded-lg"
+            />
+            <Search className="h-4 w-4 text-gray-400 absolute left-3 top-3" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {hospitals.length > 0 ? (
+            hospitals.map((hospital) => (
+              <div key={hospital._id} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition duration-300">
+                <div className="h-40 bg-blue-100 flex items-center justify-center">
+                  {hospital.image ? (
+                    <img src={hospital.image} alt={hospital.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <Building className="h-16 w-16 text-blue-300" />
+                  )}
+                </div>
+
+                <div className="p-4">
+                  <h3 className="font-semibold text-lg text-gray-800">{hospital.name}</h3>
+                  <p className="text-gray-500 text-sm mb-2">{hospital.location}</p>
+
+                  <div className="flex items-center text-sm text-gray-600 mb-4">
+                    <Users className="h-4 w-4 mr-1" />
+                    <span>{hospital.doctorsCount || 'N/A'} doctors</span>
+                  </div>
+
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-start">
+                      <MapPin className="h-4 w-4 text-gray-400 mr-2 mt-1" />
+                      <p className="text-sm text-gray-600">{hospital.address || 'Address not available'}</p>
+                    </div>
+                    <div className="flex items-start">
+                      <Phone className="h-4 w-4 text-gray-400 mr-2 mt-1" />
+                      <p className="text-sm text-gray-600">{hospital.phone || 'Contact not available'}</p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleApplyToHospital(hospital)}
+                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center justify-center"
+                  >
+                    <PlusCircle className="h-4 w-4 mr-2" /> Apply to Join
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <Building className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-500">No hospitals found. Check back later.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const renderTabContent = () => {
     if (activeTab === 'overview') {
       return renderOverviewContent();
@@ -224,6 +473,8 @@ const DoctorDashboard = () => {
       return renderScheduleContent();
     } else if (activeTab === 'messages') {
       return renderMessagesContent();
+    } else if (activeTab === 'hospitals') {
+      return renderHospitalsContent();
     } else {
       // Default fallback for sections under development
       return (
@@ -975,6 +1226,7 @@ const DoctorDashboard = () => {
             <ul className="space-y-1">
               {[
                 { id: 'overview', label: 'Overview', icon: <Activity className="h-5 w-5" /> },
+                { id: 'hospitals', label: 'Hospitals', icon: <Building className="h-5 w-5" /> },
                 { id: 'appointments', label: 'Appointments', icon: <Calendar className="h-5 w-5" /> },
                 { id: 'patients', label: 'Patients', icon: <User className="h-5 w-5" /> },
                 { id: 'schedule', label: 'Schedule', icon: <Clock className="h-5 w-5" /> },
@@ -1302,6 +1554,7 @@ const DoctorDashboard = () => {
         </main>
       </div>
       <MedicationModal />
+      <HospitalApplicationModal />
     </div>
   );
 };

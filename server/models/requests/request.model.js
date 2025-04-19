@@ -9,19 +9,22 @@ const requestSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    doctorName: {
+    coverLetter: {
         type: String
     },
-    specialization: {
-        type: [String]
+    availability: {
+        type: String
     },
-    experience: {
-        type: Number
+    startDate: {
+        type: Date
     },
     status: {
         type: String,
         required: true,
         default: "Not Applied"
+    },
+    appliedAt: {
+        type: Date
     }
 });
 
