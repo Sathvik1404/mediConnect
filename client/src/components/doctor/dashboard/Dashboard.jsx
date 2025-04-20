@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, FileText, Activity, User, Users, Bell, Settings, Clock, CheckCircle, X, ArrowRight, MessageSquare, Clipboard, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Mail, Phone, PlusCircle, Search, MoreVertical, FileText as FileTextIcon, Building, MapPin } from 'lucide-react';
+import { Calendar, FileText, Activity, User, Users, Bell, Settings, Clock, CheckCircle, X, ArrowRight, MessageSquare, Clipboard, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Mail, Phone, PlusCircle, Search, MoreVertical, FileText as FileTextIcon, Building, MapPin, LogOut } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../../AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -488,14 +488,23 @@ const DoctorDashboard = () => {
 
   const renderOverviewContent = () => {
     return (
-      //<>Overview</>
       <main className="p-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-xl shadow p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-blue-900">Today's Summary</h2>
-                <p className="text-gray-500">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+                <div className="flex items-center space-x-4">
+                  <p className="text-gray-500">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+                  {/* Logout button */}
+                  <button
+                    onClick={logout}
+                    className="flex items-center text-gray-600 hover:text-red-600 transition-colors"
+                    title="Logout"
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -560,93 +569,22 @@ const DoctorDashboard = () => {
                 ))}
               </div>
             </div>
-
-            {/* <div className="bg-white rounded-xl shadow p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-blue-900">Patient Details</h2>
-                <div className="flex space-x-2">
-                  <button className="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50">Edit</button>
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">View Full Record</button>
-                </div>
-              </div>
-
-              <div className="flex flex-col md:flex-row">
-                <div className="md:w-1/3 mb-6 md:mb-0 flex flex-col items-center">
-                  <div className="h-24 w-24 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-2xl mb-4">
-                    SJ
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-800">Sarah Johnson</h3>
-                  <p className="text-gray-500">34 years, Female</p>
-
-                  <div className="mt-4 space-y-2 w-full max-w-xs">
-                    <div className="flex items-center text-gray-600">
-                      <Mail className="h-4 w-4 mr-2" />
-                      <span>sarah.j@example.com</span>
-                    </div>
-                    <div className="flex items-center text-gray-600">
-                      <Phone className="h-4 w-4 mr-2" />
-                      <span>+1 (555) 123-4567</span>
-                    </div>
-                  </div>
-
-                  <button className="mt-6 w-full max-w-xs px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50">
-                    Send Message
-                  </button>
-                </div>
-
-                <div className="md:w-2/3 md:pl-6 md:border-l">
-                  <div className="space-y-6">
-                    <div>
-                      <h4 className="font-medium text-gray-700 mb-2">Medical History</h4>
-                      <div className="space-y-2">
-                        {[
-                          { condition: 'Hypertension', since: '2018', status: 'Ongoing' },
-                          { condition: 'Migraine', since: '2015', status: 'Managed' }
-                        ].map((item, index) => (
-                          <div key={index} className="flex justify-between p-2 bg-gray-50 rounded">
-                            <span>{item.condition}</span>
-                            <span className="text-gray-500">Since {item.since} • {item.status}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="font-medium text-gray-700 mb-2">Current Medications</h4>
-                      <div className="space-y-2">
-                        {[
-                          { name: 'Lisinopril', dosage: '10mg', frequency: 'Once daily' },
-                          { name: 'Sumatriptan', dosage: '50mg', frequency: 'As needed' }
-                        ].map((item, index) => (
-                          <div key={index} className="flex justify-between p-2 bg-gray-50 rounded">
-                            <span>{item.name} {item.dosage}</span>
-                            <span className="text-gray-500">{item.frequency}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="font-medium text-gray-700 mb-2">Recent Visits</h4>
-                      <div className="space-y-2">
-                        {[
-                          { date: 'Mar 15, 2025', reason: 'Blood pressure check', doctor: 'Dr. Smith' },
-                          { date: 'Feb 02, 2025', reason: 'Migraine follow-up', doctor: 'Dr. Smith' }
-                        ].map((item, index) => (
-                          <div key={index} className="flex justify-between p-2 bg-gray-50 rounded">
-                            <span>{item.date}</span>
-                            <span className="text-gray-500">{item.reason}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> */}
           </div>
 
           <div className="space-y-6">
+            {/* Dedicated Logout Section */}
+            <div className="bg-white rounded-xl shadow p-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-medium text-gray-800">Account Options</h2>
+                <button
+                  onClick={logout}
+                  className="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </button>
+              </div>
+            </div>
             <div className="bg-white rounded-xl shadow p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-blue-900">Calendar</h2>
@@ -684,7 +622,7 @@ const DoctorDashboard = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow p-6">
+            {/* <div className="bg-white rounded-xl shadow p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-blue-900">Recent Patients</h2>
                 <button className="text-blue-600 font-medium flex items-center">
@@ -736,13 +674,12 @@ const DoctorDashboard = () => {
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
+
           </div>
         </div>
       </main>
-      // Your overview content here
-      // Copy structure from patient dashboard and modify as needed
-    )
+    );
   };
 
   const renderAppointmentsContent = () => {

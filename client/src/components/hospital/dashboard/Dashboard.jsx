@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Search, Plus, Bell, Settings, User, Loader, AlertCircle, Check, X,
   Filter, Download, MoreHorizontal, RefreshCcw, Calendar, Clipboard,
@@ -58,6 +59,8 @@ const Dashboard = () => {
 
   const auth = useAuth();
   const userId = auth.user?._id;
+  const { logout } = auth;
+  const navigate = useNavigate();
 
   // Fetch data on component mount
   useEffect(() => {
@@ -96,6 +99,26 @@ const Dashboard = () => {
         pendingRequests: requests.length,
         departments: Array.from(new Set(staff.map(member => member.specialization || member.role))).filter(Boolean)
       });
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      setLoading(prev => ({ ...prev, action: true }));
+
+      // Call logout function from auth context
+      await auth.logout();
+
+      // Show success message
+      showAlert('success', 'Logged out successfully');
+
+      // Redirect to login page or home page
+      navigate('/hospital/hlogin');
+    } catch (err) {
+      showAlert('error', `Logout failed: ${err.message}`);
+      console.error('Logout error:', err);
+    } finally {
+      setLoading(prev => ({ ...prev, action: false }));
     }
   };
 
@@ -833,6 +856,13 @@ const Dashboard = () => {
               <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center cursor-pointer hover:bg-indigo-200 transition-colors">
                 <User className="h-5 w-5 text-indigo-600" />
               </div>
+              <button
+                onClick={handleLogout}
+                className="px-3 py-1 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium"
+                title="Logout"
+              >
+                Logout
+              </button>
             </div>
           </div>
         </div>
