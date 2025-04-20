@@ -144,7 +144,7 @@ const Dashboard = () => {
           if (status !== 'reject') {
             var response = await apiClient.put(`/doctor/profile/${doctorId}`, {
               status,
-              hospitals: [...new Set([...doctor.data.hospitals, userId])],
+              hospitals: userId,
             });
           }
 
@@ -278,7 +278,7 @@ const Dashboard = () => {
           });
 
           await apiClient.put(`/doctor/profile/${member._id}`, {
-            hospitals: doctor.data.hospitals.filter(hospitalId => hospitalId !== userId),
+            hospitals: '',
           });
 
           // Update staff list

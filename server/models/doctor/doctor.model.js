@@ -32,7 +32,7 @@ const DoctorSchema = mongoose.Schema({
         required: true
     },
     hospitals: {
-        type: [String]
+        type: String
     },
     patients: {
         type: [String]

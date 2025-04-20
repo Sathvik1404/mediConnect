@@ -520,13 +520,13 @@ const DoctorDashboard = () => {
             <div className="bg-white rounded-xl shadow p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-blue-900">Upcoming Appointments</h2>
-                <button className="text-blue-600 font-medium flex items-center">
+                <button className="text-blue-600 font-medium flex items-center" onClick={() => setActiveTab('appointments')}>
                   View All <ArrowRight className="h-4 w-4 ml-1" />
                 </button>
               </div>
 
               <div className="space-y-4">
-                {appointments.map(appointment => (
+                {appointments.slice(0, 5).map(appointment => (
                   <div key={appointment.id} className="p-4 border rounded-lg flex items-center justify-between">
                     <div className="flex items-center">
                       <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
@@ -561,7 +561,7 @@ const DoctorDashboard = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow p-6">
+            {/* <div className="bg-white rounded-xl shadow p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-blue-900">Patient Details</h2>
                 <div className="flex space-x-2">
@@ -643,7 +643,7 @@ const DoctorDashboard = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div className="space-y-6">
@@ -746,6 +746,54 @@ const DoctorDashboard = () => {
   };
 
   const renderAppointmentsContent = () => {
+    const updateAppointmentStatus = async (appointmentId, newStatus) => {
+      try {
+        // Update status in your database/API
+        // console.log(appointmentId)
+        await fetch(`http://localhost:5000/api/appointment/${appointmentId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            status: newStatus
+          }),
+        });
+
+        if (newStatus === 'Completed') {
+          const appointment = appointments.find(appointmentId)
+          const patient = await axios.get(`http://localhost:5000/api/patient/profile/${appointment.patientId}`)
+          await axios.put(`http://localhost:5000/api/patient/profile/${appointment.patientId}`, {
+            doctors: [...new Set([...patient.data.doctors, appointment.doctorId])],
+          }
+          )
+          const doctor = await axios.get(`http://localhost:5000/api/doctor/profile/${appointment.doctorId}`)
+          await axios.put(`http://localhost:5000/api/doctor/profile/${appointment.doctorId}`, {
+            patients: [...new Set([...doctor.data.patients, appointment.patientId])],
+          }
+          )
+          const hospital = await axios.get(`http://localhost:5000/api/hospitals/${doctor.hospitalId}`)
+          await axios.put(`http://localhost:5000/api/doctor/profile/${doctor.hospitalId}`, {
+            doctors: [...new Set([...hospital.data.patients, appointment.patientId])],
+          }
+          )
+        }
+
+        // Update local state to reflect changes immediately
+        const updatedAppointments = appointments.map(appointment =>
+          appointment._id === appointmentId
+            ? { ...appointment, status: newStatus }
+            : appointment
+        );
+
+        // Assuming you have a setAppointments function
+        setAppointments(updatedAppointments);
+      } catch (error) {
+        console.error('Failed to update appointment status:', error);
+        // Handle error - show notification or message to user
+      }
+    };
+
     return (
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-4">
@@ -764,37 +812,67 @@ const DoctorDashboard = () => {
         ) : (
           <div className="divide-y">
             {appointments.length > 0 ? (
-              appointments.map(appointment => (
-                <div key={appointment.id} className="py-4">
-                  <div className="flex justify-between mb-2">
-                    <h3 className="font-medium">{appointment.patientName || 'Unknown Patient'}</h3>
-                    <span className={`text-sm px-2 py-1 rounded-full ${appointment.status === 'Confirmed'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                      {appointment.status}
-                    </span>
+              [...appointments]
+                .sort((a, b) => {
+                  const dateTimeA = new Date(`${a.date} ${a.time}`)
+                  const dateTimeB = new Date(`${b.date} ${b.time}`)
+                  return dateTimeA - dateTimeB
+                })
+                .map(appointment => (
+                  <div key={appointment.id} className="py-4">
+                    <div className="flex justify-between mb-2">
+                      <h3 className="font-medium">{appointment.patientName || 'Unknown Patient'}</h3>
+                      <span className={`text-sm px-2 py-1 rounded-full ${appointment.status === 'Confirmed'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                        {appointment.status}
+                      </span>
+                    </div>
+
+                    <p className="text-gray-600 text-sm">
+                      Reason: {appointment.reasonForVisit || 'N/A'}
+                    </p>
+
+                    <div className="flex items-center mt-2 text-sm text-gray-500">
+                      <Calendar className="h-4 w-4 mr-1" />
+                      {appointment.date}
+                      <Clock className="h-4 w-4 ml-3 mr-1" />
+                      {appointment.time}
+                    </div>
+
+                    <div className="mt-2 text-sm text-gray-600">
+                      Email: {appointment.patientEmail}
+                    </div>
+
+                    <div className="mt-3 flex space-x-2">
+                      <button
+                        onClick={() => updateAppointmentStatus(appointment._id, 'Completed')}
+                        className={`px-3 py-1 text-xs rounded ${appointment.status === 'Completed'
+                          ? 'bg-green-200 text-green-800 cursor-default'
+                          : 'bg-green-100 text-green-700 hover:bg-green-200'
+                          }`}
+                        disabled={appointment.status === 'Completed'}
+                      >
+                        {appointment.status === 'Completed' ? 'Completed' : 'Mark Completed'}
+                      </button>
+
+                      <button
+                        onClick={() => updateAppointmentStatus(appointment._id, 'Rejected')}
+                        className={`px-3 py-1 text-xs rounded ${appointment.status === 'Rejected'
+                          ? 'bg-red-200 text-red-800 cursor-default'
+                          : 'bg-red-100 text-red-700 hover:bg-red-200'
+                          }`}
+                        disabled={appointment.status === 'Rejected'}
+                      >
+                        {appointment.status === 'Rejected' ? 'Rejected' : 'Reject'}
+                      </button>
+                    </div>
+
+                    {/* Optional feature: reschedule/cancel */}
+                    {/* <button className="mt-2 text-blue-600 hover:underline text-sm">Reschedule</button> */}
                   </div>
-
-                  <p className="text-gray-600 text-sm">
-                    Reason: {appointment.reasonForVisit || 'N/A'}
-                  </p>
-
-                  <div className="flex items-center mt-2 text-sm text-gray-500">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    {appointment.date}
-                    <Clock className="h-4 w-4 ml-3 mr-1" />
-                    {appointment.time}
-                  </div>
-
-                  <div className="mt-2 text-sm text-gray-600">
-                    Email: {appointment.patientEmail}
-                  </div>
-
-                  {/* Optional feature: reschedule/cancel */}
-                  {/* <button className="mt-2 text-blue-600 hover:underline text-sm">Reschedule</button> */}
-                </div>
-              ))
+                ))
             ) : (
               <p className="py-4 text-gray-600">No appointments scheduled yet.</p>
             )}
@@ -803,6 +881,7 @@ const DoctorDashboard = () => {
       </div>
     );
   };
+
   const renderPatientsContent = () => {
     return (
       <div className="bg-white rounded-lg shadow p-6">

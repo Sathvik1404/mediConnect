@@ -44,7 +44,7 @@ const AppointmentBooking = () => {
         phone: '',
         doctorId: '',
         doctorName: '',
-        hospitalName: '',
+        hospitalId: '',
         reasonForVisit: '',
         isNewPatient: false,
         insuranceProvider: '',
@@ -92,6 +92,7 @@ const AppointmentBooking = () => {
                     phone: userData.mobile || '',
                     doctorId: doctorData._id,
                     doctorName: doctorData.name,
+                    hospitalId: doctorData.hospitalId || ''
                 }));
 
                 // Generate sample time slots for the selected date
@@ -524,6 +525,9 @@ const AppointmentBooking = () => {
                                 <h4 className="text-sm font-medium uppercase text-gray-500 mb-2">Visit Information</h4>
                                 <div className="bg-gray-50 p-4 rounded-lg">
                                     <p className="font-medium">Reason: {formData.reasonForVisit || 'Not specified'}</p>
+                                    {doctor && doctor.hospitalName && (
+                                        <p className="text-gray-600">Hospital: {doctor.hospitalName}</p>
+                                    )}
                                     {formData.insuranceProvider && (
                                         <p className="text-gray-600">Insurance: {formData.insuranceProvider}</p>
                                     )}
