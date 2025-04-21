@@ -65,8 +65,8 @@ router.get('/:id/requests', async (req, res) => {
     }
 });
 
-router.put('/:id/requests/:reqId', async (req, res) => {
-    const { id, reqId } = req.params;
+router.put('/requests/:reqId', async (req, res) => {
+    const { reqId } = req.params;
     const { status } = req.body;
     await requestModel.findOneAndUpdate({ _id: reqId }, { status })
         .then(hos => res.status(200).json({ message: "Success" }))

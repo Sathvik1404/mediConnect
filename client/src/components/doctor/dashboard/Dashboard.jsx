@@ -226,7 +226,10 @@ const DoctorDashboard = () => {
           availability: applicationForm.availability,
           startDate: applicationForm.startDate,
           status: 'pending', // Initial status
-          appliedAt: new Date()
+          appliedAt: new Date(),
+          // doctorName: user.name,
+          // specialization: user.specialization,
+          // email: user.email
         });
 
         // Reset form and close modal
@@ -698,7 +701,7 @@ const DoctorDashboard = () => {
         });
 
         if (newStatus === 'Completed') {
-          const appointment = appointments.find(appointmentId)
+          const appointment = appointments.find(appointment => appointment._id === appointmentId)
           const patient = await axios.get(`http://localhost:5000/api/patient/profile/${appointment.patientId}`)
           await axios.put(`http://localhost:5000/api/patient/profile/${appointment.patientId}`, {
             doctors: [...new Set([...patient.data.doctors, appointment.doctorId])],
@@ -709,9 +712,9 @@ const DoctorDashboard = () => {
             patients: [...new Set([...doctor.data.patients, appointment.patientId])],
           }
           )
-          const hospital = await axios.get(`http://localhost:5000/api/hospitals/${doctor.hospitalId}`)
-          await axios.put(`http://localhost:5000/api/doctor/profile/${doctor.hospitalId}`, {
-            doctors: [...new Set([...hospital.data.patients, appointment.patientId])],
+          const hospital = await axios.get(`http://localhost:5000/api/hospitals/${doctor.data.hospitals}`)
+          await axios.put(`http://localhost:5000/api/hospitals/${doctor.data.hospitals}`, {
+            patients: [...new Set([...hospital.data.patients, appointment.patientId])],
           }
           )
         }
