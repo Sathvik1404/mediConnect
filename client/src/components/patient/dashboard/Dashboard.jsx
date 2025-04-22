@@ -595,14 +595,20 @@ const PatientDashboard = () => {
                       >
                         Book Appointment
                       </button>
-                      <button
-                        onClick={() => setShowMessageBox(true)}
-                        className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                      >
-                        Send Message
-                      </button>
+
+                      {/* Only show message button if doctor ID exists in patient's data */}
+                      {user.doctors && user.doctors.includes(doctor._id) && (
+                        <button
+                          onClick={() => setShowMessageBox(true)}
+                          className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        >
+                          Send Message
+                        </button>
+                      )}
                     </div>
-                    {showMessageBox && (
+
+                    {/* Message box should only appear if the condition is true and showMessageBox is true */}
+                    {showMessageBox && user.doctors && user.doctors.includes(doctor._id) && (
                       <div className="mt-6 p-4 border rounded-lg bg-gray-50">
                         <h3 className="text-lg font-semibold text-blue-900 mb-2">Message Dr.{doctor.name}</h3>
                         <textarea
@@ -634,14 +640,12 @@ const PatientDashboard = () => {
                                   }
                                 });
 
-
                                 toast.success("Message sent successfully!");
                                 setShowMessageBox(false);
                                 setMessageText('');
                                 const fetchMessages = async () => {
                                   try {
                                     const res = await axios.get(`http://localhost:5000/api/messages/`);
-
                                     setMessages(res.data);
                                   } catch (error) {
                                     console.error("Error fetching messages:", error);
