@@ -344,8 +344,10 @@ const PatientDashboard = () => {
     const fetchMessages = async () => {
       try {
         const res = await axios.get(`http://localhost:5000/api/messages/`);
-
-        setMessages(res.data);
+        const filteredMessages = res.data.filter(
+          message => message.patientId?.toString() === user._id?.toString()
+        );
+        setMessages(filteredMessages);
       } catch (error) {
         console.error("Error fetching messages:", error);
       } finally {
@@ -646,7 +648,11 @@ const PatientDashboard = () => {
                                 const fetchMessages = async () => {
                                   try {
                                     const res = await axios.get(`http://localhost:5000/api/messages/`);
-                                    setMessages(res.data);
+                                    const filteredMessages = res.data.filter(
+                                      message => message.patientId?.toString() === user._id?.toString()
+                                    );
+                                    setMessages(filteredMessages);
+
                                   } catch (error) {
                                     console.error("Error fetching messages:", error);
                                   } finally {

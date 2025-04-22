@@ -96,7 +96,11 @@ const DoctorDashboard = () => {
     const fetchMessages = async () => {
       try {
         const res = await axios.get(`http://localhost:5000/api/messages`);
-        setDoctorMessages(res.data);
+        const filteredMessages = res.data.filter(
+          message => message.doctorId?.toString() === user._id?.toString()
+        );
+        setDoctorMessages(filteredMessages);
+        console.log(filteredMessages)
       } catch (error) {
         console.error("Error fetching messages:", error);
       }
@@ -988,8 +992,10 @@ const DoctorDashboard = () => {
           reply: replyText
         });
         const res = await axios.get(`http://localhost:5000/api/messages`);
-        // const filteredMessages = res.filter(message => message.doctorId === user._id)
-        setDoctorMessages(res.data);
+        const filteredMessages = res.data.filter(
+          message => message.doctorId?.toString() === user._id?.toString()
+        );
+        setDoctorMessages(filteredMessages);
         setReplyBoxVisible(null);
         setReplyText('');
       } catch (error) {
