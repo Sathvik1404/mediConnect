@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, FileText, Activity, User, Users, Bell, Settings, Clock, CheckCircle, X, ArrowRight, MessageSquare, Clipboard, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Mail, Phone, PlusCircle, Search, MoreVertical, FileText as FileTextIcon, Building, MapPin, LogOut } from 'lucide-react';
+import { Calendar, FileText, Activity, User, Users, Bell, Settings, Clock, CheckCircle, X, ArrowRight, MessageSquare, Clipboard, List, Loader, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Mail, Phone, PlusCircle, Search, MoreVertical, FileText as FileTextIcon, Building, MapPin, LogOut } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../../AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -37,6 +37,10 @@ const DoctorDashboard = () => {
     isLoading: false,
     error: null
   });
+  const [showPrescriptionsModal, setShowPrescriptionsModal] = useState(false);
+  // const [selectedPatient, setSelectedPatient] = useState(null);
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [medicationSuggestions, setMedicationSuggestions] = useState([
     { name: 'Amoxicillin', dosage: '500mg', frequency: 'Three times daily', duration: '7 days' },
     { name: 'Lisinopril', dosage: '10mg', frequency: 'Once daily', duration: '30 days' },
@@ -854,12 +858,18 @@ const DoctorDashboard = () => {
                     <p><strong>Phone:</strong> {patient.phone || "N/A"}</p>
                   </div>
 
-                  <div className="mt-4 grid grid-cols-2 gap-2">
+                  <div className="mt-4 grid grid-cols-3 gap-2">
                     <button
                       onClick={() => handleViewProfile(patient._id)}
                       className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm flex items-center justify-center"
                     >
                       <FileText className="h-4 w-4 mr-1" /> View Profile
+                    </button>
+                    <button
+                      onClick={() => handleViewPrescriptions(patient._id, patient.name)}
+                      className="px-3 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm flex items-center justify-center"
+                    >
+                      <List className="h-4 w-4 mr-1" /> View Prescriptions
                     </button>
                     <button
                       onClick={() => handlePrescribeMedication(patient._id, patient.name)}
@@ -873,10 +883,97 @@ const DoctorDashboard = () => {
             ) : (
               <p className="text-gray-600 col-span-full">No patients found.</p>
             )}
+            {/* Prescriptions Modal */}
+            {showPrescriptionsModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-gray-800">
+                      Prescriptions for {selectedPatient?.name}
+                    </h2>
+                    <button
+                      onClick={() => setShowPrescriptionsModal(false)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <X className="h-6 w-6" />
+                    </button>
+                  </div>
+
+                  {loading ? (
+                    <div className="py-8 flex justify-center">
+                      <Loader className="h-8 w-8 text-blue-600 animate-spin" />
+                    </div>
+                  ) : prescriptions && prescriptions.length > 0 ? (
+                    <div className="space-y-4">
+                      {prescriptions.map((prescription) => (
+                        <div key={prescription._id} className="border rounded-lg p-4 hover:bg-gray-50">
+                          <div className="flex justify-between">
+                            <h3 className="font-medium text-gray-800">{prescription.medication}</h3>
+                            <p className="text-sm text-gray-500">
+                              {new Date(prescription.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                            <p><strong>Dosage:</strong> {prescription.dosage}</p>
+                            <p><strong>Frequency:</strong> {prescription.frequency}</p>
+                            <p><strong>Duration:</strong> {prescription.duration}</p>
+                            <p><strong>Status:</strong> <span className={`font-medium ${prescription.status === 'active' ? 'text-green-600' : 'text-red-600'
+                              }`}>{prescription.status}</span></p>
+                          </div>
+                          {prescription.notes && (
+                            <div className="mt-2">
+                              <p><strong>Notes:</strong></p>
+                              <p className="text-sm text-gray-600">{prescription.notes}</p>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="py-8 text-center text-gray-600">
+                      No prescriptions found for this patient.
+                    </div>
+                  )}
+
+                  <div className="mt-6 flex justify-end">
+                    <button
+                      onClick={() => handlePrescribeMedication(selectedPatient.id, selectedPatient.name)}
+                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center"
+                    >
+                      <PlusCircle className="h-4 w-4 mr-1" />
+                      Create New Prescription
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
     );
+  };
+
+  const handleViewPrescriptions = (patientId, patientName) => {
+    // You can either open a modal to display prescriptions
+    setSelectedPatient({ id: patientId, name: patientName });
+    setShowPrescriptionsModal(true);
+
+    // Fetch prescriptions for this patient written by the current doctor
+    const fetchPrescriptions = async () => {
+      try {
+        setLoading(true);
+        const doctorId = user._id; // assuming you have the current user (doctor) data
+        const response = await axios.get(`http://localhost:5000/api/prescriptions/doctor/${doctorId}/patient/${patientId}`);
+        setPrescriptions(response.data);
+      } catch (error) {
+        console.error("Error fetching prescriptions:", error);
+        toast.error("Failed to load prescriptions");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPrescriptions();
   };
 
   const renderScheduleContent = () => {

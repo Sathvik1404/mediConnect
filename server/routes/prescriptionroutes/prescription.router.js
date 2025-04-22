@@ -26,5 +26,14 @@ router.get('/patient/:id', async (req, res) => {
     }
     return res.status(200).json(prescriptions)
 })
+router.get('/doctor/:docId/patient/:id', async (req, res) => {
+    const { id, docId } = req.params
+    // console.log(id)
+    const prescriptions = await prescriptionModel.find({ patientId: id, doctorId: docId })
+    if (!prescriptions) {
+        return res.status(404).json({ message: "Not found" })
+    }
+    return res.status(200).json(prescriptions)
+})
 
 module.exports = router
