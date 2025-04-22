@@ -19,12 +19,12 @@ const DoctorDashboard = () => {
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [applicationForm, setApplicationForm] = useState({
-    coverLetter: '',
     availability: 'full-time',
     startDate: '',
     isLoading: false,
     error: null
   });
+  let [coverLetter, setCoverLetter] = useState('')
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showMedicationModal, setShowMedicationModal] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -288,8 +288,8 @@ const DoctorDashboard = () => {
                   className="w-full p-2 border rounded-md"
                   rows="5"
                   placeholder="Briefly introduce yourself and explain why you'd like to join this hospital..."
-                  value={applicationForm.coverLetter}
-                  onChange={handleApplicationChange}
+                  value={coverLetter}
+                  onChange={(e) => setCoverLetter(e.target.value)}
                 />
               </div>
 
@@ -513,8 +513,8 @@ const DoctorDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
                   { label: 'Appointments', value: appointments.length, icon: <Calendar className="h-6 w-6 text-blue-600" />, color: 'bg-blue-50' },
-                  { label: 'Pending Reports', value: '3', icon: <FileText className="h-6 w-6 text-amber-600" />, color: 'bg-amber-50' },
-                  { label: 'Messages', value: '12', icon: <MessageSquare className="h-6 w-6 text-green-600" />, color: 'bg-green-50' }
+                  // { label: 'Pending Reports', value: '3', icon: <FileText className="h-6 w-6 text-amber-600" />, color: 'bg-amber-50' },
+                  { label: 'Messages', value: doctorMessages.length, icon: <MessageSquare className="h-6 w-6 text-green-600" />, color: 'bg-green-50' }
                 ].map((item, index) => (
                   <div key={index} className="flex items-center p-4 rounded-lg border">
                     <div className={`h-12 w-12 rounded-full ${item.color} flex items-center justify-center mr-4`}>
@@ -1248,7 +1248,7 @@ const DoctorDashboard = () => {
                 { id: 'hospitals', label: 'Hospitals', icon: <Building className="h-5 w-5" /> },
                 { id: 'appointments', label: 'Appointments', icon: <Calendar className="h-5 w-5" /> },
                 { id: 'patients', label: 'Patients', icon: <User className="h-5 w-5" /> },
-                { id: 'schedule', label: 'Schedule', icon: <Clock className="h-5 w-5" /> },
+                // { id: 'schedule', label: 'Schedule', icon: <Clock className="h-5 w-5" /> },
                 { id: 'messages', label: 'Messages', icon: <MessageSquare className="h-5 w-5" /> },
               ].map(item => (
                 <li key={item.id}>
@@ -1289,12 +1289,12 @@ const DoctorDashboard = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <div className="relative">
+              {/* <div className="relative">
                 <button className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
                   <Bell className="h-5 w-5" />
                   <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
                 </button>
-              </div>
+              </div> */}
 
               <div className="flex items-center">
                 <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold mr-2">
@@ -1303,9 +1303,9 @@ const DoctorDashboard = () => {
                 <span className="font-medium text-gray-700">Dr.{user.name}</span>
               </div>
 
-              <button className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
+              {/* <button className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
                 <Settings className="h-5 w-5" />
-              </button>
+              </button> */}
             </div>
           </div>
         </header>

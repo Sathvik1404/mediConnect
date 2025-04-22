@@ -638,6 +638,18 @@ const PatientDashboard = () => {
                                 toast.success("Message sent successfully!");
                                 setShowMessageBox(false);
                                 setMessageText('');
+                                const fetchMessages = async () => {
+                                  try {
+                                    const res = await axios.get(`http://localhost:5000/api/messages/`);
+
+                                    setMessages(res.data);
+                                  } catch (error) {
+                                    console.error("Error fetching messages:", error);
+                                  } finally {
+                                    setLoadingMessages(false);
+                                  }
+                                };
+                                fetchMessages()
                               } catch (error) {
                                 toast.error(`${error}`);
                               }
@@ -797,18 +809,18 @@ const PatientDashboard = () => {
             <ChevronRight className="h-5 w-5 text-gray-400" />
           </button>
 
-          <button className="flex items-center justify-between p-4 rounded-lg shadow-sm bg-purple-50 hover:shadow-md transition-shadow">
+          {/* <button className="flex items-center justify-between p-4 rounded-lg shadow-sm bg-purple-50 hover:shadow-md transition-shadow">
             <div className="flex items-center">
               <Pill className="h-5 w-5 text-purple-600" />
               <span className="ml-3 font-medium">Request Refill</span>
             </div>
             <ChevronRight className="h-5 w-5 text-gray-400" />
-          </button>
+          </button> */}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Appointments Card */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden lg:col-span-2">
+          <div className="bg-white rounded-lg shadow-md overflow-hidden lg:col-span-4">
             <div className="flex items-center justify-between border-b p-4">
               <h2 className="font-bold text-lg text-blue-900">Upcoming Appointments</h2>
               <button
@@ -863,7 +875,7 @@ const PatientDashboard = () => {
           </div>
 
           {/* Notifications Card */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          {/* <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="flex items-center justify-between border-b p-4">
               <h2 className="font-bold text-lg text-blue-900">Notifications</h2>
               <button className="text-blue-600 text-sm hover:underline">Mark All Read</button>
@@ -884,10 +896,10 @@ const PatientDashboard = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mt-6">
           {/* Medications Card */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="flex items-center justify-between border-b p-4">
@@ -926,7 +938,7 @@ const PatientDashboard = () => {
           </div>
 
           {/* Health Metrics Card */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          {/* <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="flex items-center justify-between border-b p-4">
               <h2 className="font-bold text-lg text-blue-900">Health Metrics</h2>
               <button className="text-blue-600 text-sm hover:underline">View Details</button>
@@ -947,10 +959,10 @@ const PatientDashboard = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Recent Activity Card */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          {/* <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="flex items-center justify-between border-b p-4">
               <h2 className="font-bold text-lg text-blue-900">Recent Activity</h2>
               <button className="text-blue-600 text-sm hover:underline">View All</button>
@@ -966,7 +978,7 @@ const PatientDashboard = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
       </>
     );
@@ -1023,12 +1035,12 @@ const PatientDashboard = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <button className="relative">
+            {/* <button className="relative">
               <Bell className="h-6 w-6 text-gray-600" />
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
                 {state.notifications.length}
               </span>
-            </button>
+            </button> */}
             <button
               onClick={() => navigate('/patient/profile')}
               className="h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center"
