@@ -322,6 +322,7 @@ const DoctorDashboard = () => {
                   className="w-full p-2 border rounded-md"
                   value={applicationForm.startDate}
                   onChange={handleApplicationChange}
+                  min={new Date().toISOString().split('T')[0]} // This sets the minimum date to today
                   required
                 />
               </div>

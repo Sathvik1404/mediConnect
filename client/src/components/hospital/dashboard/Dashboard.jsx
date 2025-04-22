@@ -737,7 +737,7 @@ const Dashboard = () => {
                 </div>
               )}
               <div className="col-span-2">
-                <p className="text-sm text-gray-500">Hospital ID</p>
+                <p className="text-sm text-gray-500">Doctor ID</p>
                 <p className="font-medium text-xs text-gray-600">{member._id}</p>
               </div>
             </div>

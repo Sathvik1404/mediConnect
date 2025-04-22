@@ -53,10 +53,11 @@ router.put('/:id', async (req, res) => {
         );
 
         // Update each hospital by adding this doctor to their doctors array
-        await hospitalModel.findOneAndUpdate(
-            { _id: hospitals },
-            { $addToSet: { doctors: id } } // Add the doctor ID without duplicating
-        );
+        if (hospitals)
+            await hospitalModel.findOneAndUpdate(
+                { _id: hospitals },
+                { $addToSet: { doctors: id } } // Add the doctor ID without duplicating
+            );
 
         res.status(200).json({ message: "Success" });
     } catch (err) {
