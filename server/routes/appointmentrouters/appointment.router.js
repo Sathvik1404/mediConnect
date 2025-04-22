@@ -20,6 +20,26 @@ router.post('/', async (req, res) => {
         .catch(err => res.status(500).json({ error: 'Failed to create one' }));
 });
 
+// In your appointment routes file (e.g., routes/appointment.js)
+router.get('/doctor/:doctorId', async (req, res) => {
+    try {
+        const { doctorId } = req.params;
+        const { date } = req.query;
+
+        // Find all appointments for this doctor on this date
+        const appointments = await AppointmentModel.find({
+            doctorId,
+            date: date,
+            status: { $ne: 'cancelled' } // Exclude cancelled appointments
+        }).select('time');
+
+        res.json(appointments);
+    } catch (error) {
+        console.error('Error fetching doctor appointments:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 router.get('/', async (req, res) => {
     const response = await AppointmentModel.find({});
     // console.log(response);

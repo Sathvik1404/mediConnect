@@ -95,8 +95,8 @@ const AppointmentBooking = () => {
                     hospitalId: doctorData.hospitalId || ''
                 }));
 
-                // Generate sample time slots for the selected date
-                generateTimeSlots(formData.date);
+                // Generate time slots for the selected date
+                await generateTimeSlots(formData.date);
 
                 setLoading(false);
             } catch (error) {
@@ -109,33 +109,72 @@ const AppointmentBooking = () => {
         fetchData();
     }, [userId, doctorId, navigate]);
 
+    const fetchDoctorAppointments = async (doctorId, date) => {
+        try {
+            const response = await axios.get(
+                `http://localhost:5000/api/appointment/doctor/${doctorId}?date=${date}`
+            );
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching doctor appointments:', error);
+            return [];
+        }
+    };
+
     // Generate time slots based on selected date
-    const generateTimeSlots = (selectedDate) => {
+    const generateTimeSlots = async (selectedDate) => {
         const isToday = selectedDate === today.toISOString().split('T')[0];
         const currentHour = today.getHours();
+        const currentMinute = today.getMinutes();
 
-        // Sample time slots (9 AM to 5 PM)
+        // Define doctor's working hours (9 AM to 5 PM)
+        const startHour = isToday ? Math.max(9, currentHour) : 9;
+        const endHour = 17; // 5 PM
+
+        // Get existing appointments for this doctor on the selected date
+        const existingAppointments = await fetchDoctorAppointments(doctorId, selectedDate);
+        const bookedTimes = existingAppointments.map(apt => apt.time);
+
+        // Generate all possible 15-minute slots
         const slots = [];
-        const startHour = isToday ? Math.max(9, currentHour + 1) : 9;
+        for (let hour = startHour; hour <= endHour; hour++) {
+            // Skip generating past time slots if it's today
+            const minuteIntervals = [0, 15, 30, 45];
 
-        for (let hour = startHour; hour <= 17; hour++) {
-            const formattedHour = hour.toString().padStart(2, '0');
-            slots.push({
-                id: `${formattedHour}:00`,
-                time: `${formattedHour}:00`,
-                display: `${hour % 12 || 12}:00 ${hour >= 12 ? 'PM' : 'AM'}`,
-                available: Math.random() > 0.3 // Random availability for demo
-            });
+            minuteIntervals.forEach(minute => {
+                // Skip times in the past if it's today
+                if (isToday && hour === currentHour && minute <= currentMinute) {
+                    return;
+                }
 
-            // Add 30-minute slot
-            if (hour < 17) {
-                slots.push({
-                    id: `${formattedHour}:30`,
-                    time: `${formattedHour}:30`,
-                    display: `${hour % 12 || 12}:30 ${hour >= 12 ? 'PM' : 'AM'}`,
-                    available: Math.random() > 0.3 // Random availability for demo
+                // Skip the last slot of the day (5:00 PM)
+                if (hour === endHour && minute > 0) {
+                    return;
+                }
+
+                const formattedHour = hour.toString().padStart(2, '0');
+                const formattedMinute = minute.toString().padStart(2, '0');
+                const timeString = `${formattedHour}:${formattedMinute}`;
+
+                // Check if this time slot is booked
+                const isBooked = bookedTimes.some(bookedTime => {
+                    // Convert both times to minutes for easier comparison
+                    const bookedParts = bookedTime.split(':');
+                    const bookedTotalMinutes = parseInt(bookedParts[0]) * 60 + parseInt(bookedParts[1]);
+
+                    const slotTotalMinutes = hour * 60 + minute;
+
+                    // Consider a slot unavailable if it's within 15 minutes of a booked appointment
+                    return Math.abs(bookedTotalMinutes - slotTotalMinutes) < 15;
                 });
-            }
+
+                slots.push({
+                    id: timeString,
+                    time: timeString,
+                    display: `${hour % 12 || 12}:${formattedMinute} ${hour >= 12 ? 'PM' : 'AM'}`,
+                    available: !isBooked
+                });
+            });
         }
 
         setAvailableSlots(slots);
@@ -145,7 +184,14 @@ const AppointmentBooking = () => {
     const handleDateChange = (e) => {
         const newDate = e.target.value;
         setFormData({ ...formData, date: newDate });
-        generateTimeSlots(newDate);
+
+        // Set loading state while fetching slots
+        setLoading(true);
+
+        // Call the async function and handle the loading state
+        generateTimeSlots(newDate).finally(() => {
+            setLoading(false);
+        });
     };
 
     const handleTimeSelection = (slot) => {
