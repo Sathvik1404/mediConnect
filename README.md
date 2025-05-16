@@ -59,7 +59,26 @@ MediConnect is a modern, full-stack healthcare management platform that connects
 - Razorpay account (for payments)
 - [Optional] Cloudinary API for images
 
+---
 
+### 📁 Folder Structure
+
+mediConnect/
+├── client/ # React frontend
+│ ├── src/
+│ │ ├── components/
+│ │ ├── pages/
+│ │ ├── context/ # Auth Context
+│ │ └── App.jsx
+├── server/ # Express backend
+│ ├── models/
+│ ├── routes/
+│ ├── controllers/
+│ └── index.js
+
+yaml
+Copy
+Edit
 
 ---
 
@@ -67,11 +86,13 @@ MediConnect is a modern, full-stack healthcare management platform that connects
 
 #### 1. Clone the Repository
 
+```bash
 git clone https://github.com/your-username/mediConnect.git
 cd mediConnect
-
 2. Install Dependencies
-
+bash
+Copy
+Edit
 # For frontend
 cd client
 npm install
@@ -79,7 +100,6 @@ npm install
 # For backend
 cd ../server
 npm install
-
 3. Configure Environment Variables
 Create .env files for both client/ and server/.
 
@@ -93,7 +113,6 @@ MONGO_URI=your_mongodb_connection
 JWT_SECRET=your_secret
 RAZORPAY_KEY_ID=your_key
 RAZORPAY_KEY_SECRET=your_secret
-
 4. Run the Project
 bash
 Copy
@@ -105,8 +124,6 @@ nodemon index.js
 # Run frontend
 cd ../client
 npm start
-
-
 🧪 Testing
 Use Thunder Client or Postman to test the following:
 
@@ -118,6 +135,8 @@ POST /api/appointment
 
 GET /api/messages/:id
 
+📸 Screenshots
+Add screenshots of the Patient Dashboard, Doctor Panel, Appointment Page, and Messaging Module.
 
 ✅ TODOs
  Add video call integration (WebRTC)
@@ -125,3 +144,15 @@ GET /api/messages/:id
  Notification system
 
  Advanced analytics dashboard for doctors/hospitals
+
+🤝 Contributing
+Fork the repo
+
+Create a new branch (git checkout -b feature-x)
+
+Commit your changes (git commit -m 'Add feature x')
+
+Push to the branch (git push origin feature-x)
+
+Open a Pull Request
+
