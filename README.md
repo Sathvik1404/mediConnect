@@ -1,158 +1,148 @@
 # MediConnect 🏥
 
-MediConnect is a modern, full-stack healthcare management platform that connects patients, doctors, and hospitals through a seamless digital experience.
+MediConnect is a modern full-stack healthcare management system that bridges the gap between **patients**, **doctors**, and **hospitals** via an intuitive and responsive web application.
 
 ---
 
 ## 🌟 Features
 
-### 👩‍⚕️ For Patients
-- Register and login
-- Book appointments with doctors
-- View and cancel upcoming appointments
-- Message doctors directly
-- Track medications and refill alerts
-- Review hospitals and doctors
-- View medical metrics and activity logs
+### 👩‍⚕️ Patient Module
 
-### 🧑‍⚕️ For Doctors
-- Manage appointments and patient records
-- View incoming applications from hospitals
-- Respond to messages from patients
-- Write prescriptions and medical notes
+* Signup/Login authentication
+* Book and cancel appointments
+* Track appointment history
+* Message doctors
+* Submit hospital/doctor reviews
+* Medication tracking
 
-### 🏥 For Hospitals
-- Register and manage doctor staff
-- Review doctor applications
-- Manage hospital profile and ratings
+### 🧑‍⚕️ Doctor Module
 
-### 📦 Admin Panel (optional)
-- Oversee all users, appointments, and metrics
+* Manage patient appointments
+* View messages and reply
+* Prescribe medications
+* Apply to hospitals
+* Track patient history
+
+### 🏥 Hospital Module
+
+* Manage hospital profiles
+* View and accept doctor applications
+* Maintain ratings and feedback
+
+### ⚖️ Admin Module *(optional)*
+
+* Overview of all system users and actions
+* Aggregate reports
 
 ---
 
-## 🛠 Tech Stack
+## 🛠️ Tech Stack
 
 ### Frontend
-- React.js
-- Tailwind CSS
-- React Router
-- Axios
-- Lucide Icons
+
+* React.js
+* Tailwind CSS
+* Axios
+* React Router DOM
+* Lucide React Icons
 
 ### Backend
-- Node.js
-- Express.js
-- MongoDB + Mongoose
-- Razorpay API (for payments)
-- JWT Authentication
-- Multer (file uploads)
-- RESTful API architecture
+
+* Node.js
+* Express.js
+* MongoDB + Mongoose
+* JWT Auth
+* Razorpay Integration (for payments)
 
 ---
 
-## 🚀 Getting Started
+## ✨ Getting Started
 
-### 🔧 Prerequisites
-- Node.js v18+
-- MongoDB (local or Atlas)
-- Razorpay account (for payments)
-- [Optional] Cloudinary API for images
-
----
-
-### 📁 Folder Structure
-
-mediConnect/
-├── client/ # React frontend
-│ ├── src/
-│ │ ├── components/
-│ │ ├── pages/
-│ │ ├── context/ # Auth Context
-│ │ └── App.jsx
-├── server/ # Express backend
-│ ├── models/
-│ ├── routes/
-│ ├── controllers/
-│ └── index.js
-
-yaml
-Copy
-Edit
-
----
-
-### ⚙️ Setup Instructions
-
-#### 1. Clone the Repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/your-username/mediConnect.git
 cd mediConnect
-2. Install Dependencies
-bash
-Copy
-Edit
-# For frontend
+```
+
+### 2. Install Dependencies
+
+```bash
+# Frontend
 cd client
 npm install
 
-# For backend
+# Backend
 cd ../server
 npm install
-3. Configure Environment Variables
-Create .env files for both client/ and server/.
+```
 
-server/.env:
+### 3. Create `.env` Files
 
-ini
-Copy
-Edit
+**server/.env**
+
+```
 PORT=5000
-MONGO_URI=your_mongodb_connection
-JWT_SECRET=your_secret
-RAZORPAY_KEY_ID=your_key
-RAZORPAY_KEY_SECRET=your_secret
-4. Run the Project
-bash
-Copy
-Edit
-# Run backend
+MONGO_URI=your_mongo_uri
+JWT_SECRET=your_secret_key
+RAZORPAY_KEY_ID=your_key_id
+RAZORPAY_KEY_SECRET=your_key_secret
+```
+
+---
+
+### 4. Start the App
+
+```bash
+# Start backend
 cd server
 nodemon index.js
 
-# Run frontend
+# Start frontend
 cd ../client
 npm start
-🧪 Testing
-Use Thunder Client or Postman to test the following:
+```
 
-POST /api/patient/login
+---
 
-GET /api/hospitals
+## 🔧 Folder Structure
 
-POST /api/appointment
+```
+mediConnect/
+  ├── client/        # React frontend
+  │    ├── src/
+  │        ├── components/
+  │        ├── pages/
+  │        └── App.jsx
+  └── server/        # Express backend
+       ├── models/
+       ├── routes/
+       ├── controllers/
+       └── index.js
+```
 
-GET /api/messages/:id
+---
 
-📸 Screenshots
-Add screenshots of the Patient Dashboard, Doctor Panel, Appointment Page, and Messaging Module.
+## 🔮 API Testing Endpoints
 
-✅ TODOs
- Add video call integration (WebRTC)
+Use **Thunder Client** or **Postman**:
 
- Notification system
+| Endpoint             | Method | Description             |
+| -------------------- | ------ | ----------------------- |
+| `/api/patient/login` | POST   | Patient login           |
+| `/api/hospitals`     | GET    | Fetch hospitals         |
+| `/api/appointment`   | POST   | Create appointment      |
+| `/api/messages/:id`  | GET    | Get messages for a user |
 
- Advanced analytics dashboard for doctors/hospitals
+---
 
-🤝 Contributing
-Fork the repo
+## 📈 Future Enhancements
 
-Create a new branch (git checkout -b feature-x)
+* [ ] AI diagnosis suggestions
+* [ ] Video consultations
+* [ ] Notifications via email/SMS
 
-Commit your changes (git commit -m 'Add feature x')
+---
 
-Push to the branch (git push origin feature-x)
 
-Open a Pull Request
-
+> Built with passion to simplify healthcare ❤️
