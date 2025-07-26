@@ -36,17 +36,16 @@ router.get('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { name, mobile, email, address, patients } = req.body;
-    await hospitalModel.findOneAndUpdate({ _id: id }, { name, mobile, email, address, patients })
+    const { name, mobile, email, address, patients, doctors } = req.body;
+    await hospitalModel.findOneAndUpdate({ _id: id }, { name, mobile, email, address, patients, doctors })
         .then(hos => res.status(200).json({ message: "Success" }))
         .catch(err => res.status(500).json({ message: "Internal Server Error or No data" }))
 });
 
-router.post('/:id/apply', async (req, res) => {
-    const { id } = req.params;
-    const { doctorId, doctorName, specialization, experience } = req.body;
+router.post('/apply', async (req, res) => {
+    const { doctorId, hospitalId, coverLetter, availability, startDate, status, appliedAt } = req.body;
     try {
-        await requestModel.create({ hospitalId: id, doctorId, doctorName, specialization, experience })
+        await requestModel.create({ doctorId, hospitalId, coverLetter, availability, startDate, status, appliedAt })
             .then(user => res.json({ success: true }))
             .catch(err => res.json(err))
     } catch (err) {
@@ -57,6 +56,7 @@ router.post('/:id/apply', async (req, res) => {
 
 router.get('/:id/requests', async (req, res) => {
     const { id } = req.params;
+    console.log(id)
     const requests = await requestModel.find({ hospitalId: id });
     if (requests) {
         res.status(200).json(requests)
@@ -65,12 +65,19 @@ router.get('/:id/requests', async (req, res) => {
     }
 });
 
-router.put('/:id/requests/:reqId', async (req, res) => {
-    const { id, reqId } = req.params;
+router.put('/requests/:reqId', async (req, res) => {
+    const { reqId } = req.params;
     const { status } = req.body;
     await requestModel.findOneAndUpdate({ _id: reqId }, { status })
         .then(hos => res.status(200).json({ message: "Success" }))
         .catch(err => res.status(500).json({ message: "Internal Server Error or No data" }))
+})
+
+router.delete('/requests/:reqId', async (req, res) => {
+    const { reqId } = req.params
+    await requestModel.findOneAndDelete({ _id: reqId })
+        .then(req => res.status(200).json({ message: "Success" }))
+        .catch(err => res.status(500).json({ message: "Couldn't delete the request" }))
 })
 
 module.exports = router;

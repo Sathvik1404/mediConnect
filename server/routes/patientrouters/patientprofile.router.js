@@ -7,6 +7,7 @@ const session = require('express-session');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const Upload = require('./upload')
 
 const router = express.Router();
 
@@ -23,6 +24,11 @@ router.use(session({
     resave: false,
     saveUninitialized: true
 }));
+
+router.get('/', async (req, res) => {
+    const patiets = await patientModel.find({})
+    res.json(patiets)
+})
 
 router.get('/:id', async (req, res) => {
     const { id } = req.params
@@ -42,38 +48,60 @@ router.put('/:id', async (req, res) => {
 })
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, './files'); // Directory to save files
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
     },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname); // Save with the original name, overwriting if it exists
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
     }
 });
 
+const fileFilter = function (req, file, cb) {
+    // Allowed file extensions
+    const allowedTypes = /jpeg|jpg|png|gif/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+
+    if (extname && mimetype) {
+        cb(null, true);
+    } else {
+        cb(new Error('Only image files (jpeg, jpg, png, gif) are allowed!'));
+    }
+};
+
 const upload = multer({
     storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    fileFilter: fileFilter
 }).single('record');
 
-// Route to handle file upload
 router.put('/uploadrecord/:id', upload, async (req, res) => {
     const { id } = req.params;
     try {
+        console.log(req.file);
         if (!req.file) {
             return res.status(400).json({ message: 'No file uploaded' });
         }
 
+        const uploadResult = await Upload(req.file.path);
+        console.log(uploadResult);
+
         const patient = await patientModel.findOneAndUpdate(
             { _id: id },
-            { record: req.file.path },
-            { new: true }  // Return the updated document
+            { record: uploadResult.secure_url },
+            { new: true }
         );
 
         if (!patient) {
             return res.status(404).json({ message: 'Patient not found' });
         }
 
-        res.status(200).json({ message: 'File uploaded successfully', filePath: req.file.path });
+        res.status(200).json({
+            message: 'File uploaded successfully',
+            filePath: uploadResult.secure_url
+        });
     } catch (error) {
+        console.error('Upload error:', error);
         res.status(500).json({ message: 'Error uploading file', error });
     }
 });
@@ -97,14 +125,19 @@ router.get('/downloadrecord/:id', async (req, res) => {
             return res.status(500).json({ message: 'Invalid record path', error: 'Record path is not a valid string' });
         }
 
-        const filePath = path.join(__dirname, '../../', patient.record[0]);
-        // console.log('File path:', filePath);
+        // console.log(patient.record)
+        // res.download(patient.record[0])
 
-        if (fs.existsSync(filePath)) {
-            res.download(filePath); // Triggers the file download in the browser
-        } else {
-            res.status(404).json({ message: 'File not found on server' });
-        }
+        return res.status(200).json({ fileUrl: patient.record });
+
+        // const filePath = path.join(__dirname, '../../', patient.record[0]);
+        // // console.log('File path:', filePath);
+
+        // if (fs.existsSync(filePath)) {
+        //     res.download(filePath); // Triggers the file download in the browser
+        // } else {
+        //     res.status(404).json({ message: 'File not found on server' });
+        // }
     } catch (error) {
         res.status(500).json({ message: 'Error fetching record', error });
     }

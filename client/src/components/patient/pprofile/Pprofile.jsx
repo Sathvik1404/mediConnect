@@ -54,14 +54,19 @@ const Pprofile = () => {
       alert('Please select a file to upload.');
       return;
     }
+    console.log(selectedFile)
 
     const fileData = new FormData();
     fileData.append('record', selectedFile);
-
+    console.log(fileData)
     try {
       const response = await axios.put(
         `http://localhost:5000/api/patient/profile/uploadrecord/${auth.user._id}`,
-        fileData
+        fileData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      }
       );
       setPatient(prev => ({ ...prev, record: response.data.filePath }));
       setFormData(prev => ({ ...prev, record: response.data.filePath }));
@@ -95,11 +100,15 @@ const Pprofile = () => {
     }
   };
 
-  const viewMedicalRecord = () => {
-    window.open(
-      `http://localhost:5000/api/patient/profile/downloadrecord/${auth.user._id}`,
-      '_blank'
-    );
+  const viewMedicalRecord = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/patient/profile/downloadrecord/${auth.user._id}`);
+      const fileUrl = response.data.fileUrl;
+      window.open(fileUrl, '_blank');
+    } catch (err) {
+      console.error('Failed to fetch record:', err);
+      alert('Unable to open medical record.');
+    }
   };
 
   if (loading) {

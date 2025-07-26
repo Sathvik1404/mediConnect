@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const LandingPage = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const navigate = useNavigate()
+    const [reviews, setReviews] = useState([]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -19,7 +20,18 @@ const LandingPage = () => {
         e.preventDefault()
         navigate('/authpage')
     }
-
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                const respo = await fetch('http://localhost:5000/api/patient/review');
+                const tem = await respo.json();
+                setReviews([...tem]);
+            } catch (error) {
+                console.error("Failed to fetch reviews:", error);
+            }
+        };
+        fetchReviews();
+    }, []);
     return (
         <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
             {/* Navigation */}
@@ -56,9 +68,9 @@ const LandingPage = () => {
                             <button onClick={handleButton} className="py-4 px-6 bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium rounded-xl transition-colors">
                                 Get Started
                             </button>
-                            <button className="py-4 px-6 border border-blue-600 text-blue-600 text-lg font-medium rounded-xl hover:bg-blue-50 transition-colors">
+                            <a href='#testimonials'><button className="py-4 px-6 border border-blue-600 text-blue-600 text-lg font-medium rounded-xl hover:bg-blue-50 transition-colors">
                                 Learn More
-                            </button>
+                            </button></a>
                         </div>
                         <div className="mt-8 flex items-center space-x-2">
                             <div className="flex -space-x-2">
@@ -75,7 +87,7 @@ const LandingPage = () => {
                         <div className="relative z-0 rounded-xl overflow-hidden shadow-2xl">
                             <div className="bg-gradient-to-r from-blue-400 to-indigo-500 aspect-video rounded-xl"></div>
                             <img
-                                src="/api/placeholder/600/400"
+                                src="/dashboard.png"
                                 alt="Hospital management dashboard preview"
                                 className="absolute inset-0 w-full h-full object-cover rounded-xl"
                             />
@@ -161,7 +173,7 @@ const LandingPage = () => {
                             <div className="relative">
                                 <div className="rounded-xl overflow-hidden shadow-xl">
                                     <img
-                                        src="/api/placeholder/500/400"
+                                        src="/booking.png"
                                         alt="Patient using app"
                                         className="w-full object-cover rounded-xl"
                                     />
@@ -216,7 +228,7 @@ const LandingPage = () => {
                             <div className="relative">
                                 <div className="rounded-xl overflow-hidden shadow-xl">
                                     <img
-                                        src="/api/placeholder/500/400"
+                                        src="/doctor"
                                         alt="Doctor using app"
                                         className="w-full object-cover rounded-xl"
                                     />
@@ -255,7 +267,7 @@ const LandingPage = () => {
                                     </div>
                                 ))}
                             </div>
-                            <button className="mt-8 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
+                            <button onClick={handleButton} className="mt-8 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
                                 Join as Healthcare Provider
                             </button>
                         </div>
@@ -276,41 +288,42 @@ const LandingPage = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {[
-                            {
-                                quote: "The appointment system is so intuitive. I've never missed a doctor's appointment since I started using this platform.",
-                                name: "Sarah Johnson",
-                                role: "Patient"
-                            },
-                            {
-                                quote: "As a doctor, this system has revolutionized how I manage my practice. Less paperwork means more time with patients.",
-                                name: "Dr. Michael Chen",
-                                role: "Cardiologist"
-                            },
-                            {
-                                quote: "Our hospital has seen a 40% reduction in administrative costs since implementing this system. It's been transformative.",
-                                name: "Emily Rodriguez",
-                                role: "Hospital Administrator"
-                            }
-                        ].map((testimonial, index) => (
-                            <div key={index} className="bg-white rounded-xl shadow-lg p-6">
-                                <div className="mb-4">
-                                    {[...Array(5)].map((_, i) => (
-                                        <span key={i} className="text-yellow-400">★</span>
-                                    ))}
-                                </div>
-                                <p className="text-gray-600 italic mb-6">"{testimonial.quote}"</p>
-                                <div className="flex items-center">
-                                    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl">
-                                        {testimonial.name.charAt(0)}
+                        {
+                            // {
+                            //     quote: "The appointment system is so intuitive. I've never missed a doctor's appointment since I started using this platform.",
+                            //     name: "Sarah Johnson",
+                            //     role: "Patient"
+                            // },
+                            // {
+                            //     quote: "As a doctor, this system has revolutionized how I manage my practice. Less paperwork means more time with patients.",
+                            //     name: "Dr. Michael Chen",
+                            //     role: "Cardiologist"
+                            // },
+                            // {
+                            //     quote: "Our hospital has seen a 40% reduction in administrative costs since implementing this system. It's been transformative.",
+                            //     name: "Emily Rodriguez",
+                            //     role: "Hospital Administrator"
+                            // }
+
+                            [...reviews].reverse().slice(1, 4).map((testimonial, index) => (
+                                <div key={index} className="bg-white rounded-xl shadow-lg p-6">
+                                    <div className="mb-4">
+                                        {[...Array(5)].map((_, i) => (
+                                            <span key={i} className="text-yellow-400">★</span>
+                                        ))}
                                     </div>
-                                    <div className="ml-4">
-                                        <p className="font-medium text-blue-900">{testimonial.name}</p>
-                                        <p className="text-sm text-gray-500">{testimonial.role}</p>
+                                    <p className="text-gray-600 italic mb-6">"{testimonial.quote}"</p>
+                                    <div className="flex items-center">
+                                        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl">
+                                            {testimonial.name.charAt(0)}
+                                        </div>
+                                        <div className="ml-4">
+                                            <p className="font-medium text-blue-900">{testimonial.name}</p>
+                                            <p className="text-sm text-gray-500">{testimonial.role}</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
                     </div>
                 </div>
             </section>
@@ -325,10 +338,10 @@ const LandingPage = () => {
                         Join our growing community of patients, doctors, and hospitals. Experience healthcare management like never before.
                     </p>
                     <div className="mt-10 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-                        <button className="py-4 px-6 bg-white text-blue-600 hover:bg-blue-50 font-medium text-lg rounded-xl transition-colors">
+                        <button onClick={handleButton} className="py-4 px-6 bg-white text-blue-600 hover:bg-blue-50 font-medium text-lg rounded-xl transition-colors">
                             Sign Up Now
                         </button>
-                        <button className="py-4 px-6 border border-white text-white hover:bg-blue-700 font-medium text-lg rounded-xl transition-colors">
+                        <button onClick={handleButton} className="py-4 px-6 border border-white text-white hover:bg-blue-700 font-medium text-lg rounded-xl transition-colors">
                             Schedule a Demo
                         </button>
                     </div>

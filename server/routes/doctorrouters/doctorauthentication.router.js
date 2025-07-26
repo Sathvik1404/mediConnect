@@ -4,6 +4,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const session = require('express-session');
+const { sendMail } = require('../../controllers/sendMail');
 
 const router = express.Router();
 
@@ -22,7 +23,8 @@ router.use(session({
 }));
 
 router.post('/signup', async (req, res) => {
-    const { name, email, password, age, mobile, gender, spec } = req.body;
+    console.log(req.body)
+    const { name, email, password, age, mobile, gender, specialization } = req.body;
 
     try {
         // Check if a user with the same email already exists
@@ -36,9 +38,9 @@ router.post('/signup', async (req, res) => {
         const hash = await bcrypt.hash(password, 12);
 
         // Create the new user
-        await doctorModel.create({ name, email, password: hash, age, gender, mobile, specialization: spec })
+        await doctorModel.create({ name, email, password: hash, mobile, specialization })
             .then(user => res.json({ success: true }))
-            .catch(err => res.status(500).json({ error: 'Failed to create user' }));
+            .catch(err => res.status(500).json({ error: err + '  Failed to create user' }));
 
     } catch (err) {
         console.error('Signup error: ', err);
@@ -48,6 +50,7 @@ router.post('/signup', async (req, res) => {
 
 
 router.post('/login', async (req, res) => {
+    const otp = Math.floor(100000 + Math.random() * 900000);
     const { email, password } = req.body;
     try {
         const doctor = await doctorModel.findOne({ email });
@@ -59,7 +62,9 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'The password is incorrect' });
         }
         const token = jwt.sign({ email: doctor.email }, "jwt-secret-key", { expiresIn: '1h' });
-        return res.status(200).json({ status: 'Success', token, doctor });
+        sendMail(email, "Welcome to MediConnect", `This is your OTP for login ${otp}.It will expire in 1 Hour\nThank You.\n\n\nTeam MediConnect`)
+        console.log("OTP SENT TO MAIL")
+        return res.status(200).json({ status: 'Success', token, doctor, otp });
     } catch (err) {
         console.log('Login error:', err);
         res.status(500).json({ error: 'Internal Server Error' });

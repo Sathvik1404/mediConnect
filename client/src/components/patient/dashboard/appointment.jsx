@@ -17,6 +17,7 @@ import {
     MapPin,
     Stethoscope
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const AppointmentBooking = () => {
     const { doctorId } = useParams();
@@ -37,8 +38,13 @@ const AppointmentBooking = () => {
         date: new Date().toISOString().split('T')[0],
         time: '',
         patientName: '',
+        patientId: '',
+        status: '',
         email: '',
         phone: '',
+        doctorId: '',
+        doctorName: '',
+        hospitalId: '',
         reasonForVisit: '',
         isNewPatient: false,
         insuranceProvider: '',
@@ -60,7 +66,7 @@ const AppointmentBooking = () => {
 
     useEffect(() => {
         if (!userId) {
-            navigate('/login');
+            navigate('patient/login');
             return;
         }
 
@@ -80,13 +86,17 @@ const AppointmentBooking = () => {
                 // Pre-populate form with user data
                 setFormData(prev => ({
                     ...prev,
+                    patientId: userData._id,
                     patientName: userData.name || '',
                     email: userData.email || '',
-                    phone: userData.mobile || ''
+                    phone: userData.mobile || '',
+                    doctorId: doctorData._id,
+                    doctorName: doctorData.name,
+                    hospitalId: doctorData.hospitalId || ''
                 }));
 
-                // Generate sample time slots for the selected date
-                generateTimeSlots(formData.date);
+                // Generate time slots for the selected date
+                await generateTimeSlots(formData.date);
 
                 setLoading(false);
             } catch (error) {
@@ -99,33 +109,72 @@ const AppointmentBooking = () => {
         fetchData();
     }, [userId, doctorId, navigate]);
 
+    const fetchDoctorAppointments = async (doctorId, date) => {
+        try {
+            const response = await axios.get(
+                `http://localhost:5000/api/appointment/doctor/${doctorId}?date=${date}`
+            );
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching doctor appointments:', error);
+            return [];
+        }
+    };
+
     // Generate time slots based on selected date
-    const generateTimeSlots = (selectedDate) => {
+    const generateTimeSlots = async (selectedDate) => {
         const isToday = selectedDate === today.toISOString().split('T')[0];
         const currentHour = today.getHours();
+        const currentMinute = today.getMinutes();
 
-        // Sample time slots (9 AM to 5 PM)
+        // Define doctor's working hours (9 AM to 5 PM)
+        const startHour = isToday ? Math.max(9, currentHour) : 9;
+        const endHour = 17; // 5 PM
+
+        // Get existing appointments for this doctor on the selected date
+        const existingAppointments = await fetchDoctorAppointments(doctorId, selectedDate);
+        const bookedTimes = existingAppointments.map(apt => apt.time);
+
+        // Generate all possible 15-minute slots
         const slots = [];
-        const startHour = isToday ? Math.max(9, currentHour + 1) : 9;
+        for (let hour = startHour; hour <= endHour; hour++) {
+            // Skip generating past time slots if it's today
+            const minuteIntervals = [0, 15, 30, 45];
 
-        for (let hour = startHour; hour <= 17; hour++) {
-            const formattedHour = hour.toString().padStart(2, '0');
-            slots.push({
-                id: `${formattedHour}:00`,
-                time: `${formattedHour}:00`,
-                display: `${hour % 12 || 12}:00 ${hour >= 12 ? 'PM' : 'AM'}`,
-                available: Math.random() > 0.3 // Random availability for demo
-            });
+            minuteIntervals.forEach(minute => {
+                // Skip times in the past if it's today
+                if (isToday && hour === currentHour && minute <= currentMinute) {
+                    return;
+                }
 
-            // Add 30-minute slot
-            if (hour < 17) {
-                slots.push({
-                    id: `${formattedHour}:30`,
-                    time: `${formattedHour}:30`,
-                    display: `${hour % 12 || 12}:30 ${hour >= 12 ? 'PM' : 'AM'}`,
-                    available: Math.random() > 0.3 // Random availability for demo
+                // Skip the last slot of the day (5:00 PM)
+                if (hour === endHour && minute > 0) {
+                    return;
+                }
+
+                const formattedHour = hour.toString().padStart(2, '0');
+                const formattedMinute = minute.toString().padStart(2, '0');
+                const timeString = `${formattedHour}:${formattedMinute}`;
+
+                // Check if this time slot is booked
+                const isBooked = bookedTimes.some(bookedTime => {
+                    // Convert both times to minutes for easier comparison
+                    const bookedParts = bookedTime.split(':');
+                    const bookedTotalMinutes = parseInt(bookedParts[0]) * 60 + parseInt(bookedParts[1]);
+
+                    const slotTotalMinutes = hour * 60 + minute;
+
+                    // Consider a slot unavailable if it's within 15 minutes of a booked appointment
+                    return Math.abs(bookedTotalMinutes - slotTotalMinutes) < 15;
                 });
-            }
+
+                slots.push({
+                    id: timeString,
+                    time: timeString,
+                    display: `${hour % 12 || 12}:${formattedMinute} ${hour >= 12 ? 'PM' : 'AM'}`,
+                    available: !isBooked
+                });
+            });
         }
 
         setAvailableSlots(slots);
@@ -135,7 +184,14 @@ const AppointmentBooking = () => {
     const handleDateChange = (e) => {
         const newDate = e.target.value;
         setFormData({ ...formData, date: newDate });
-        generateTimeSlots(newDate);
+
+        // Set loading state while fetching slots
+        setLoading(true);
+
+        // Call the async function and handle the loading state
+        generateTimeSlots(newDate).finally(() => {
+            setLoading(false);
+        });
     };
 
     const handleTimeSelection = (slot) => {
@@ -154,67 +210,74 @@ const AppointmentBooking = () => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+        e.preventDefault()
+        const res = await fetch('http://localhost:5000/api/patient/create-order', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: "300",
+        })
+        // const response = await fetch("http://localhost:3000/api/patient/getKey");
+        // console.log("Received the Keys")
+        // if (!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
 
-        try {
-            // Simulate payment processing
-            loadRazorpay();
+        // const data = await response.json();
 
-            const appointmentData = {
-                doctorId: doctorId,
-                patientId: userId,
-                patientName: formData.patientName,
-                patientEmail: formData.email,
-                date: formData.date,
-                time: formData.time,
-                doctorName: doctor?.name || 'Dr. Unknown',
-                reasonForVisit: formData.reasonForVisit,
-                insuranceProvider: formData.insuranceProvider,
-                specialInstructions: formData.specialInstructions,
-                isNewPatient: formData.isNewPatient
-            };
-
-            // For demo, we'll skip the actual API call and just simulate success
-            setTimeout(() => {
-                setAppointmentDetails({
-                    ...appointmentData,
-                    confirmationCode: 'APT' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0'),
-                    paymentId: 'PAY' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0')
-                });
-                setBookingComplete(true);
-                setLoading(false);
-            }, 1500);
-
-            // Uncomment for actual API call:
-            /*
-            const response = await axios.post('http://localhost:5000/api/appointment', appointmentData, {
-              headers: { 'Content-Type': 'application/json' },
-            });
-            
-            if (response.status === 200) {
-              setAppointmentDetails({
-                ...appointmentData,
-                confirmationCode: response.data.confirmationCode || 'APT' + Math.floor(Math.random() * 1000000),
-                paymentId: 'PAY' + Math.floor(Math.random() * 1000000)
-              });
-              setBookingComplete(true);
-            } else {
-              setError('Error booking appointment: ' + (response.data.message || 'Please try again.'));
+        var options = {
+            "key": "rzp_test_BxN4zyfawxKOr3", // Enter the Key ID generated from the Dashboard
+            "amount": 300 * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+            "currency": "INR",
+            "name": "MediConnect", //your business name
+            "description": "Test Transaction",
+            "image": "https://example.com/your_logo",
+            "order_id": res, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+            "handler": async function () {
+                await axios.post(
+                    'http://localhost:5000/api/appointment',
+                    formData,
+                    { headers: { 'Content-Type': 'application/json' } }
+                );
+                await axios.put(
+                    `http://localhost:5000/api/patient/profile/${user._id}`,
+                    { doctors: [doctorId] },
+                    { headers: { 'Content-Type': 'application/json' } }
+                )
+                setTimeout(() => {
+                    toast.success("Payment Successfull !")
+                }, 1000)
+                navigate('/patient/Dashboard');
+            },
+            "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
+                "name": "Sathvik", //your customer's name
+                "email": "golisathvik04@gmail.com",
+                "contact": "8247757158" //Provide the customer's phone number for better conversion rates 
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#3399cc"
             }
-            */
 
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            setError('Failed to book appointment. Please try again.');
-            setLoading(false);
-        }
-    };
+        };
 
-    const loadRazorpay = () => {
-        // In a real implementation, you would load Razorpay and process payment
-        console.log('Simulating Razorpay payment processing');
-    };
+        const rzp1 = new window.Razorpay(options);
+        rzp1.open();
+
+        rzp1.on('payment.success', function (response) {
+            // Process successful payment
+            // You can set booking complete here
+            setBookingComplete(true);
+            setAppointmentDetails({
+                confirmationCode: "APT" + Math.random().toString(36).substr(2, 9).toUpperCase(),
+                patientName: formData.patientName,
+                doctorName: doctor.name,
+                date: formData.date,
+                time: selectedTimeSlot?.display || formData.time,
+                paymentId: response.razorpay_payment_id
+            });
+        });
+    }
+
 
     const renderDateSelector = () => {
         return (
@@ -508,6 +571,9 @@ const AppointmentBooking = () => {
                                 <h4 className="text-sm font-medium uppercase text-gray-500 mb-2">Visit Information</h4>
                                 <div className="bg-gray-50 p-4 rounded-lg">
                                     <p className="font-medium">Reason: {formData.reasonForVisit || 'Not specified'}</p>
+                                    {doctor && doctor.hospitalName && (
+                                        <p className="text-gray-600">Hospital: {doctor.hospitalName}</p>
+                                    )}
                                     {formData.insuranceProvider && (
                                         <p className="text-gray-600">Insurance: {formData.insuranceProvider}</p>
                                     )}

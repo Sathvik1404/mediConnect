@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Mail, Lock, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../AuthContext';
-
+import { Heart, ArrowRight } from 'lucide-react';
+import { toast } from 'react-toastify';
 const Login = () => {
+  const isScrolled = true;
   const auth = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -11,7 +13,7 @@ const Login = () => {
     password: ''
   });
   const [loading, setLoading] = useState(false);
-  const [notification, setNotification] = useState({ message: '', type: '' });
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,56 +23,41 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setNotification({ message: '', type: '' }); // Reset notification
+
 
     try {
-      const user = await auth.doctorLoginAction(formData);
-
-      if (user.ok) {
-        const otp = Math.floor(100000 + Math.random() * 900000);
-        await sendOTP(formData.email, otp); // Function to send OTP via email
-        sessionStorage.setItem('otp', otp); // Save OTP temporarily
-        sessionStorage.setItem('email', formData.email);
-        console.log(otp)
-        navigate('/doctor/Verify');
+      const result = await auth.doctorLoginAction(formData);
+      console.log(result)
+      if (result.ok) {
+        setTimeout(() => {
+          toast.success("Otp sent to your Email");
+          navigate('/doctor/Verify', { state: { otp: result.otp, email: formData.email } });
+        }, 2000);
       } else {
-        setNotification({ message: user.error || '⚠️ Login failed. Please try again.', type: 'error' });
+        toast.warning("Invalid login details");
       }
     } catch (error) {
-      setNotification({ message: `Error: ${error.message}`, type: 'error' });
+      toast.warning(error);
     } finally {
       setLoading(false);
-    }
-  };
-  const sendOTP = async (email, otp) => {
-    try {
-      await window.Email.send({
-        Host: 'smtp.elasticemail.com',
-        Username: 'golisathu@gmail.com',
-        Password: 'BD3254FB9DB4883CB42ECB69B7C9642F4240',
-        To: email,
-        From: 'golisathu@gmail.com',
-        Subject: 'Your OTP for Login',
-        Body: `Your OTP is: ${otp}`,
-      });
-    } catch (error) {
-      console.error('Error sending OTP:', error);
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center" onClick={() => { navigate('/') }} style={{ cursor: 'pointer' }}>
-              <span className="text-2xl font-bold text-indigo-600">mediConnect</span>
-            </div>
+      <nav className={`fixed w-full z-10 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'}`}>
+        <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
+          <div className="flex items-center">
+            <Heart className="h-8 w-8 text-blue-600" />
+            <span className="ml-2 text-xl font-bold text-blue-900" onClick={() => navigate('/authpage')} style={{ cursor: 'pointer' }}>MediConnect</span>
+          </div>
+          <div className="hidden md:flex items-center space-x-8">
             <button
-              onClick={() => navigate('/doctor/dsignup')}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+              onClick={() => navigate('/doctor/DSignup')}
+              className="w-full flex items-center justify-center py-2 px-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
             >
-              Register <ChevronRight className="ml-2 h-4 w-4" />
+              SignUp
+              <ArrowRight className="ml-2 h-5 w-6" />
             </button>
           </div>
         </div>
@@ -84,11 +71,11 @@ const Login = () => {
           </div>
 
           {/* Notification Section */}
-          {notification.message && (
+          {/* {notification.message && (
             <div className={`mb-4 p-4 rounded-lg ${notification.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
               {notification.message}
             </div>
-          )}
+          )} */}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
@@ -133,6 +120,7 @@ const Login = () => {
               className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-${loading ? '300' : '600'} hover:bg-indigo-${loading ? '400' : '700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-${loading ? '300' : '500'} disabled:opacity-${loading ? '50' : '100'} disabled:cursor-notallowed transition-colors duration-${loading ? '200' : '200'}`}
             >
               {loading ? 'Logging in...' : 'Log in'}
+              <ArrowRight className="ml-2 h-5 w-6" />
             </button>
           </form>
         </div>

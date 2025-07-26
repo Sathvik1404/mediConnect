@@ -12,15 +12,36 @@ import {
   Heart,
   Search,
   ChevronRight,
-  BarChart
+  BarChart,
+  MessageCircle,
+  MessageCircleDashed,
+  LucideMessageSquareReply,
+  LucideMessageSquareQuote
 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../../AuthContext';
+import { toast } from 'react-toastify';
 
 const PatientDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [reviewForm, setReviewForm] = useState({
+    name: '',
+    role: '',
+    quote: ''
+  });
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [showMessageBox, setShowMessageBox] = useState(false);
+  const [messageDoctorId, setMessageDoctorId] = useState(null);
+  const [messageText, setMessageText] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [loadingMessages, setLoadingMessages] = useState(true);
+  const [isListening, setIsListening] = useState(false);
+
+
 
   const [state, setState] = useState({
     hospitals: [],
@@ -51,7 +72,12 @@ const PatientDashboard = () => {
     loading: false,
     error: null
   });
-
+  try {
+    const noti = fetch('http://localhost:5000/api/appointment');
+    // console.log(noti);
+  } catch (err) {
+    console.log(err)
+  }
   const handleError = useCallback((error, errorMessage) => {
     console.error(error);
     setState(prev => ({ ...prev, error: errorMessage, loading: false }));
@@ -60,12 +86,28 @@ const PatientDashboard = () => {
   const fetchData = useCallback(async (url, errorMessage) => {
     try {
       const response = await axios.get(url);
+      // console.log(response)
       return response.data;
     } catch (error) {
       handleError(error, `Error fetching ${errorMessage}`);
       return null;
     }
   }, [handleError]);
+
+  const fetchPrescriptions = useCallback(async () => {
+    try {
+      setState(prev => ({ ...prev, loading: true }));
+      console.log(typeof user?._id)
+      const response = await axios.get(`http://localhost:5000/api/prescriptions/patient/${user?._id}`);
+
+      if (response.data) {
+        setPrescriptions(response.data);
+      }
+      setState(prev => ({ ...prev, loading: false }));
+    } catch (error) {
+      handleError(error, 'Error fetching prescriptions');
+    }
+  }, [user, handleError]);
 
   const fetchHospitals = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true }));
@@ -79,6 +121,33 @@ const PatientDashboard = () => {
       }));
     }
   }, [fetchData]);
+
+  const startListening = () => {
+    if (!('webkitSpeechRecognition' in window)) {
+      alert('Your browser does not support speech recognition.');
+      return;
+    }
+
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.continuous = false;
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+
+    recognition.onstart = () => setIsListening(true);
+
+    recognition.onresult = (event) => {
+      const speechResult = event.results[0][0].transcript;
+      setMessageText(speechResult)
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+    };
+
+    recognition.onend = () => setIsListening(false);
+
+    recognition.start();
+  };
 
   const fetchDoctors = useCallback(async (hospitalId) => {
     setState(prev => ({ ...prev, loading: true }));
@@ -106,14 +175,62 @@ const PatientDashboard = () => {
     }));
   }, [fetchData]);
 
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const getFilteredHospitals = useCallback(() => {
+    if (!searchTerm.trim()) return state.hospitals;
+
+    return state.hospitals.filter(hospital =>
+      // console.log(hospital)
+      hospital.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      hospital.location.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [state.hospitals, searchTerm]);
+
+  const getFilteredDoctors = useCallback(() => {
+    if (!searchTerm.trim()) return state.doctors;
+
+    return state.doctors.filter(doctor =>
+      doctor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doctor.specialization?.join(', ').toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [state.doctors, searchTerm]);
+
+  const getFilteredAppointments = useCallback(() => {
+    if (!searchTerm.trim()) return state.appointments;
+
+    return state.appointments.filter(appointment =>
+      appointment.doctor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.specialty.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.date.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [state.appointments, searchTerm]);
+
+  const getFilteredPrescriptions = useCallback(() => {
+    if (!searchTerm.trim()) return prescriptions;
+
+    return prescriptions.filter(prescription =>
+      prescription.medicationName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prescription.doctorName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prescription.status.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [prescriptions, searchTerm]);
+
   const fetchAppointments = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true }));
-    const data = await fetchData('http://localhost:5000/api/appointment', 'appointments');
+    const data = await axios.get('http://localhost:5000/api/appointment')
+    // console.log(data.data)
 
-    if (data) {
-      const filteredAppointments = data.filter(appointment =>
+    if (data.data) {
+      // console.log("Current User ID:", user?._id);
+      const filteredAppointments = data.data.filter(appointment =>
         appointment.patientId === user?._id
       );
+
+      // console.log(filteredAppointments)
 
       // Format appointments for UI presentation
       const formattedAppointments = filteredAppointments.map(appointment => ({
@@ -161,13 +278,36 @@ const PatientDashboard = () => {
   const handleBookAppointment = (doctorId) => {
     navigate(`/patient/appointment/${doctorId}`);
   };
+  const handleMessageDoctor = (doctorId) => {
+    setMessageDoctorId(doctorId);
+    setShowMessageBox(true);
+  };
+
+  const requestRefill = async (prescriptionId) => {
+    try {
+      setState(prev => ({ ...prev, loading: true }));
+      await axios.post(`http://localhost:5000/api/prescriptions/refill-request`, {
+        prescriptionId,
+        patientId: user._id
+      });
+
+      toast.success("Refill request sent successfully!");
+      setState(prev => ({ ...prev, loading: false }));
+      // Refresh prescriptions to update UI
+      fetchPrescriptions();
+    } catch (error) {
+      toast.error("Failed to request refill");
+      handleError(error, 'Error requesting refill');
+    }
+  };
 
   useEffect(() => {
     if (user) {
       fetchHospitals();
       fetchAppointments();
+      fetchPrescriptions();
     }
-  }, [fetchHospitals, fetchAppointments, user]);
+  }, [fetchHospitals, fetchAppointments, fetchPrescriptions, user]);
 
   // Helper function to render trend icon
   const renderTrendIcon = (trend) => {
@@ -184,6 +324,12 @@ const PatientDashboard = () => {
       return renderAppointmentsContent();
     } else if (activeTab === 'hospitals') {
       return renderHospitalsContent();
+    } else if (activeTab === 'medications') {
+      return renderMedicationsContent();
+    } else if (activeTab === 'review') {
+      return renderReview();
+    } else if (activeTab === 'messages') {
+      return renderMessages();
     } else {
       return (
         <div className="bg-white rounded-lg shadow p-6">
@@ -194,10 +340,232 @@ const PatientDashboard = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/messages/`);
+        const filteredMessages = res.data.filter(
+          message => message.patientId?.toString() === user._id?.toString()
+        );
+        setMessages(filteredMessages);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      } finally {
+        setLoadingMessages(false);
+      }
+    };
+
+    if (user?._id) fetchMessages();
+  }, [user?._id]);
+
+  const renderMedicationsContent = () => {
+    return (
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold mb-4 text-blue-900">Your Prescriptions</h2>
+
+        {renderSearchIndicator()}
+
+        {state.loading ? (
+          <p>Loading prescriptions...</p>
+        ) : (
+          <div className="divide-y">
+            {prescriptions.length > 0 ? (
+              prescriptions.map(prescription => (
+                <div key={prescription._id} className="py-4">
+                  <div className="flex justify-between mb-2">
+                    <h3 className="font-medium">{prescription.medication}</h3>
+                    <span className={`text-sm px-2 py-1 rounded-full ${prescription.status === 'Active'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                      {prescription.status}
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm">Doctor: {prescription.doctorName}</p>
+                  <p className="text-gray-600 text-sm">Dosage: {prescription.dosage} - {prescription.frequency}</p>
+                  <p className="text-gray-600 text-sm">Instructions: {prescription.instructions}</p>
+                  <div className="flex items-center mt-2 text-sm text-gray-500">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    Prescribed: {new Date(prescription.prescribedDate).toLocaleDateString()}
+                    <Clock className="h-4 w-4 ml-3 mr-1" />
+                    Expires: {new Date(prescription.expiryDate).toLocaleDateString()}
+                  </div>
+                  <div className="mt-2 flex gap-2">
+                    {prescription.status === 'Active' && (
+                      <button
+                        onClick={() => requestRefill(prescription._id)}
+                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+                        disabled={prescription.refillRequestPending}
+                      >
+                        {prescription.refillRequestPending ? 'Refill Pending' : 'Request Refill'}
+                      </button>
+                    )}
+                    <button
+                      className="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded-md hover:bg-gray-300"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="py-4 text-gray-600">
+                {searchTerm
+                  ? `No prescriptions found matching "${searchTerm}".`
+                  : 'No active prescriptions found.'}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderMessages = () => {
+    return (
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold mb-4 text-blue-900">Your Messages</h2>
+
+        {loadingMessages ? (
+          <p>Loading messages...</p>
+        ) : messages.length === 0 ? (
+          <p className="text-gray-600">
+            No messages yet. You can message your doctor from the hospitals tab.
+          </p>
+        ) : (
+          <div className="space-y-4 max-h-[500px] overflow-y-auto">
+            {messages.map((msg, index) => (
+              <div
+                key={msg._id || index}
+                className={`p-4 border rounded-md ${msg.from === 'patient' ? 'bg-blue-50' : 'bg-green-50'}`}
+              >
+                <div className="flex justify-between items-center mb-1">
+                  <h4 className="font-semibold text-gray-800">
+                    {msg.from === 'patient' ? 'You' : `Dr. ${msg.doctorName || 'Doctor'}`}
+                  </h4>
+                  <span className="text-sm text-gray-500">
+                    {new Date(msg.timestamp).toLocaleString()}
+                  </span>
+                </div>
+                <p className="text-gray-700">{msg.message}</p>
+                <p className="text-gray-700">Reply : {msg.reply}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderReview = () => {
+    const handleReviewChange = (e) => {
+      const { name, value } = e.target;
+      setReviewForm(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleReviewSubmit = async (e) => {
+      e.preventDefault();
+      setSubmitting(true);
+      try {
+        const res = await axios.post("http://localhost:5000/api/patient/review", reviewForm);
+        if (res.status === 200 || res.status === 201) {
+          setReviewForm({ name: '', role: '', quote: '' });
+          setState(prev => ({
+            ...prev,
+            testimonials: [...(prev.testimonials || []), reviewForm]
+          }));
+          toast.success("Review Submitted Successfully");
+        }
+      } catch (error) {
+        toast.warning("Error submitting review:", error);
+      } finally {
+        setSubmitting(false);
+      }
+    };
+
+    return (
+      <div className="bg-white rounded-lg shadow p-6 space-y-8">
+        <h2 className="text-xl font-bold text-blue-900">Share Your Experience</h2>
+        <form onSubmit={handleReviewSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+            <input
+              type="text"
+              name="name"
+              value={reviewForm.name}
+              onChange={handleReviewChange}
+              required
+              placeholder="Enter your name"
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Your Role</label>
+            <input
+              type="text"
+              name="role"
+              value={reviewForm.role}
+              onChange={handleReviewChange}
+              required
+              placeholder="Patient / Doctor / Administrator"
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Your Review</label>
+            <textarea
+              name="quote"
+              value={reviewForm.quote}
+              onChange={handleReviewChange}
+              required
+              rows="4"
+              placeholder="Share your experience..."
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+          >
+            {submitting ? 'Submitting...' : 'Submit Review'}
+          </button>
+        </form>
+
+        {/* Testimonials Display */}
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">What others say</h3>
+          {state.testimonials && state.testimonials.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {state.testimonials.map((testimonial, index) => (
+                <div
+                  key={testimonial._id || index}
+                  className="border rounded-lg p-4 hover:shadow-md bg-gray-50 transition duration-300"
+                >
+                  <p className="text-gray-700 italic mb-4">"{testimonial.quote}"</p>
+                  <div className="text-right">
+                    <h4 className="font-semibold text-blue-700">{testimonial.name}</h4>
+                    <p className="text-sm text-gray-600">{testimonial.role}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-600">No reviews available yet. Be the first to share!</p>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const renderHospitalsContent = () => {
     return (
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-bold mb-4">Hospitals</h2>
+        {renderSearchIndicator()}
 
         {state.selectedHospital ? (
           <div>
@@ -216,29 +584,112 @@ const PatientDashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {state.doctors.length > 0 ? (
-                state.doctors.map((doctor, index) => (
+              {getFilteredDoctors().length > 0 ? (
+                getFilteredDoctors().map((doctor, index) => (
                   <div key={doctor._id || index} className="bg-white border rounded-lg p-4 hover:shadow-md">
                     <h4 className="font-bold">{doctor.name || 'Unknown Doctor'}</h4>
                     <p className="text-gray-600">Specialization: {doctor.specialization?.join(', ') || 'N/A'}</p>
                     <p className="text-gray-600">Experience: {doctor.experience || 'N/A'} years</p>
-                    <button
-                      onClick={() => handleBookAppointment(doctor._id)}
-                      className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                    >
-                      Book Appointment
-                    </button>
+                    <div className="flex" style={{ display: 'flex', flexDirection: 'row', gap: '5%' }}>
+                      <button
+                        onClick={() => handleBookAppointment(doctor._id)}
+                        className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      >
+                        Book Appointment
+                      </button>
+
+                      {/* Only show message button if doctor ID exists in patient's data */}
+                      {user.doctors && user.doctors.includes(doctor._id) && (
+                        <button
+                          onClick={() => setShowMessageBox(true)}
+                          className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        >
+                          Send Message
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Message box should only appear if the condition is true and showMessageBox is true */}
+                    {showMessageBox && user.doctors && user.doctors.includes(doctor._id) && (
+                      <div className="mt-6 p-4 border rounded-lg bg-gray-50">
+                        <h3 className="text-lg font-semibold text-blue-900 mb-2">Message Dr.{doctor.name}</h3>
+                        <textarea
+                          value={messageText}
+                          onChange={(e) => setMessageText(e.target.value)}
+                          placeholder={isListening ? "Listening....." : "Write your questions here...."}
+                          className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 resize-none"
+                          rows={4}
+                        />
+                        <div className="mt-2 flex gap-2">
+                          <button
+                            onClick={startListening}
+                            className='px-3 py-1 bg-white-600 text-white rounded-md hover:bg-blue-600'>
+                            🎙️
+                          </button>
+                          <button
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            onClick={async () => {
+                              try {
+                                await axios.post("http://localhost:5000/api/messages", {
+                                  doctorId: doctor._id,
+                                  patientId: user._id,
+                                  message: messageText,
+                                  doctorName: doctor.name,
+                                  patientName: user.name
+                                }, {
+                                  headers: {
+                                    'Content-Type': 'application/json'
+                                  }
+                                });
+
+                                toast.success("Message sent successfully!");
+                                setShowMessageBox(false);
+                                setMessageText('');
+                                const fetchMessages = async () => {
+                                  try {
+                                    const res = await axios.get(`http://localhost:5000/api/messages/`);
+                                    const filteredMessages = res.data.filter(
+                                      message => message.patientId?.toString() === user._id?.toString()
+                                    );
+                                    setMessages(filteredMessages);
+
+                                  } catch (error) {
+                                    console.error("Error fetching messages:", error);
+                                  } finally {
+                                    setLoadingMessages(false);
+                                  }
+                                };
+                                fetchMessages()
+                              } catch (error) {
+                                toast.error(`${error}`);
+                              }
+                            }}
+                          >
+                            Send Message
+                          </button>
+                          <button
+                            className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+                            onClick={() => {
+                              setShowMessageBox(false);
+                              setMessageText('');
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))
               ) : (
-                <p>No doctors available at this hospital.</p>
+                <p>No doctors found matching "{searchTerm}".</p>
               )}
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {state.hospitals.length > 0 ? (
-              state.hospitals.map((hospital, index) => (
+            {getFilteredHospitals().length > 0 ? (
+              getFilteredHospitals().map((hospital, index) => (
                 <div
                   key={hospital._id || index}
                   className="bg-white border rounded-lg p-4 cursor-pointer hover:shadow-md"
@@ -250,7 +701,7 @@ const PatientDashboard = () => {
                 </div>
               ))
             ) : (
-              <p>No hospitals found.</p>
+              <p>No hospitals found matching "{searchTerm}".</p>
             )}
           </div>
         )}
@@ -271,18 +722,20 @@ const PatientDashboard = () => {
           </button>
         </div>
 
+        {renderSearchIndicator()}
+
         {state.loading ? (
           <p>Loading appointments...</p>
         ) : (
           <div className="divide-y">
-            {state.appointments.length > 0 ? (
-              state.appointments.map(appointment => (
+            {getFilteredAppointments().length > 0 ? (
+              getFilteredAppointments().map(appointment => (
                 <div key={appointment.id} className="py-4">
                   <div className="flex justify-between mb-2">
                     <h3 className="font-medium">{appointment.doctor}</h3>
                     <span className={`text-sm px-2 py-1 rounded-full ${appointment.status === 'Confirmed'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-yellow-100 text-yellow-800'
                       }`}>
                       {appointment.status}
                     </span>
@@ -304,7 +757,9 @@ const PatientDashboard = () => {
                 </div>
               ))
             ) : (
-              <p className="py-4 text-gray-600">No appointments scheduled. Book your first appointment now!</p>
+              <p className="py-4 text-gray-600">
+                {searchTerm ? `No appointments found matching "${searchTerm}".` : 'No appointments scheduled. Book your first appointment now!'}
+              </p>
             )}
           </div>
         )}
@@ -339,6 +794,8 @@ const PatientDashboard = () => {
           </div>
         </div>
 
+        {renderSearchIndicator()}
+
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <button
@@ -352,7 +809,9 @@ const PatientDashboard = () => {
             <ChevronRight className="h-5 w-5 text-gray-400" />
           </button>
 
-          <button className="flex items-center justify-between p-4 rounded-lg shadow-sm bg-green-50 hover:shadow-md transition-shadow">
+          <button
+            onClick={() => setActiveTab('messages')}
+            className="flex items-center justify-between p-4 rounded-lg shadow-sm bg-green-50 hover:shadow-md transition-shadow">
             <div className="flex items-center">
               <MessageSquare className="h-5 w-5 text-green-600" />
               <span className="ml-3 font-medium">Message Doctor</span>
@@ -360,18 +819,18 @@ const PatientDashboard = () => {
             <ChevronRight className="h-5 w-5 text-gray-400" />
           </button>
 
-          <button className="flex items-center justify-between p-4 rounded-lg shadow-sm bg-purple-50 hover:shadow-md transition-shadow">
+          {/* <button className="flex items-center justify-between p-4 rounded-lg shadow-sm bg-purple-50 hover:shadow-md transition-shadow">
             <div className="flex items-center">
               <Pill className="h-5 w-5 text-purple-600" />
               <span className="ml-3 font-medium">Request Refill</span>
             </div>
             <ChevronRight className="h-5 w-5 text-gray-400" />
-          </button>
+          </button> */}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Appointments Card */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden lg:col-span-2">
+          <div className="bg-white rounded-lg shadow-md overflow-hidden lg:col-span-4">
             <div className="flex items-center justify-between border-b p-4">
               <h2 className="font-bold text-lg text-blue-900">Upcoming Appointments</h2>
               <button
@@ -384,14 +843,14 @@ const PatientDashboard = () => {
             <div className="divide-y">
               {state.loading ? (
                 <div className="p-4">Loading appointments...</div>
-              ) : state.appointments.length > 0 ? (
-                state.appointments.slice(0, 2).map(appointment => (
+              ) : getFilteredAppointments().length > 0 ? (
+                getFilteredAppointments().slice(0, 2).map(appointment => (
                   <div key={appointment.id} className="p-4 hover:bg-gray-50">
                     <div className="flex justify-between mb-2">
                       <h3 className="font-medium">{appointment.doctor}</h3>
                       <span className={`text-sm px-2 py-1 rounded-full ${appointment.status === 'Confirmed'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
                         }`}>
                         {appointment.status}
                       </span>
@@ -407,20 +866,26 @@ const PatientDashboard = () => {
                 ))
               ) : (
                 <div className="p-4">
-                  <p>No upcoming appointments.</p>
-                  <button
-                    onClick={() => setActiveTab('hospitals')}
-                    className="mt-2 text-blue-600 text-sm hover:underline"
-                  >
-                    Book your first appointment
-                  </button>
+                  {searchTerm ? (
+                    <p>No appointments found matching "{searchTerm}".</p>
+                  ) : (
+                    <>
+                      <p>No upcoming appointments.</p>
+                      <button
+                        onClick={() => setActiveTab('hospitals')}
+                        className="mt-2 text-blue-600 text-sm hover:underline"
+                      >
+                        Book your first appointment
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
             </div>
           </div>
 
           {/* Notifications Card */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          {/* <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="flex items-center justify-between border-b p-4">
               <h2 className="font-bold text-lg text-blue-900">Notifications</h2>
               <button className="text-blue-600 text-sm hover:underline">Mark All Read</button>
@@ -441,10 +906,10 @@ const PatientDashboard = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mt-6">
           {/* Medications Card */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="flex items-center justify-between border-b p-4">
@@ -457,27 +922,33 @@ const PatientDashboard = () => {
               </button>
             </div>
             <div className="divide-y">
-              {state.medications.map(medication => (
-                <div key={medication.id} className="p-4 hover:bg-gray-50">
-                  <div className="flex justify-between">
-                    <h3 className="font-medium">{medication.name}</h3>
-                    <span className={`text-sm ${medication.remaining < 10 ? 'text-red-600' : 'text-gray-500'
-                      }`}>
-                      {medication.remaining} days left
-                    </span>
+              {prescriptions.length > 0 ? (
+                prescriptions.slice(0, 3).map(prescription => (
+                  <div key={prescription._id} className="p-4 hover:bg-gray-50">
+                    <div className="flex justify-between">
+                      <h3 className="font-medium">{prescription.medication}</h3>
+                      <span className={`text-sm ${prescription.refillsRemaining < 2 ? 'text-red-600' : 'text-gray-500'}`}>
+                        {prescription.refillsRemaining} refills left
+                      </span>
+                    </div>
+                    <p className="text-gray-600 text-sm">{prescription.dosage} - {prescription.frequency}</p>
+                    <div className="mt-2 flex justify-between">
+                      <button className="text-sm text-blue-600 hover:underline">Instructions</button>
+                      <button className="text-sm text-blue-600 hover:underline"
+                        onClick={() => requestRefill(prescription._id)}>Request Refill</button>
+                    </div>
                   </div>
-                  <p className="text-gray-600 text-sm">{medication.dosage} - {medication.frequency}</p>
-                  <div className="mt-2 flex justify-between">
-                    <button className="text-sm text-blue-600 hover:underline">Instructions</button>
-                    <button className="text-sm text-blue-600 hover:underline">Request Refill</button>
-                  </div>
+                ))
+              ) : (
+                <div className="p-4 text-center text-gray-500">
+                  {state.loading ? "Loading prescriptions..." : "No active prescriptions found."}
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
           {/* Health Metrics Card */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          {/* <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="flex items-center justify-between border-b p-4">
               <h2 className="font-bold text-lg text-blue-900">Health Metrics</h2>
               <button className="text-blue-600 text-sm hover:underline">View Details</button>
@@ -498,10 +969,10 @@ const PatientDashboard = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Recent Activity Card */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          {/* <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="flex items-center justify-between border-b p-4">
               <h2 className="font-bold text-lg text-blue-900">Recent Activity</h2>
               <button className="text-blue-600 text-sm hover:underline">View All</button>
@@ -517,9 +988,27 @@ const PatientDashboard = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
       </>
+    );
+  };
+
+  const renderSearchIndicator = () => {
+    if (!searchTerm) return null;
+
+    return (
+      <div className="bg-blue-50 rounded-lg p-2 mb-4 flex items-center justify-between">
+        <span className="text-blue-700">
+          Showing results for: <strong>{searchTerm}</strong>
+        </span>
+        <button
+          onClick={() => setSearchTerm('')}
+          className="text-blue-600 hover:text-blue-800"
+        >
+          Clear
+        </button>
+      </div>
     );
   };
 
@@ -533,24 +1022,35 @@ const PatientDashboard = () => {
             <span className="ml-2 text-xl font-bold text-blue-900">MediConnect</span>
           </div>
 
+          {/* Replace the existing search input with this */}
           <div className="hidden md:flex items-center flex-1 max-w-lg mx-8">
             <div className="relative w-full">
               <input
                 type="text"
                 className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Search..."
+                placeholder="Search doctors, hospitals, locations..."
+                value={searchTerm}
+                onChange={handleSearch}
               />
               <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              )}
             </div>
           </div>
 
           <div className="flex items-center space-x-4">
-            <button className="relative">
+            {/* <button className="relative">
               <Bell className="h-6 w-6 text-gray-600" />
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
                 {state.notifications.length}
               </span>
-            </button>
+            </button> */}
             <button
               onClick={() => navigate('/patient/profile')}
               className="h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center"
@@ -577,14 +1077,15 @@ const PatientDashboard = () => {
                   { id: 'hospitals', label: 'Hospitals', icon: <FileText className="h-5 w-5" /> },
                   { id: 'medications', label: 'Medications', icon: <Pill className="h-5 w-5" /> },
                   { id: 'messages', label: 'Messages', icon: <MessageSquare className="h-5 w-5" /> },
-                  { id: 'profile', label: 'My Profile', icon: <User className="h-5 w-5" /> }
+                  { id: 'review', label: 'Review', icon: <LucideMessageSquareQuote className='h-5 w-5' /> },
+                  // { id: 'profile', label: 'My Profile', icon: <User className="h-5 w-5" /> }
                 ].map(item => (
                   <li key={item.id}>
                     <button
                       onClick={() => setActiveTab(item.id)}
                       className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors ${activeTab === item.id
-                          ? 'bg-blue-50 text-blue-600'
-                          : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-blue-50 text-blue-600'
+                        : 'text-gray-600 hover:bg-gray-100'
                         }`}
                     >
                       {item.icon}

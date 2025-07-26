@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const session = require('express-session');
 const nodemailer = require('nodemailer');
+const Razorpay = require('razorpay');
+const { sendMail } = require('../../controllers/sendMail');
 
 const router = express.Router();
 
@@ -50,6 +52,7 @@ router.post('/signup', async (req, res) => {
 
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
+    const otp = Math.floor(100000 + Math.random() * 900000);
     // const otp = sessionStorage.getItem('otp')
     // // Create a transporter using Gmail
     // const transporter = nodemailer.createTransport({
@@ -70,6 +73,7 @@ router.post('/login', async (req, res) => {
     // };
 
     try {
+        const otp = Math.floor(100000 + Math.random() * 900000);
         const patient = await patientModel.findOne({ email });
         if (!patient) {
             return res.status(404).json({ error: 'No record exists' });
@@ -79,7 +83,7 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'The password is incorrect' });
         }
         const token = jwt.sign({ email: patient.email }, "jwt-secret-key", { expiresIn: '1h' });
-
+        sendMail(email, "Welcome to MediConnect", `This is your OTP for login ${otp}.It will expire in 1 Hour\nThank You.\n\n\nTeam MediConnect`)
         // Send the email
         // await transporter.sendMail(mailOptions, (error, info) => {
         //     if (error) {
@@ -88,11 +92,35 @@ router.post('/login', async (req, res) => {
         //     console.log('Email sent:', info.response);
         // });
 
-        return res.status(200).json({ status: 'Success', token, patient });
+        return res.status(200).json({ status: 'Success', token, patient, otp });
     } catch (err) {
         console.log('Login error:', err);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+router.get('/getKey', async (req, res) => {
+    res.status(200).json({ key: process.env.RAZORPAY_KEY_ID })
+})
+router.post('/create-order', async (req, res) => {
+    const razorpay = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_SECRET_ID,
+    });
+    try {
+        const options = {
+            amount: req.body.amount * 100,
+            currency: "INR",
+            receipt: `receipt_${Date.now()}`,
+            payment_capture: 1,
+        };
+
+        const order = await razorpay.orders.create(options);
+        res.json({ success: true, order });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+})
+
 
 module.exports = router;

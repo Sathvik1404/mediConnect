@@ -26,7 +26,7 @@ const AppointmentShema = mongoose.Schema({
     doctorName: {
         type: String
     },
-    hospitalName: {
+    hospitalId: {
         type: String
     }
 });
